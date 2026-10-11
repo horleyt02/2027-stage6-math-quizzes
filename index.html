@@ -1,1 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stage 6 Mathematics Revision Quizzes - 2027 HSC Cohort</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .gradient-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col">
 
+    <!-- Top Header Banner -->
+    <header class="gradient-header text-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-8 text-center sm:text-left sm:flex sm:items-center sm:justify-between">
+            <div>
+                <span class="inline-block bg-blue-500/30 text-blue-100 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
+                    NESA Curriculum Support
+                </span>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                    Stage 6 Mathematics Revision Quizzes
+                </h1>
+                <p class="text-blue-100 mt-1 font-medium text-sm sm:text-base">
+                    2027 HSC Cohort
+                </p>
+            </div>
+            <div class="mt-4 sm:mt-0 flex justify-center gap-2">
+                <button onclick="toggleTeacherMode()" class="bg-white/10 hover:bg-white/20 text-xs px-3 py-2 rounded-lg transition-colors flex items-center gap-1.5 border border-white/20">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    <span id="teacher-mode-btn-text">Teacher Edit Mode</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8">
+        
+        <!-- Breadcrumb Navigation -->
+        <nav id="breadcrumb" class="mb-6 hidden text-sm font-medium text-slate-500">
+            <ol class="flex flex-wrap items-center gap-2">
+                <li>
+                    <button onclick="navigateTo('main')" class="hover:text-blue-600 transition-colors flex items-center gap-1">
+                        <i data-lucide="home" class="w-4 h-4"></i> Home
+                    </button>
+                </li>
+                <li id="bc-term-item" class="hidden flex items-center gap-2">
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+                    <button id="bc-term-btn" onclick="navigateTo('term4')" class="hover:text-blue-600 transition-colors">2026 Term 4</button>
+                </li>
+                <li id="bc-course-item" class="hidden flex items-center gap-2">
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+                    <span id="bc-course-title" class="text-slate-900 font-semibold">Course</span>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Notification Banner for Inactive Terms -->
+        <div id="notice-banner" class="hidden mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3 shadow-sm">
+            <i data-lucide="alert-circle" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+            <div>
+                <h4 class="font-semibold text-amber-900" id="notice-title">Page Not Active Yet</h4>
+                <p class="text-sm text-amber-800 mt-0.5" id="notice-message">These quiz pages are currently under development and will become available closer to term commencement.</p>
+            </div>
+            <button onclick="closeNotice()" class="ml-auto text-amber-500 hover:text-amber-700">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <!-- VIEW 1: MAIN TERM SELECTION -->
+        <div id="view-main" class="space-y-8">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 text-center">
+                <h2 class="text-2xl font-bold text-slate-900 mb-2">Select Revision Period</h2>
+                <p class="text-slate-600 max-w-xl mx-auto mb-8">
+                    Choose your current term to access weekly Google Form revision quizzes and solution guides.
+                </p>
+
+                <!-- Term Buttons Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- 2026 Term 4 Button (Active) -->
+                    <button onclick="navigateTo('term4')" class="group relative p-6 bg-gradient-to-br from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 text-left flex flex-col justify-between">
+                        <div class="flex items-center justify-between w-full mb-4">
+                            <span class="bg-blue-400/30 text-blue-100 text-xs font-semibold px-2.5 py-1 rounded-md">ACTIVE NOW</span>
+                            <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold">2026 Term 4</h3>
+                            <p class="text-blue-100 text-xs mt-1">Preliminary Revision Quizzes</p>
+                        </div>
+                    </button>
+
+                    <!-- 2027 Term 1 Button (Inactive) -->
+                    <button onclick="showInactiveNotice('2027 Term 1')" class="group relative p-6 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl border border-slate-200 transition-all text-left flex flex-col justify-between">
+                        <div class="flex items-center justify-between w-full mb-4">
+                            <span class="bg-slate-200 text-slate-600 text-xs font-medium px-2.5 py-1 rounded-md">UPCOMING</span>
+                            <i data-lucide="lock" class="w-4 h-4 text-slate-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">2027 Term 1</h3>
+                            <p class="text-slate-500 text-xs mt-1">HSC Course Content</p>
+                        </div>
+                    </button>
+
+                    <!-- 2027 Term 2 Button (Inactive) -->
+                    <button onclick="showInactiveNotice('2027 Term 2')" class="group relative p-6 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl border border-slate-200 transition-all text-left flex flex-col justify-between">
+                        <div class="flex items-center justify-between w-full mb-4">
+                            <span class="bg-slate-200 text-slate-600 text-xs font-medium px-2.5 py-1 rounded-md">UPCOMING</span>
+                            <i data-lucide="lock" class="w-4 h-4 text-slate-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">2027 Term 2</h3>
+                            <p class="text-slate-500 text-xs mt-1">HSC Course Content</p>
+                        </div>
+                    </button>
+
+                    <!-- 2027 Term 3 Button (Inactive) -->
+                    <button onclick="showInactiveNotice('2027 Term 3')" class="group relative p-6 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl border border-slate-200 transition-all text-left flex flex-col justify-between">
+                        <div class="flex items-center justify-between w-full mb-4">
+                            <span class="bg-slate-200 text-slate-600 text-xs font-medium px-2.5 py-1 rounded-md">UPCOMING</span>
+                            <i data-lucide="lock" class="w-4 h-4 text-slate-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">2027 Term 3</h3>
+                            <p class="text-slate-500 text-xs mt-1">HSC Course Content</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: 2026 TERM 4 COURSE SELECTION -->
+        <div id="view-term4" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+                <div class="border-b border-slate-100 pb-4 mb-6">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">2026 Term 4</h2>
+                    <p class="text-slate-600 mt-1 font-medium">Select your Mathematics course to access relevant preliminary content revision quizzes.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i data-lucide="book-open" class="w-5 h-5 text-blue-600"></i>
+                        What's your course?
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        
+                        <!-- Standard 1 or 2 Card -->
+                        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-lg">Standard 1 or 2</h4>
+                                <p class="text-sm text-slate-600 mt-1">If you are studying Standard 1 or Standard 2 Mathematics:</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-200/60">
+                                <button onclick="navigateToCourse('standard')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm">
+                                    <span>Click Here for Standard Preliminary Content</span>
+                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Card -->
+                        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-lg">Advanced</h4>
+                                <p class="text-sm text-slate-600 mt-1">If you are studying Advanced Mathematics:</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-200/60">
+                                <button onclick="navigateToCourse('advanced')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm">
+                                    <span>Click Here for Advanced Preliminary Content</span>
+                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Extension 1 Card -->
+                        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-lg">Extension 1</h4>
+                                <p class="text-sm text-slate-600 mt-1">If you are studying Extension 1 Mathematics, complete both components:</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-200/60 flex flex-col sm:flex-row gap-2">
+                                <button onclick="navigateToCourse('advanced')" class="flex-1 bg-slate-700 hover:bg-slate-800 text-white font-medium py-2 px-3 rounded-lg text-sm transition-colors flex items-center justify-center gap-1">
+                                    <span>Advanced</span>
+                                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button onclick="navigateToCourse('extension1')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-3 rounded-lg text-sm transition-colors flex items-center justify-center gap-1">
+                                    <span>Extension 1</span>
+                                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Extension 2 Card -->
+                        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-lg">Extension 2</h4>
+                                <p class="text-sm text-slate-600 mt-1">If you are studying Extension 2 Mathematics, complete both components:</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-200/60 flex flex-col sm:flex-row gap-2">
+                                <button onclick="navigateToCourse('advanced')" class="flex-1 bg-slate-700 hover:bg-slate-800 text-white font-medium py-2 px-3 rounded-lg text-sm transition-colors flex items-center justify-center gap-1">
+                                    <span>Advanced</span>
+                                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button onclick="navigateToCourse('extension1')" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-3 rounded-lg text-sm transition-colors flex items-center justify-center gap-1">
+                                    <span>Extension 1</span>
+                                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: COURSE QUIZ CONTENT PAGE -->
+        <div id="view-course" class="hidden space-y-6">
+            
+            <!-- Course Heading Banner -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6 mb-6">
+                    <div>
+                        <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">2026 Term 4</span>
+                        <h2 id="course-title-heading" class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+                            Course Content Title
+                        </h2>
+                    </div>
+                    <button onclick="navigateTo('term4')" class="self-start sm:self-center text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-3 rounded-lg transition-colors flex items-center gap-1">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Courses
+                    </button>
+                </div>
+
+                <!-- Instructions Card (From handwritten photo) -->
+                <div class="bg-blue-50/70 rounded-xl p-5 border border-blue-100 text-slate-800 space-y-2">
+                    <h3 class="font-bold text-blue-900 flex items-center gap-2 text-base">
+                        <i data-lucide="info" class="w-5 h-5 text-blue-600"></i> Instructions & Guidelines:
+                    </h3>
+                    <ul class="space-y-1.5 text-sm pl-6 list-disc text-slate-700">
+                        <li>You will complete <strong>2 revision quizzes</strong> per week.</li>
+                        <li>Each quiz has <strong>5 multiple choice questions</strong>.</li>
+                        <li>You have <strong>7-8 minutes</strong> to complete them.</li>
+                        <li>You can use a <strong>NESA approved calculator</strong> and the reference sheet.</li>
+                        <li>Once you submit the quiz you will be able to view the <strong>worked solutions</strong>.</li>
+                    </ul>
+                    <p class="font-semibold text-blue-800 text-sm pt-2">Good luck! 🚀</p>
+                </div>
+            </div>
+
+            <!-- Teacher Quick Add / Edit Notice -->
+            <div id="teacher-panel" class="hidden bg-slate-900 text-white rounded-xl p-4 shadow-md">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-bold text-amber-400 flex items-center gap-2 text-sm">
+                        <i data-lucide="edit-3" class="w-4 h-4"></i> Teacher Quick Link Manager
+                    </h4>
+                    <span class="text-xs text-slate-400">Edits save locally to browser</span>
+                </div>
+                <p class="text-xs text-slate-300 mb-3">
+                    Paste your Google Form links for the active course below. Changes are saved instantly!
+                </p>
+                <div id="teacher-inputs-container" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto p-1">
+                    <!-- Dynamic inputs generated in JS -->
+                </div>
+            </div>
+
+            <!-- Weekly Quizzes Schedule Container -->
+            <div id="weeks-container" class="space-y-6">
+                <!-- Dynamically populated weeks and quiz cards -->
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-auto py-6 text-center text-xs text-slate-500">
+        <div class="max-w-6xl mx-auto px-4">
+            <p>© Stage 6 Mathematics - 2027 HSC Cohort Revision Portal</p>
+            <p class="mt-1 text-slate-400">Designed for GitHub Pages distribution</p>
+        </div>
+    </footer>
+
+    <script>
+        // Default structure for quizzes from Term 4 Week 3 to Week 10
+        // Teachers can paste Google Form URLs into the 'url' fields below!
+        const initialQuizData = {
+            standard: {
+                title: "Standard Preliminary Content",
+                weeks: [
+                    { week: 3, quizzes: [{ id: 1, title: "Quiz 1", url: "" }, { id: 2, title: "Quiz 2", url: "" }] },
+                    { week: 4, quizzes: [{ id: 3, title: "Quiz 3", url: "" }, { id: 4, title: "Quiz 4", url: "" }] },
+                    { week: 5, quizzes: [{ id: 5, title: "Quiz 5", url: "" }, { id: 6, title: "Quiz 6", url: "" }] },
+                    { week: 6, quizzes: [{ id: 7, title: "Quiz 7", url: "" }, { id: 8, title: "Quiz 8", url: "" }] },
+                    { week: 7, quizzes: [{ id: 9, title: "Quiz 9", url: "" }, { id: 10, title: "Quiz 10", url: "" }] },
+                    { week: 8, quizzes: [{ id: 11, title: "Quiz 11", url: "" }, { id: 12, title: "Quiz 12", url: "" }] },
+                    { week: 9, quizzes: [{ id: 13, title: "Quiz 13", url: "" }, { id: 14, title: "Quiz 14", url: "" }] },
+                    { week: 10, quizzes: [{ id: 15, title: "Quiz 15", url: "" }, { id: 16, title: "Quiz 16", url: "" }] }
+                ]
+            },
+            advanced: {
+                title: "Advanced Preliminary Content",
+                weeks: [
+                    { week: 3, quizzes: [{ id: 1, title: "Quiz 1", url: "" }, { id: 2, title: "Quiz 2", url: "" }] },
+                    { week: 4, quizzes: [{ id: 3, title: "Quiz 3", url: "" }, { id: 4, title: "Quiz 4", url: "" }] },
+                    { week: 5, quizzes: [{ id: 5, title: "Quiz 5", url: "" }, { id: 6, title: "Quiz 6", url: "" }] },
+                    { week: 6, quizzes: [{ id: 7, title: "Quiz 7", url: "" }, { id: 8, title: "Quiz 8", url: "" }] },
+                    { week: 7, quizzes: [{ id: 9, title: "Quiz 9", url: "" }, { id: 10, title: "Quiz 10", url: "" }] },
+                    { week: 8, quizzes: [{ id: 11, title: "Quiz 11", url: "" }, { id: 12, title: "Quiz 12", url: "" }] },
+                    { week: 9, quizzes: [{ id: 13, title: "Quiz 13", url: "" }, { id: 14, title: "Quiz 14", url: "" }] },
+                    { week: 10, quizzes: [{ id: 15, title: "Quiz 15", url: "" }, { id: 16, title: "Quiz 16", url: "" }] }
+                ]
+            },
+            extension1: {
+                title: "Extension 1 Preliminary Content",
+                weeks: [
+                    { week: 3, quizzes: [{ id: 1, title: "Quiz 1", url: "" }, { id: 2, title: "Quiz 2", url: "" }] },
+                    { week: 4, quizzes: [{ id: 3, title: "Quiz 3", url: "" }, { id: 4, title: "Quiz 4", url: "" }] },
+                    { week: 5, quizzes: [{ id: 5, title: "Quiz 5", url: "" }, { id: 6, title: "Quiz 6", url: "" }] },
+                    { week: 6, quizzes: [{ id: 7, title: "Quiz 7", url: "" }, { id: 8, title: "Quiz 8", url: "" }] },
+                    { week: 7, quizzes: [{ id: 9, title: "Quiz 9", url: "" }, { id: 10, title: "Quiz 10", url: "" }] },
+                    { week: 8, quizzes: [{ id: 11, title: "Quiz 11", url: "" }, { id: 12, title: "Quiz 12", url: "" }] },
+                    { week: 9, quizzes: [{ id: 13, title: "Quiz 13", url: "" }, { id: 14, title: "Quiz 14", url: "" }] },
+                    { week: 10, quizzes: [{ id: 15, title: "Quiz 15", url: "" }, { id: 16, title: "Quiz 16", url: "" }] }
+                ]
+            }
+        };
+
+        // Load data from localStorage or fallback to defaults
+        let quizData = JSON.parse(localStorage.getItem('hsc_math_quiz_data')) || initialQuizData;
+        let currentCourse = null;
+        let isTeacherMode = false;
+
+        // Save current data back to localStorage
+        function saveData() {
+            localStorage.setItem('hsc_math_quiz_data', JSON.stringify(quizData));
+        }
+
+        // Navigation state handler
+        function navigateTo(viewName) {
+            closeNotice();
+            document.getElementById('view-main').classList.add('hidden');
+            document.getElementById('view-term4').classList.add('hidden');
+            document.getElementById('view-course').classList.add('hidden');
+
+            const breadcrumb = document.getElementById('breadcrumb');
+            const bcTermItem = document.getElementById('bc-term-item');
+            const bcCourseItem = document.getElementById('bc-course-item');
+
+            if (viewName === 'main') {
+                document.getElementById('view-main').classList.remove('hidden');
+                breadcrumb.classList.add('hidden');
+            } else if (viewName === 'term4') {
+                document.getElementById('view-term4').classList.remove('hidden');
+                breadcrumb.classList.remove('hidden');
+                bcTermItem.classList.remove('hidden');
+                bcCourseItem.classList.add('hidden');
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            lucide.createIcons();
+        }
+
+        // Show course view
+        function navigateToCourse(courseKey) {
+            closeNotice();
+            currentCourse = courseKey;
+            const courseInfo = quizData[courseKey];
+
+            document.getElementById('view-main').classList.add('hidden');
+            document.getElementById('view-term4').classList.add('hidden');
+            document.getElementById('view-course').classList.remove('hidden');
+
+            // Breadcrumb setup
+            const breadcrumb = document.getElementById('breadcrumb');
+            const bcTermItem = document.getElementById('bc-term-item');
+            const bcCourseItem = document.getElementById('bc-course-item');
+            const bcCourseTitle = document.getElementById('bc-course-title');
+
+            breadcrumb.classList.remove('hidden');
+            bcTermItem.classList.remove('hidden');
+            bcCourseItem.classList.remove('hidden');
+            bcCourseTitle.textContent = courseInfo.title;
+
+            // Header title setup
+            document.getElementById('course-title-heading').textContent = courseInfo.title;
+
+            // Render weekly quizzes schedule
+            renderWeeks();
+            if (isTeacherMode) {
+                renderTeacherInputs();
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            lucide.createIcons();
+        }
+
+        // Render Weeks and Quiz cards
+        function renderWeeks() {
+            const container = document.getElementById('weeks-container');
+            container.innerHTML = '';
+
+            const courseInfo = quizData[currentCourse];
+
+            courseInfo.weeks.forEach(weekObj => {
+                const weekCard = document.createElement('div');
+                weekCard.className = 'bg-white rounded-xl shadow-sm border border-slate-200 p-5 sm:p-6';
+
+                let quizCardsHTML = '';
+
+                weekObj.quizzes.forEach(quiz => {
+                    const hasLink = quiz.url && quiz.url.trim().length > 0;
+                    
+                    if (hasLink) {
+                        quizCardsHTML += `
+                            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition-all">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-xs font-extrabold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">AVAILABLE</span>
+                                        <i data-lucide="check-circle-2" class="w-4 h-4 text-blue-600"></i>
+                                    </div>
+                                    <h5 class="font-bold text-slate-900 text-base">${quiz.title}</h5>
+                                </div>
+                                <div class="mt-4">
+                                    <a href="${quiz.url}" target="_blank" rel="noopener noreferrer" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs py-2 px-3 rounded-md transition-colors flex items-center justify-center gap-1.5 shadow-sm">
+                                        <span>Start Google Form Quiz</span>
+                                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        quizCardsHTML += `
+                            <div class="bg-slate-50 border border-slate-200/80 rounded-lg p-4 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-xs font-semibold text-slate-500 bg-slate-200/70 px-2 py-0.5 rounded">UNRELEASED</span>
+                                        <i data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i>
+                                    </div>
+                                    <h5 class="font-bold text-slate-700 text-base">${quiz.title}</h5>
+                                </div>
+                                <div class="mt-4">
+                                    <button disabled class="w-full bg-slate-200 text-slate-400 font-medium text-xs py-2 px-3 rounded-md cursor-not-allowed flex items-center justify-center gap-1">
+                                        <span>Releases Week ${weekObj.week}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+
+                weekCard.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                        <h4 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                            Term 4: Week ${weekObj.week}
+                        </h4>
+                        <span class="text-xs text-slate-500 font-medium">${weekObj.quizzes.length} Quizzes</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        ${quizCardsHTML}
+                    </div>
+                `;
+
+                container.appendChild(weekCard);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Toggle Teacher Mode for adding URLs
+        function toggleTeacherMode() {
+            isTeacherMode = !isTeacherMode;
+            const btnText = document.getElementById('teacher-mode-btn-text');
+            const panel = document.getElementById('teacher-panel');
+
+            if (isTeacherMode) {
+                btnText.textContent = "Exit Edit Mode";
+                if (panel && currentCourse) panel.classList.remove('hidden');
+                if (currentCourse) renderTeacherInputs();
+            } else {
+                btnText.textContent = "Teacher Edit Mode";
+                if (panel) panel.classList.add('hidden');
+            }
+        }
+
+        // Render teacher link inputs
+        function renderTeacherInputs() {
+            const container = document.getElementById('teacher-inputs-container');
+            const panel = document.getElementById('teacher-panel');
+            panel.classList.remove('hidden');
+            container.innerHTML = '';
+
+            const courseInfo = quizData[currentCourse];
+
+            courseInfo.weeks.forEach(weekObj => {
+                weekObj.quizzes.forEach(quiz => {
+                    const div = document.createElement('div');
+                    div.className = "flex flex-col gap-1 text-xs";
+                    div.innerHTML = `
+                        <label class="text-slate-300 font-medium">Wk ${weekObj.week} - ${quiz.title} Link:</label>
+                        <input type="text" value="${quiz.url || ''}" placeholder="https://forms.google.com/..." 
+                            oninput="updateQuizUrl('${currentCourse}', ${weekObj.week}, ${quiz.id}, this.value)"
+                            class="px-2.5 py-1.5 rounded bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:border-blue-500 font-mono text-xs" />
+                    `;
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        // Update link in data structure
+        function updateQuizUrl(courseKey, weekNum, quizId, newUrl) {
+            const courseInfo = quizData[courseKey];
+            const weekObj = courseInfo.weeks.find(w => w.week === weekNum);
+            if (weekObj) {
+                const quiz = weekObj.quizzes.find(q => q.id === quizId);
+                if (quiz) {
+                    quiz.url = newUrl.trim();
+                    saveData();
+                    renderWeeks();
+                }
+            }
+        }
+
+        // Show banner for inactive terms
+        function showInactiveNotice(termName) {
+            const banner = document.getElementById('notice-banner');
+            const title = document.getElementById('notice-title');
+            const msg = document.getElementById('notice-message');
+
+            title.textContent = `${termName} Content Not Active Yet`;
+            msg.textContent = `The quizzes for ${termName} are currently under development. Please select 2026 Term 4 to access preliminary content quizzes.`;
+            banner.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Close notice banner
+        function closeNotice() {
+            document.getElementById('notice-banner').classList.add('hidden');
+        }
+
+        // Initialize Lucide icons on start
+        window.onload = function() {
+            lucide.createIcons();
+        };
+    </script>
+</body>
+</html>
