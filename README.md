@@ -1,1 +1,1 @@
-# 2027-stage6-math-quizzes
+# 2027-stage6-maths-quizzes
