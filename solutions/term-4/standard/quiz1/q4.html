@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Standard Notation</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .digit-jump-container {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.5rem;
+            letter-spacing: 0.5rem;
+            position: relative;
+            display: inline-block;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-question text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-3 text-gray-800">The thickness of a sheet of clingwrap is \( 0.0267 \text{ mm} \).</p>
+                <p class="font-semibold mb-5 text-gray-800">Express this in standard notation, correct to 2 significant figures.</p>
+                
+                <div class="grid grid-cols-1 gap-4 mt-6" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( 2.7 \times 10^{-2} \text{ mm} \)</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( 2.67 \times 10^{-2} \text{ mm} \)</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( 2.7 \times 10^{-3} \text{ mm} \)</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( 2.67 \times 10^{-3} \text{ mm} \)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1: Definition -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Standard Notation Format</p>
+                        <p>Standard notation (or scientific notation) is written in the form \( A \times 10^n \), where \( 1 \le A < 10 \).</p>
+                        <p class="mt-2 text-gray-700">To convert \( 0.0267 \) into this format, the main number needs to be \( 2.67 \).</p>
+                    </div>
+                    
+                    <!-- Step 2: Converting -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Find the Power of 10</p>
+                        
+                        <div class="flex justify-center my-4">
+                            <svg width="220" height="60" viewBox="0 0 220 60">
+                                <text x="10" y="30" font-family="monospace" font-size="24" font-weight="bold" fill="#1f2937" letter-spacing="10">0.0267</text>
+                                <!-- Jump 1 -->
+                                <path d="M 38 35 Q 52 55 66 35" fill="none" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowhead)"></path>
+                                <!-- Jump 2 -->
+                                <path d="M 66 35 Q 80 55 94 35" fill="none" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowhead)"></path>
+                                
+                                <defs>
+                                    <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto">
+                                        <polygon points="0,0 6,3 0,6" fill="#3b82f6" />
+                                    </marker>
+                                </defs>
+                            </svg>
+                        </div>
+                        
+                        <p>While we often use the shortcut of "moving the decimal point" 2 places to the right, conceptually, what is really happening?</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-2 text-sm text-gray-700">
+                            <li>We are <strong>multiplying</strong> \( 0.0267 \) by \( 100 \) (which is \( 10^2 \)) to shift the digits and get \( 2.67 \).</li>
+                            <li>To keep the overall value equal to the original number, we must balance this by simultaneously <strong>dividing</strong> by \( 100 \) (which is multiplying by \( 10^{-2} \)).</li>
+                        </ul>
+                        
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-3 shadow-sm text-center font-medium">
+                            \( 0.0267 = \mathbf{2.67 \times 10^{-2}} \)
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Rounding -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Round to 2 Significant Figures</p>
+                        <p>We need our answer to 2 significant figures. Looking at \( 2.67 \):</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-1 text-sm text-gray-700">
+                            <li>The first two significant digits are <strong>2</strong> and <strong>6</strong>.</li>
+                            <li>The next digit is <strong>7</strong>.</li>
+                            <li>Because 7 is 5 or greater, we round up the 6 to a 7.</li>
+                        </ul>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-3 shadow-sm text-center font-medium text-lg">
+                            \( 2.67 \text{ rounds to } \mathbf{2.7} \)
+                        </div>
+                        
+                        <p class="font-bold text-green-700 text-xl mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">\( 2.7 \times 10^{-2} \text{ mm} \)</p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option A is correct.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see common mistakes and detailed feedback.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const feedbackData = {
+            'A': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-6">You successfully converted the number to standard notation by calculating a shift of 2 decimal places (\\( 10^{-2} \\)), and you correctly rounded the value to 2 significant figures (\\( 2.67 \\rightarrow 2.7 \\)).</p>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200">
+                            <i class="fas fa-info-circle mr-1"></i> Explore the other options on the left to see common mistakes students make with counting zeroes and rounding!
+                        </p>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4">You successfully converted the number to standard notation, but you forgot to complete the second instruction in the question.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Analysing your answer:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3">
+                            <div class="text-lg">\\( 2.67 \\times 10^{-2} \\)</div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> The question asks for the answer to be correct to <strong>2 significant figures</strong>. Your answer, \\( 2.67 \\), contains 3 significant figures. You must round it to two digits: look at the third digit (7) to round the second digit up.
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4">You correctly rounded to 2 significant figures, but you miscounted the power of 10 when converting to standard notation.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-lg">
+                            <p class="tracking-widest"><strong>0.02</strong>67</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> You arrived at an exponent of \\( 10^{-3} \\) by counting all the zeroes, including the zero <em>before</em> the decimal point. </p>
+                            <p>To write \\( 2.67 \\), the decimal point only needs to jump past the two digits after the decimal point (the \\( 0 \\) and the \\( 2 \\)). Since it shifted 2 places, we divide by 100, which is an exponent of \\( 10^{-2} \\).</p>
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4">You combined two errors here: you miscounted the power of 10 for standard notation, and you forgot to round your answer.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        
+                        <div class="space-y-4 text-sm text-purple-800">
+                            <div class="p-3 bg-purple-50 rounded-lg border border-purple-100">
+                                <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error 1:</strong> You arrived at an exponent of \\( 10^{-3} \\) by counting all the zeroes, including the one <em>before</em> the decimal point. The decimal point only shifts 2 places to turn \\( 0.0267 \\) into \\( 2.67 \\), so it should be \\( 10^{-2} \\).</p>
+                            </div>
+                            <div class="p-3 bg-purple-50 rounded-lg border border-purple-100">
+                                <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error 2:</strong> The question asks for <strong>2 significant figures</strong>. Your answer, \\( 2.67 \\), contains 3 significant figures. You must round the 6 up to a 7.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset styling on all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Add styling to selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show the solution section upon first interaction
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show the feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
