@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Linear Modelling</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .graph-label {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11px;
+            fill: #374151;
+        }
+        .graph-title-y {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12px;
+            fill: #111827;
+            text-anchor: middle;
+            transform-origin: 15px 125px;
+            transform: rotate(-90deg);
+        }
+        .graph-title-x {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 13px;
+            fill: #111827;
+            text-anchor: middle;
+        }
+        .grid-line {
+            stroke: #d1d5db;
+            stroke-width: 1;
+        }
+        .axis-line {
+            stroke: #111827;
+            stroke-width: 1.5;
+        }
+        .plot-line {
+            stroke: #1f2937;
+            stroke-width: 2;
+            fill: none;
+        }
+        .highlight-text {
+            background-color: #fef08a;
+            padding: 0 4px;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #854d0e;
+            border: 1px solid #fde047;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-question text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-4 text-gray-800 leading-relaxed" id="problem-text">
+                    On Sunday, Mickey loads $20 onto a new public transport pass. During the week (Monday to Friday), he takes the bus <span id="to-and-from-span">to and from</span> his friend's house. Each bus ride costs $1.50.<br><br>
+                    Which graph shows the balance on Mickey's public transport pass during the week?
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center relative overflow-hidden" data-value="A">
+                        <div class="absolute top-3 left-3 w-8 h-8 flex-shrink-0 z-10">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <div class="w-full flex justify-center mt-4">
+                            <svg width="250" height="250" viewBox="0 0 250 250">
+                                <!-- Background grid generated via JS for Option A -->
+                                <g id="grid-a"></g>
+                                <text x="15" y="125" class="graph-title-y">Public transport pass balance ($)</text>
+                                <text x="145" y="240" class="graph-title-x">Days</text>
+                                <polyline points="40,10 240,197.5" class="plot-line"></polyline>
+                            </svg>
+                        </div>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center relative overflow-hidden" data-value="B">
+                        <div class="absolute top-3 left-3 w-8 h-8 flex-shrink-0 z-10">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <div class="w-full flex justify-center mt-4">
+                            <svg width="250" height="250" viewBox="0 0 250 250">
+                                <!-- Background grid generated via JS for Option B -->
+                                <g id="grid-b"></g>
+                                <text x="15" y="125" class="graph-title-y">Public transport pass balance ($)</text>
+                                <text x="145" y="240" class="graph-title-x">Days</text>
+                                <polyline points="40,10 240,197.5" class="plot-line"></polyline>
+                            </svg>
+                        </div>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center relative overflow-hidden" data-value="C">
+                        <div class="absolute top-3 left-3 w-8 h-8 flex-shrink-0 z-10">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <div class="w-full flex justify-center mt-4">
+                            <svg width="250" height="250" viewBox="0 0 250 250">
+                                <!-- Background grid generated via JS for Option C -->
+                                <g id="grid-c"></g>
+                                <text x="15" y="125" class="graph-title-y">Public transport pass balance ($)</text>
+                                <text x="145" y="240" class="graph-title-x">Days</text>
+                                <polyline points="40,210 240,22.5" class="plot-line"></polyline>
+                            </svg>
+                        </div>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center relative overflow-hidden" data-value="D">
+                        <div class="absolute top-3 left-3 w-8 h-8 flex-shrink-0 z-10">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <div class="w-full flex justify-center mt-4">
+                            <svg width="250" height="250" viewBox="0 0 250 250">
+                                <!-- Background grid generated via JS for Option D -->
+                                <g id="grid-d"></g>
+                                <text x="15" y="125" class="graph-title-y">Public transport pass balance ($)</text>
+                                <text x="145" y="240" class="graph-title-x">Days</text>
+                                <polyline points="40,210 240,22.5" class="plot-line"></polyline>
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Determine the Direction (Gradient)</p>
+                        <p>Mickey starts with $20 (the \( y \)-intercept). Because he is <em>spending</em> money on bus rides, his balance must decrease over time.</p>
+                        <div class="bg-red-50 p-3 rounded-lg border border-red-100 my-2 text-sm text-red-800">
+                            <i class="fas fa-times-circle mr-1"></i> This means the line must slope downwards. We can immediately eliminate Options C and D.
+                        </div>
+                    </div>
+                    
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Calculate the Daily Cost</p>
+                        <p>The problem states he travels <span class="highlight-text">to and from</span> his friend's house. This means he takes <strong>2 bus rides per day</strong>.</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium">
+                            Daily Cost = 2 rides \( \times \) $1.50 = <strong>$3.00 per day</strong>
+                        </div>
+                        <p class="text-sm text-gray-600 italic">This tells us the gradient (slope) of our line is -3.</p>
+                    </div>
+
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Calculate the Final Balance</p>
+                        <p>Let's calculate his balance at the end of the 5-day week to see which graph matches.</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-2 text-gray-700">
+                            <li><strong>Total spent:</strong> 5 days \( \times \) $3.00/day = <strong>$15.00</strong></li>
+                            <li><strong>Final balance:</strong> $20.00 initial - $15.00 spent = <strong>$5.00</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-4">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 4: Verify the Graph</p>
+                        <p>We are looking for the downward-sloping graph that ends at exactly <strong>$5</strong> on day 5 (coordinate point \( (5, 5) \)).</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-1 text-sm text-gray-700">
+                            <li>Graph A ends at $12.50.</li>
+                            <li>Graph B ends at exactly $5.</li>
+                        </ul>
+                        <p class="font-bold text-green-700 text-xl mt-4 bg-green-100 inline-block px-4 py-2 rounded-lg">Graph B</p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option B is correct.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select a graph on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see common mistakes and detailed feedback.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Function to programmatically generate the graph grids to keep the HTML clean
+        function drawGrid(containerId, startY, endY, stepY, yLabels) {
+            const group = document.getElementById(containerId);
+            let svgContent = '';
+            
+            // Draw x-axis grid lines (Days 0 to 5)
+            // X goes from 40 to 240, step is 40.
+            for (let i = 0; i <= 5; i++) {
+                const x = 40 + (i * 40);
+                svgContent += `<line x1="${x}" y1="10" x2="${x}" y2="210" class="grid-line" />`;
+                svgContent += `<text x="${x}" y="225" class="graph-label" text-anchor="middle">${i}</text>`;
+            }
+
+            // Draw y-axis grid lines (9 lines)
+            for (let i = 0; i < 9; i++) {
+                const y = 10 + (i * 25);
+                svgContent += `<line x1="40" y1="${y}" x2="240" y2="${y}" class="grid-line" />`;
+                
+                // Add labels on the left
+                const labelIndex = 8 - i; // reverse order for y-axis
+                if(yLabels[labelIndex] !== undefined) {
+                    svgContent += `<text x="35" y="${y + 4}" class="graph-label" text-anchor="end">${yLabels[labelIndex]}</text>`;
+                }
+            }
+
+            // Draw main axes with arrows
+            svgContent += `<line x1="30" y1="210" x2="250" y2="210" class="axis-line" />`; // X axis
+            svgContent += `<polygon points="250,210 245,207 245,213" fill="#111827"></polygon>`; // X arrow
+            
+            svgContent += `<line x1="40" y1="220" x2="40" y2="5" class="axis-line" />`; // Y axis
+            svgContent += `<polygon points="40,5 37,10 43,10" fill="#111827"></polygon>`; // Y arrow
+
+            group.innerHTML = svgContent;
+        }
+
+        // Initialize graphs
+        drawGrid('grid-a', 12, 20, 1, [12, 13, 14, 15, 16, 17, 18, 19, 20]);
+        drawGrid('grid-b', 4, 20, 2, [4, 6, 8, 10, 12, 14, 16, 18, 20]);
+        drawGrid('grid-c', 20, 28, 1, [20, 21, 22, 23, 24, 25, 26, 27, 28]);
+        drawGrid('grid-d', 20, 36, 2, [20, 22, 24, 26, 28, 30, 32, 34, 36]);
+
+        // Feedback content mapped to options
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4">You correctly realised that spending money means the balance decreases over time (the line goes down), but you missed a crucial detail in the reading.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Analysing Graph A:</p>
+                        <div class="space-y-3 text-sm text-gray-700">
+                            <p>This graph drops from $20 down to $12.50 over 5 days. That's a total drop of $7.50.</p>
+                            <p>\\[ \\$7.50 \\div 5 \\text{ days} = \\$1.50 \\text{ per day} \\]</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Reading Error:</strong> You only accounted for one bus ride ($1.50) per day. The problem states Mickey takes the bus <strong>"to and from"</strong> his friend's house, which means he takes 2 rides ($3.00) every day.
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-6">You successfully read the prompt, recognising that "to and from" means 2 rides a day, costing $3.00 daily. You also knew that spending money means the balance decreases, leading you straight to the graph that drops $15 over 5 days.</p>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200">
+                            <i class="fas fa-info-circle mr-1"></i> Explore the other options on the left to see the common reading and logic traps embedded in this question.
+                        </p>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4">You made an error with the direction of the gradient, and you missed a detail when reading the question.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Analysing Graph C:</p>
+                        <div class="space-y-3 text-sm text-gray-700">
+                            <p>This graph goes <strong>up</strong> from $20 to $27.50 over 5 days. That's a gain of $1.50 per day.</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> Because Mickey is <em>paying</em> for rides, money is being deducted from his pass. His balance should go down (a negative gradient), not up.</p>
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Reading Error:</strong> You also only accounted for one ride per day. "To and from" means 2 rides per day.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4">You correctly calculated the daily cost of $3.00, but you applied it in the wrong direction.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Analysing Graph D:</p>
+                        <div class="space-y-3 text-sm text-gray-700">
+                            <p>This graph goes <strong>up</strong> from $20 to $35 over 5 days. That's a steady increase of $3.00 per day.</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> You added the cost of the rides to his balance instead of subtracting it. Since Mickey is paying for the bus, the balance on his transport pass must decrease over time. The graph needs a negative gradient.
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 4;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Style feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                // Special interaction: highlight the text in the problem when step 2 is revealed
+                if (currentStep === 2) {
+                    document.getElementById('to-and-from-span').classList.add('highlight-text', 'transition-all', 'duration-500');
+                }
+
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
