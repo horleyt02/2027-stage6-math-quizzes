@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Probability</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Custom button states */
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .math-large {
+            font-size: 1.15rem;
+        }
+        .frac-btn .MathJax {
+            font-size: 1.3em !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-question text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="font-semibold mb-2 text-gray-800 text-xl">A standard deck of playing cards is shuffled and two cards are drawn at random.</p>
+                <p class="font-medium mb-5 text-gray-700">What is the probability that the two cards are different colours?</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="multiple-choice">
+                    <button class="choice-btn frac-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center math-large" data-value="A">
+                        <span class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-4 font-bold text-gray-600 shrink-0">A</span> 
+                        <div class="w-full text-center py-2">\( \frac{13}{51} \)</div>
+                    </button>
+                    <button class="choice-btn frac-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center math-large" data-value="B">
+                        <span class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-4 font-bold text-gray-600 shrink-0">B</span> 
+                        <div class="w-full text-center py-2">\( \frac{26}{51} \)</div>
+                    </button>
+                    <button class="choice-btn frac-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center math-large" data-value="C">
+                        <span class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-4 font-bold text-gray-600 shrink-0">C</span> 
+                        <div class="w-full text-center py-2">\( \frac{26}{52} \)</div>
+                    </button>
+                    <button class="choice-btn frac-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center math-large" data-value="D">
+                        <span class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-4 font-bold text-gray-600 shrink-0">D</span> 
+                        <div class="w-full text-center py-2">\( \frac{27}{52} \)</div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Understand Drawing Without Replacement</p>
+                        <p class="mb-2">A standard deck has 52 cards: <strong>26 Red</strong> and <strong>26 Black</strong>.</p>
+                        <p class="mb-2">When two cards are "drawn at random," we assume they are drawn <strong>without replacement</strong> (you don't put the first card back). This directly affects the probabilities for the second card.</p>
+                        <div class="bg-amber-50 border-l-4 border-amber-400 p-3 text-amber-800 text-sm mt-3">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Crucial concept:</strong> Once the first card is taken out, there are only <strong>51 cards left</strong> in the deck, so the denominator for the second draw must be 51!
+                        </div>
+                    </div>
+                    
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Construct a Tree Diagram</p>
+                        <p class="mb-3">Let's map out the possible outcomes and their probabilities using a probability tree.</p>
+                        
+                        <!-- Custom SVG Tree Diagram -->
+                        <div class="w-full bg-white rounded-lg border border-gray-200 shadow-sm p-4 overflow-x-auto">
+                            <svg viewBox="0 0 600 300" class="min-w-[500px] w-full mx-auto" xmlns="http://www.w3.org/2000/svg">
+                                <!-- First level branches -->
+                                <line x1="100" y1="150" x2="280" y2="70" stroke="#475569" stroke-width="2" />
+                                <line x1="100" y1="150" x2="280" y2="230" stroke="#475569" stroke-width="2" />
+                                
+                                <!-- First level labels (Fractions) -->
+                                <foreignObject x="130" y="70" width="60" height="60">
+                                    <div xmlns="http://www.w3.org/1999/xhtml" class="w-full h-full flex items-center justify-center text-sm font-semibold text-gray-700 bg-white bg-opacity-80 rounded">
+                                        26/52
+                                    </div>
+                                </foreignObject>
+                                <foreignObject x="130" y="180" width="60" height="60">
+                                    <div xmlns="http://www.w3.org/1999/xhtml" class="w-full h-full flex items-center justify-center text-sm font-semibold text-gray-700 bg-white bg-opacity-80 rounded">
+                                        26/52
+                                    </div>
+                                </foreignObject>
+
+                                <!-- First level nodes -->
+                                <text x="300" y="75" font-family="sans-serif" font-weight="bold" font-size="16" fill="#dc2626" text-anchor="middle">Red</text>
+                                <text x="300" y="235" font-family="sans-serif" font-weight="bold" font-size="16" fill="#0f172a" text-anchor="middle">Black</text>
+
+                                <!-- Second level branches (from Red) -->
+                                <line x1="330" y1="70" x2="480" y2="30" stroke="#475569" stroke-width="2" />
+                                <line x1="330" y1="70" x2="480" y2="110" stroke="#475569" stroke-width="2" />
+
+                                <!-- Second level branches (from Black) -->
+                                <line x1="330" y1="230" x2="480" y2="190" stroke="#475569" stroke-width="2" />
+                                <line x1="330" y1="230" x2="480" y2="270" stroke="#475569" stroke-width="2" />
+
+                                <!-- Second level labels (from Red) -->
+                                <foreignObject x="360" y="10" width="60" height="40">
+                                    <div xmlns="http://www.w3.org/1999/xhtml" class="w-full h-full flex items-center justify-center text-sm font-semibold text-gray-700 bg-white bg-opacity-80 rounded">
+                                        25/51
+                                    </div>
+                                </foreignObject>
+                                <foreignObject x="360" y="85" width="60" height="40">
+                                    <div xmlns="http://www.w3.org/1999/xhtml" class="w-full h-full flex items-center justify-center text-sm font-semibold text-gray-700 bg-white bg-opacity-80 rounded">
+                                        26/51
+                                    </div>
+                                </foreignObject>
+
+                                <!-- Second level labels (from Black) -->
+                                <foreignObject x="360" y="170" width="60" height="40">
+                                    <div xmlns="http://www.w3.org/1999/xhtml" class="w-full h-full flex items-center justify-center text-sm font-semibold text-gray-700 bg-white bg-opacity-80 rounded">
+                                        26/51
+                                    </div>
+                                </foreignObject>
+                                <foreignObject x="360" y="245" width="60" height="40">
+                                    <div xmlns="http://www.w3.org/1999/xhtml" class="w-full h-full flex items-center justify-center text-sm font-semibold text-gray-700 bg-white bg-opacity-80 rounded">
+                                        25/51
+                                    </div>
+                                </foreignObject>
+
+                                <!-- Second level nodes -->
+                                <text x="510" y="35" font-family="sans-serif" font-weight="bold" font-size="16" fill="#dc2626" text-anchor="middle">Red</text>
+                                <text x="510" y="115" font-family="sans-serif" font-weight="bold" font-size="16" fill="#0f172a" text-anchor="middle">Black</text>
+                                <text x="510" y="195" font-family="sans-serif" font-weight="bold" font-size="16" fill="#dc2626" text-anchor="middle">Red</text>
+                                <text x="510" y="275" font-family="sans-serif" font-weight="bold" font-size="16" fill="#0f172a" text-anchor="middle">Black</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Identify the Favourable Paths</p>
+                        <p>We want the probability that the two cards are <strong>different colours</strong>. Looking at our tree diagram, there are two paths that satisfy this:</p>
+                        <ul class="list-disc list-inside mt-3 space-y-2 text-gray-700">
+                            <li><span class="font-semibold text-red-600">Red</span> then <span class="font-semibold text-slate-800">Black</span></li>
+                            <li><span class="font-semibold text-slate-800">Black</span> then <span class="font-semibold text-red-600">Red</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-4">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 4: Calculate the Total Probability</p>
+                        <p>Multiply along the branches to find the probability of each path, then add them together (since it is an "OR" situation):</p>
+                        
+                        <div class="text-center my-4 text-lg bg-white p-4 rounded-lg border border-gray-200">
+                            <p class="mb-3">\( P(\text{Different}) = P(\text{Red, Black}) + P(\text{Black, Red}) \)</p>
+                            <p class="mb-3">\( P(\text{Different}) = \left(\frac{26}{52} \times \frac{26}{51}\right) + \left(\frac{26}{52} \times \frac{26}{51}\right) \)</p>
+                            <p class="mb-3">\( P(\text{Different}) = \frac{13}{51} + \frac{13}{51} \)</p>
+                            <p class="font-bold text-blue-700 text-2xl">\( P(\text{Different}) = \frac{26}{51} \)</p>
+                        </div>
+                        
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, the correct statement is <strong>B</strong>.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <!-- Header -->
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                
+                <!-- Initial Empty State -->
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see common mistakes and detailed feedback.</p>
+                </div>
+
+                <!-- Dynamic Feedback Content -->
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <!-- Title gets injected here -->
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    
+                    <!-- Body gets injected here -->
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Store misconception data with properly escaped MathJax
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4">You correctly identified that the denominator reduces to 51 without replacement, but you missed a crucial step when determining the possible paths.</p>
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm text-lg relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        
+                        <div class="bg-red-50 p-4 rounded -mx-2 mb-3 border border-red-200">
+                            <p class="text-red-800 font-bold mb-2">You calculated:</p>
+                            <div class="text-center my-4 text-xl">
+                                \\( P(\\text{Red then Black}) = \\frac{26}{52} \\times \\frac{26}{51} = \\frac{13}{51} \\)
+                            </div>
+                        </div>
+
+                        <p class="text-red-700 text-sm mt-4"><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Missing Path:</strong> You found the probability of drawing a Red card <em>first</em> and a Black card <em>second</em>. However, getting two different colours could also happen by drawing a Black card first and a Red card second!</p>
+                        
+                        <p class="text-gray-700 text-sm mt-3">You needed to add both possible paths together: \\( P(\\text{R, B}) + P(\\text{B, R}) \\).</p>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: true,
+                title: 'Correct! (Option B)',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Great Job!</h4>
+                        <p class="text-gray-600 mb-6">You successfully recognised that drawing two cards implies drawing <strong>without replacement</strong> (meaning the denominator reduces to 51). You also correctly identified that there are <strong>two possible paths</strong> to get different colours (Red-Black OR Black-Red) and added their probabilities together.</p>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200">
+                            <i class="fas fa-info-circle mr-1"></i> Feel free to explore the other options on the left to see common mistakes students make, or walk through the detailed visual solution steps below the problem.
+                        </p>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4">You correctly identified both possible paths (Red-Black and Black-Red), but you made an error regarding the structure of the deck during the draw.</p>
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm text-lg relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        
+                        <div class="bg-orange-50 p-4 rounded -mx-2 my-3 border border-orange-200">
+                            <p class="text-orange-800 font-bold mb-2">You likely calculated:</p>
+                            <div class="text-center my-4 text-lg">
+                                \\( \\left(\\frac{26}{52} \\times \\frac{26}{52}\\right) + \\left(\\frac{26}{52} \\times \\frac{26}{52}\\right) = \\frac{26}{52} \\)
+                            </div>
+                        </div>
+                        
+                        <p class="text-orange-700 text-sm mt-3"><i class="fas fa-info-circle mr-1"></i> <strong>Conceptual Error:</strong> You assumed the drawing was done <em>with replacement</em>. Because a card is taken out and kept, there are only 51 cards remaining in the deck for the second draw. Therefore, the denominators for the second fractions must be 51, not 52.</p>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4">You likely tried to use the smart <strong>complementary probability</strong> method: <br> \\( 1 - P(\\text{same colour}) \\). However, you made an error when calculating the probability of getting the same colour.</p>
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm text-lg relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        
+                        <div class="bg-purple-50 p-4 rounded -mx-2 mb-3 border border-purple-200">
+                            <p class="text-purple-800 font-bold mb-2">Your calculation for 'Same Colour':</p>
+                            <div class="text-center my-4 text-lg">
+                                \\( P(\\text{Same}) = 2 \\times \\left( \\frac{26}{52} \\times \\frac{25}{52} \\right) = \\frac{25}{52} \\)
+                            </div>
+                            <p class="text-purple-800 font-bold mt-4 mb-2">Then subtracting from 1:</p>
+                            <div class="text-center my-4 text-lg">
+                                \\( 1 - \\frac{25}{52} = \\frac{27}{52} \\)
+                            </div>
+                        </div>
+                        
+                        <p class="text-purple-700 text-sm mt-3"><i class="fas fa-exclamation-circle mr-1"></i> <strong>Error:</strong> While you correctly reduced the numerator to 25 (because one card of that colour is gone), you forgot to reduce the <strong>denominator to 51</strong> (because there is one less card in the deck overall).</p>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 4;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        // Handle Option Selection
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Update button visuals
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                });
+                
+                this.classList.remove('border-gray-200');
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                }
+
+                // Show Solution Walkthrough section on first click
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Update right panel
+                emptyState.classList.add('hidden');
+                
+                // Reset animation
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                // Inject Content
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Theme styling for the title pill
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-render MathJax
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Handle Step-by-Step Walkthrough
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                // Smooth scroll to the new step
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-render math in newly visible step
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                // Update button text or hide it
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>

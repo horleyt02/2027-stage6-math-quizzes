@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Quadratic Equation</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Custom button states */
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .math-large {
+            font-size: 1.15rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-question text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="font-semibold mb-5 text-gray-800 text-xl">What are the solutions of \( 3x^2 + 5x - 1 = 0 \)?</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="multiple-choice">
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center math-large" data-value="A">
+                        <span class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-4 font-bold text-gray-600 shrink-0">A</span> 
+                        <div class="w-full text-center">\( x = \frac{-5 \pm \sqrt{37}}{6} \)</div>
+                    </button>
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center math-large" data-value="B">
+                        <span class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-4 font-bold text-gray-600 shrink-0">B</span> 
+                        <div class="w-full text-center">\( x = \frac{-5 \pm \sqrt{13}}{6} \)</div>
+                    </button>
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center math-large" data-value="C">
+                        <span class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-4 font-bold text-gray-600 shrink-0">C</span> 
+                        <div class="w-full text-center">\( x = \frac{5 \pm \sqrt{37}}{6} \)</div>
+                    </button>
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center math-large" data-value="D">
+                        <span class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-4 font-bold text-gray-600 shrink-0">D</span> 
+                        <div class="w-full text-center">\( x = \frac{5 \pm \sqrt{13}}{6} \)</div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Steps will be revealed sequentially -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Identify the coefficients</p>
+                        <p>For the standard quadratic equation \( ax^2 + bx + c = 0 \), identify the values of \( a \), \( b \) and \( c \) from \( 3x^2 + 5x - 1 = 0 \):</p>
+                        <ul class="list-disc list-inside mt-2 ml-2 text-gray-700">
+                            <li>\( a = 3 \)</li>
+                            <li>\( b = 5 \)</li>
+                            <li>\( c = -1 \)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Use the reference sheet to find the Quadratic Formula</p>
+                        <div class="text-center my-3 text-lg">
+                            \( x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} \)
+                        </div>
+                    </div>
+
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Substitute the values into the formula</p>
+                        <div class="text-center my-3 text-lg">
+                            \( x = \frac{-(5) \pm \sqrt{(5)^2 - 4(3)(-1)}}{2(3)} \)
+                        </div>
+                    </div>
+
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-4">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 4: Simplify the denominator</p>
+                        <p class="text-center">Denominator: \( 2(3) = 6 \)</p>
+                    </div>
+
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-5">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 5: Simplify inside the square root (discriminant)</p>
+                        <div class="bg-white p-3 rounded border border-gray-200 mt-2 text-center">
+                            <p class="mb-2">\( (5)^2 - 4(3)(-1) \)</p>
+                            <p class="mb-2">\( 25 - (-12) \)</p>
+                            <p class="font-semibold text-blue-700">\( 25 + 12 = 37 \)</p>
+                        </div>
+                    </div>
+
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-6">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 6: Combine for final answer</p>
+                        <div class="text-center my-3 text-xl">
+                            \( x = \frac{-5 \pm \sqrt{37}}{6} \)
+                        </div>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, the correct statement is <strong>A</strong>.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <!-- Header -->
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                
+                <!-- Initial Empty State -->
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see common mistakes and detailed feedback.</p>
+                </div>
+
+                <!-- Dynamic Feedback Content -->
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <!-- Title gets injected here -->
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    
+                    <!-- Body gets injected here -->
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Store misconception data based on the provided notes
+        const feedbackData = {
+            'A': {
+                isCorrect: true,
+                title: 'Correct! (Option A)',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Great Job!</h4>
+                        <p class="text-gray-600 mb-6">You successfully applied the Quadratic Formula, identified the correct coefficients, and carefully simplified both the denominator and the discriminant.</p>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200">
+                            <i class="fas fa-info-circle mr-1"></i> Feel free to explore the other options on the left to see common mistakes students make, or walk through the detailed solution steps below the problem.
+                        </p>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4">You made a sign error inside the square root (the discriminant).</p>
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm text-lg relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="mb-2">When calculating \\( b^2 - 4ac \\):</p>
+                        <p class="mb-2">\\( (5)^2 - 4(3)(-1) \\)</p>
+                        
+                        <div class="bg-orange-50 p-3 rounded -mx-2 my-3 border border-orange-200">
+                            <p class="text-orange-700 font-bold mb-1">You likely calculated:</p>
+                            <p class="text-gray-800">\\( 25 - 12 = 13 \\)</p>
+                            <p class="text-orange-600 text-sm mt-2 italic"><i class="fas fa-exclamation-triangle mr-1"></i> Error: Multiplying two negative numbers \\( (-4) \\times (-1) \\) results in a positive number. It should be \\( 25 + 12 \\).</p>
+                        </div>
+                        
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4">You correctly evaluated the discriminant inside the square root, but you made a mistake at the start of the formula.</p>
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm text-lg relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="mb-2">The quadratic formula starts with \\( -b \\).</p>
+                        <p class="mb-2">Since your \\( b = 5 \\), the formula should begin with:</p>
+                        
+                        <div class="bg-red-50 p-3 rounded -mx-2 my-3 border border-red-200 text-center">
+                            <p class="text-red-700 font-bold text-xl">\\( -5 \\pm ... \\)</p>
+                        </div>
+                        
+                        <p class="mt-2 text-gray-700 text-sm">You wrote \\( b \\) instead of \\( -b \\), resulting in \\( 5 \\) instead of \\( -5 \\).</p>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4">You made two common errors when setting up and evaluating the formula.</p>
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm text-lg relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        
+                        <div class="bg-purple-50 p-3 rounded -mx-2 mb-3 mt-1 border border-purple-200">
+                            <p class="text-purple-800 font-bold mb-1"><i class="fas fa-times-circle mr-1"></i> Error 1: Missing Negative Sign</p>
+                            <p class="text-purple-700 text-sm">You forgot the negative sign at the front of the formula. Because \\( b = 5 \\), it should start with \\( -5 \\), not \\( 5 \\).</p>
+                        </div>
+
+                        <div class="bg-purple-50 p-3 rounded -mx-2 mb-2 border border-purple-200">
+                            <p class="text-purple-800 font-bold mb-1"><i class="fas fa-times-circle mr-1"></i> Error 2: Discriminant Sign Error</p>
+                            <p class="text-purple-700 text-sm">Inside the square root, you likely calculated \\( 25 - 12 = 13 \\). Remember that \\( -4(3)(-1) = +12 \\), so it should be \\( 25 + 12 = 37 \\).</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 6; // Adjusted to 6 steps
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        // Handle Option Selection
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Update button visuals
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                });
+                
+                this.classList.remove('border-gray-200');
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                }
+
+                // Show Solution Walkthrough section on first click
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Update right panel
+                emptyState.classList.add('hidden');
+                
+                // Reset animation
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                // Inject Content
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Theme styling for the title pill
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-render MathJax
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Handle Step-by-Step Walkthrough
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                // Smooth scroll to the new step
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-render math in newly visible step
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                // Update button text or hide it
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
