@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Polynomial Graphing</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* SVG Graph Styling */
+        .graph-axis {
+            stroke: #64748b;
+            stroke-width: 1.5;
+        }
+        .graph-line {
+            fill: none;
+            stroke: #1e293b;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .graph-text {
+            font-family: 'Times New Roman', serif;
+            font-size: 14px;
+            fill: #1e293b;
+        }
+        .graph-label-math {
+            font-style: italic;
+        }
+        .highlight-fade {
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0;
+        }
+        .highlight-visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-question text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-4 text-gray-800">Consider the graph.</p>
+                
+                <div class="flex justify-center mb-6 border border-gray-100 rounded-lg p-2 bg-gray-50 overflow-hidden relative">
+                    <svg id="main-graph" width="340" height="300" viewBox="0 0 340 300">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                                <polygon points="0,0 8,4 0,8" fill="#64748b"></polygon>
+                            </marker>
+                            <marker id="arrowhead-red" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                                <polygon points="0,0 8,4 0,8" fill="#ef4444"></polygon>
+                            </marker>
+                        </defs>
+                        <!-- Axes -->
+                        <line x1="20" y1="150" x2="320" y2="150" class="graph-axis" marker-end="url(#arrowhead)"></line>
+                        <line x1="140" y1="280" x2="140" y2="20" class="graph-axis" marker-end="url(#arrowhead)"></line>
+                        <!-- Arrows for bottom/left -->
+                        <polygon points="20,150 28,146 28,154" fill="#64748b"></polygon>
+                        <polygon points="140,280 136,272 144,272" fill="#64748b"></polygon>
+                        
+                        <!-- Labels -->
+                        <text x="125" y="30" class="graph-text graph-label-math text-sm">y</text>
+                        <text x="310" y="165" class="graph-text graph-label-math text-sm">x</text>
+                        <circle cx="50" cy="150" r="3" fill="#1e293b"></circle>
+                        <text x="45" y="140" class="graph-text text-sm">-3</text>
+                        <circle cx="200" cy="150" r="3" fill="#1e293b"></circle>
+                        <text x="195" y="165" class="graph-text text-sm">2</text>
+                        
+                        <!-- Main Polynomial Path (Generated via JS) -->
+                        <polyline id="path-poly" class="graph-line"></polyline>
+
+                        <!-- Highlights Layer (Toggled via JS) -->
+                        <g id="highlight-roots" class="highlight-fade">
+                            <circle cx="50" cy="150" r="8" fill="none" stroke="#ef4444" stroke-width="3"></circle>
+                            <circle cx="140" cy="150" r="8" fill="none" stroke="#ef4444" stroke-width="3"></circle>
+                            <circle cx="200" cy="150" r="8" fill="none" stroke="#ef4444" stroke-width="3"></circle>
+                        </g>
+
+                        <g id="highlight-mults" class="highlight-fade">
+                            <!-- Bounce indicators -->
+                            <path d="M 30 180 Q 50 140 70 180" fill="none" stroke="#f59e0b" stroke-width="3" stroke-dasharray="4"></path>
+                            <path d="M 180 130 Q 200 160 220 130" fill="none" stroke="#f59e0b" stroke-width="3" stroke-dasharray="4"></path>
+                            <text x="50" y="195" class="graph-text font-bold text-xs" fill="#d97706" text-anchor="middle">Bounce (Even)</text>
+                            <text x="200" y="120" class="graph-text font-bold text-xs" fill="#d97706" text-anchor="middle">Bounce (Even)</text>
+                            <!-- Inflection indicator -->
+                            <path d="M 125 170 C 140 160, 140 140, 155 130" fill="none" stroke="#8b5cf6" stroke-width="3" stroke-dasharray="4"></path>
+                            <text x="100" y="125" class="graph-text font-bold text-xs" fill="#7c3aed" text-anchor="middle">Inflection</text>
+                        </g>
+
+                        <g id="highlight-ends" class="highlight-fade">
+                            <!-- End behavior arrows -->
+                            <!-- Bottom Left -->
+                            <path d="M 46 220 L 43 260" fill="none" stroke="#ef4444" stroke-width="4" marker-end="url(#arrowhead-red)"></path>
+                            <!-- Top Right -->
+                            <path d="M 216 40 L 221 20" fill="none" stroke="#ef4444" stroke-width="4" marker-end="url(#arrowhead-red)"></path>
+                            <text x="80" y="250" class="graph-text font-bold text-sm" fill="#ef4444" text-anchor="start">As x → -∞, y → -∞</text>
+                            <text x="230" y="30" class="graph-text font-bold text-sm" fill="#ef4444" text-anchor="end">As x → ∞, y → ∞</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <p class="font-semibold mb-5 text-gray-800">Which of the following best represents the equation of the graph?</p>
+                
+                <div class="grid grid-cols-1 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( y = \frac{1}{4}x^3(x + 3)^2(x - 2)^2 \)</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( y = \frac{1}{4}x^3(x - 3)^2(x + 2)^2 \)</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( y = -4x^3(x + 3)^2(x - 2)^2 \)</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( y = -4x^3(x - 3)^2(x + 2)^2 \)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Identify the Roots (Factors)</p>
+                        <p>Look at where the graph crosses or touches the \( x \)-axis.</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-1 text-gray-700">
+                            <li>Root at \( x = -3 \implies \) factor is \( (x + 3) \)</li>
+                            <li>Root at \( x = 0 \implies \) factor is \( x \)</li>
+                            <li>Root at \( x = 2 \implies \) factor is \( (x - 2) \)</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Determine Multiplicities</p>
+                        <p>Look at the <em>shape</em> of the graph at each root to find the power of each factor.</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-2 text-sm text-gray-700">
+                            <li>At \( x = -3 \), the graph <strong>bounces</strong> off the axis (turning point). This means it has an even multiplicity, like \( \boldsymbol{(x + 3)^2}\).</li>
+                            <li>At \( x = 0 \), the graph flattens out but crosses the axis (point of inflection). This means it has an odd multiplicity greater than 1, like \( \boldsymbol{x^3} \).</li>
+                            <li>At \( x = 2 \), the graph <strong>bounces</strong> off the axis. This means it has an even multiplicity, like \( \boldsymbol{(x - 2)^2} \).</li>
+                        </ul>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Analyse End Behaviour</p>
+                        <p>Look at the tails of the graph.</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-1 text-sm text-gray-700">
+                            <li>The degree of our polynomial is \( 2 + 3 + 2 = 7 \) (an odd degree).</li>
+                            <li>The graph starts at the bottom-left and ends at the top-right.</li>
+                        </ul>
+                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 my-3 shadow-sm font-medium text-blue-900">
+                            An odd-degree polynomial that ends in the positive \( y \)-direction (top-right) must have a <strong>positive leading coefficient</strong>.
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-4">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 4: Conclusion</p>
+                        <p>Combining the factors, multiplicities, and a positive leading coefficient, we get an equation in the form:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium">
+                            \[ y = a x^3 (x + 3)^2 (x - 2)^2 \]
+                        </div>
+                        <p class="mt-2 text-sm text-gray-600">Where \( a \) is a positive number. Looking at the options, only Option A fits all these criteria.</p>
+                        <p class="font-bold text-green-700 text-xl mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">Option A</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see common mistakes and detailed feedback.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Draw the polynomial SVG
+        function drawGraph() {
+            const pathPoly = document.getElementById('path-poly');
+            // Helper to map math coordinates to SVG coordinates
+            const mapCoords = (x, y) => {
+                const scaleX = 30; // 30 pixels per x unit
+                const scaleY = 1.5; // Scale y down to fit inside the SVG beautifully
+                const originX = 140;
+                const originY = 150;
+                return `${originX + x * scaleX},${originY - y * scaleY}`;
+            };
+
+            // f(x) = 1/4 * x^3 * (x+3)^2 * (x-2)^2
+            let pts = [];
+            for (let x = -3.8; x <= 2.8; x += 0.05) {
+                let y = 0.25 * Math.pow(x, 3) * Math.pow(x + 3, 2) * Math.pow(x - 2, 2);
+                pts.push(mapCoords(x, y));
+            }
+            pathPoly.setAttribute('points', pts.join(' '));
+        }
+
+        drawGraph();
+
+        const feedbackData = {
+            'A': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-6">You successfully synthesised all the features of the graph! You converted the roots at \\(-3\\), \\(0\\), and \\(2\\) into their factors, recognised the multiplicities from the turning/inflection points, and used the end behaviour to confirm the positive leading coefficient.</p>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200">
+                            <i class="fas fa-info-circle mr-1"></i> Walk through the detailed solution steps below to see the specific features highlighted on the graph!
+                        </p>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4">You correctly identified the end behaviour and the multiplicities, but you made a sign error when converting the roots into factors.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Conceptual Error:</p>
+                        <div class="space-y-3 text-sm text-gray-700">
+                            <p>You used \\( (x - 3) \\) for the root at \\( -3 \\) and \\( (x + 2) \\) for the root at \\( 2 \\).</p>
+                            <p>Remember that if a graph has an \\(x\\)-intercept (root) at \\( x = c \\), the corresponding factor in the polynomial must be \\( (x - c) \\) so that when you substitute \\( x = c \\), the bracket equals zero.</p>
+                            <div class="bg-orange-50 p-2 rounded border border-orange-200 text-center font-semibold text-orange-900 mt-2">
+                                Root at \\( -3 \\implies (x - (-3)) = (x + 3) \\)
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4">You correctly identified the roots and their multiplicities, but you misinterpreted the end behaviour to select the wrong leading coefficient.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Conceptual Error:</p>
+                        <div class="space-y-3 text-sm text-gray-700">
+                            <p>The polynomial in Option C has a <strong>negative</strong> leading coefficient (\\( -4 \\)).</p>
+                            <p>Because the graph provided ends positive, the leading coefficient must be <strong>positive</strong>.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4">You made two errors here: you swapped the signs on the factors, and you chose the wrong leading coefficient.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        
+                        <div class="space-y-4 text-sm text-purple-800">
+                            <div class="p-3 bg-purple-50 rounded-lg border border-purple-100">
+                                <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Error 1:</strong> You confused the roots with their factors. A root at \\( x = -3 \\) corresponds to a factor of \\( (x + 3) \\), because \\( (-3 + 3) = 0 \\).</p>
+                            </div>
+                            <div class="p-3 bg-purple-50 rounded-lg border border-purple-100">
+                                <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Error 2:</strong> You chose a negative leading coefficient (\\( -4 \\)). A polynomial ending positive must have a <strong>positive</strong> leading coefficient.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 4;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        // SVG Highlight Elements
+        const highlightRoots = document.getElementById('highlight-roots');
+        const highlightMults = document.getElementById('highlight-mults');
+        const highlightEnds = document.getElementById('highlight-ends');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; 
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                // Toggle SVG highlights based on the step
+                if (currentStep === 1) {
+                    highlightRoots.classList.add('highlight-visible');
+                } else if (currentStep === 2) {
+                    highlightRoots.classList.remove('highlight-visible');
+                    highlightMults.classList.add('highlight-visible');
+                } else if (currentStep === 3) {
+                    highlightMults.classList.remove('highlight-visible');
+                    highlightEnds.classList.add('highlight-visible');
+                } else if (currentStep === 4) {
+                    highlightEnds.classList.remove('highlight-visible');
+                }
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
