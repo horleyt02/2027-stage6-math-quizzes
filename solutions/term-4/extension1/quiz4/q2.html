@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Inverse Function Domain</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Graph Specific Styles */
+        .graph-axis {
+            stroke: #374151;
+            stroke-width: 1.5;
+        }
+        .graph-line {
+            fill: none;
+            stroke: #111827;
+            stroke-width: 2;
+        }
+        .graph-line-faded {
+            fill: none;
+            stroke: #9ca3af;
+            stroke-width: 1.5;
+            stroke-dasharray: 4,4;
+        }
+        .graph-highlight-red {
+            fill: none;
+            stroke: #ef4444;
+            stroke-width: 3.5;
+        }
+        .graph-highlight-green {
+            fill: none;
+            stroke: #10b981;
+            stroke-width: 3.5;
+        }
+        .graph-label {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            font-style: italic;
+            fill: #111827;
+        }
+        .graph-guide {
+            stroke: #6b7280;
+            stroke-width: 1;
+            stroke-dasharray: 4,4;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-question text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-2 text-gray-800">The graph of a cubic \( y = h(x) \) function is shown below.</p>
+                <p class="mb-4 text-gray-800 text-base">It has \( x \)-intercepts at \( x = c, x = 0 \) and \( x = d \), and has turning points where \( x = a \) and \( x = b \).</p>
+                
+                <!-- SVG Container for Problem Graph -->
+                <div class="flex justify-center mb-6 bg-white border border-gray-100 rounded-lg p-4 shadow-sm" id="problem-graph-container">
+                    <!-- Graph generated via JS -->
+                </div>
+
+                <p class="font-semibold mb-5 text-gray-800">Which of the following restrictions on the domain would allow the function \( h(x) \) to have an inverse function \( y = h^{-1}(x) \)?</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( [c, 0] \)</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( [a, b] \)</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( [c, d] \)</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( [0, \infty) \)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: The Horizontal Line Test</p>
+                        <p>For a function to have an inverse, it must be <strong>one-to-one</strong>. This means no two different \(x\)-values can share the same \(y\)-value.</p>
+                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 my-2 shadow-sm text-sm text-blue-900">
+                            <i class="fas fa-lightbulb text-yellow-500 mr-1"></i> Visually, this means the graph must pass the <strong>Horizontal Line Test</strong>: any horizontal line must intersect the graph at most <em>once</em>.
+                        </div>
+                    </div>
+                    
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Identify the Turning Points</p>
+                        <p>Turning points (local maxima and minima) are the exact locations where a graph changes direction from increasing to decreasing, or vice versa.</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-1 text-sm text-gray-700">
+                            <li>There is a local minimum at \( x = a \).</li>
+                            <li>There is a local maximum at \( x = b \).</li>
+                        </ul>
+                        <p class="mt-2 text-gray-700 text-sm">If an interval contains a turning point, the graph will "turn back" on itself, causing horizontal lines to intersect it multiple times.</p>
+                    </div>
+
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Evaluate the Intervals</p>
+                        <p>To pass the test, we must restrict the domain to a section of the graph that is strictly increasing or strictly decreasing, completely avoiding crossing over any turning points.</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-3 shadow-sm">
+                            <ul class="list-disc pl-5 space-y-2 text-sm text-gray-700">
+                                <li>\( [c, 0] \) contains the turning point \( a \). <span class="text-red-600 font-bold">Fails.</span></li>
+                                <li>\( [c, d] \) contains both turning points \( a \) and \( b \). <span class="text-red-600 font-bold">Fails.</span></li>
+                                <li>\( [0, \infty) \) contains the turning point \( b \). <span class="text-red-600 font-bold">Fails.</span></li>
+                                <li>\( [a, b] \) is exactly the region <em>between</em> the turning points. It is strictly increasing. <span class="text-green-600 font-bold">Passes!</span></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-4">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 4: Conclusion</p>
+                        <p>Restricting the domain to the interval between the two turning points ensures the function is one-to-one.</p>
+                        <p class="font-bold text-green-700 text-xl mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">Option B: \( [a, b] \)</p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option B is correct.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see a visual analysis of each domain restriction.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-4 w-max text-sm uppercase tracking-wider"></div>
+                    
+                    <!-- Dynamic Feedback SVG Container -->
+                    <div class="w-full flex justify-center bg-white border border-gray-200 rounded-xl p-4 mb-4 shadow-inner min-h-[200px]" id="feedback-svg-container">
+                    </div>
+                    
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-sm md:text-base"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Mathematical model for the cubic graph to ensure accurate rendering
+        // Using a polynomial of the form f(x) = k * (x - root1) * x * (x - root2)
+        // Adjusting parameters to visually match the provided image.
+        const mathModel = {
+            c: -80,
+            zero: 0,
+            d: 100,
+            k: -0.0003, // Negative leading coefficient to go top-left to bottom-right
+            f: function(x) {
+                return this.k * (x - this.c) * (x - this.zero) * (x - this.d);
+            },
+            // Turning points (calculated via derivative 3x^2 - 40x - 8000 = 0)
+            a: -45.3, 
+            b: 58.7,
+            // Viewport mapping configurations
+            mapX: function(x) { return x + 120; }, // Center origin horizontally
+            mapY: function(y) { return 125 - y; }  // Flip Y and center vertically
+        };
+
+        // Helper to generate a polyline string from the math model within a domain
+        function generatePath(minX, maxX, step = 2) {
+            let pts = [];
+            for (let x = minX; x <= maxX; x += step) {
+                pts.push(`${mathModel.mapX(x)},${mathModel.mapY(mathModel.f(x))}`);
+            }
+            // Ensure we hit the exact max point
+            pts.push(`${mathModel.mapX(maxX)},${mathModel.mapY(mathModel.f(maxX))}`);
+            return pts.join(' ');
+        }
+
+        // Draw the static problem graph
+        function drawProblemGraph() {
+            const container = document.getElementById('problem-graph-container');
+            const svgNS = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("width", "300");
+            svg.setAttribute("height", "250");
+            svg.setAttribute("viewBox", "0 0 300 250");
+            
+            let svgContent = `
+                <defs>
+                    <marker id="arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                        <polygon points="0,0 8,4 0,8" fill="#374151" />
+                    </marker>
+                </defs>
+                <!-- Axes -->
+                <line x1="20" y1="125" x2="280" y2="125" class="graph-axis" marker-end="url(#arrow)"></line>
+                <line x1="120" y1="230" x2="120" y2="20" class="graph-axis" marker-end="url(#arrow)"></line>
+                
+                <!-- Main Curve -->
+                <polyline points="${generatePath(-100, 130)}" class="graph-line"></polyline>
+                
+                <!-- Guides for Turning Points -->
+                <line x1="${mathModel.mapX(mathModel.a)}" y1="125" x2="${mathModel.mapX(mathModel.a)}" y2="${mathModel.mapY(mathModel.f(mathModel.a))}" class="graph-guide"></line>
+                <line x1="${mathModel.mapX(mathModel.b)}" y1="125" x2="${mathModel.mapX(mathModel.b)}" y2="${mathModel.mapY(mathModel.f(mathModel.b))}" class="graph-guide"></line>
+                
+                <!-- Dots for roots and turning point x-axis markers -->
+                <circle cx="${mathModel.mapX(mathModel.c)}" cy="125" r="3" fill="#111827"></circle>
+                <circle cx="${mathModel.mapX(0)}" cy="125" r="3" fill="#111827"></circle>
+                <circle cx="${mathModel.mapX(mathModel.d)}" cy="125" r="3" fill="#111827"></circle>
+                <circle cx="${mathModel.mapX(mathModel.a)}" cy="125" r="2" fill="#111827"></circle>
+                <circle cx="${mathModel.mapX(mathModel.b)}" cy="125" r="2" fill="#111827"></circle>
+                
+                <!-- Labels -->
+                <text x="${mathModel.mapX(mathModel.c) - 5}" y="142" class="graph-label">c</text>
+                <text x="${mathModel.mapX(0) + 5}" y="140" class="graph-label">0</text>
+                <text x="${mathModel.mapX(mathModel.d) + 2}" y="118" class="graph-label">d</text>
+                <text x="${mathModel.mapX(mathModel.a) - 4}" y="120" class="graph-label">a</text>
+                <text x="${mathModel.mapX(mathModel.b) - 4}" y="142" class="graph-label">b</text>
+                
+                <text x="270" y="140" class="graph-label">x</text>
+                <text x="105" y="30" class="graph-label">y</text>
+                <text x="40" y="60" class="graph-label" font-size="12">y = h(x)</text>
+            `;
+            svg.innerHTML = svgContent;
+            container.appendChild(svg);
+        }
+
+        drawProblemGraph();
+
+        // Function to generate the dynamic feedback SVG showing the Horizontal Line Test
+        function generateFeedbackSVG(option) {
+            let highlightMin, highlightMax, testY, intersectionX = [], colorClass, isCorrect;
+
+            if (option === 'A') { // [c, 0]
+                highlightMin = mathModel.c; highlightMax = 0;
+                testY = -35; 
+                intersectionX = [-70.24, -15.69]; 
+                colorClass = 'graph-highlight-red'; isCorrect = false;
+            } else if (option === 'B') { // [a, b]
+                highlightMin = mathModel.a; highlightMax = mathModel.b;
+                testY = 0; 
+                intersectionX = [0]; 
+                colorClass = 'graph-highlight-green'; isCorrect = true;
+            } else if (option === 'C') { // [c, d]
+                highlightMin = mathModel.c; highlightMax = mathModel.d;
+                testY = 15; 
+                intersectionX = [-83.27, 6.18, 97.09];
+                colorClass = 'graph-highlight-red'; isCorrect = false;
+            } else if (option === 'D') { // [0, infinity)
+                highlightMin = 0; highlightMax = 130;
+                testY = 20; 
+                intersectionX = [8.24, 96.04];
+                colorClass = 'graph-highlight-red'; isCorrect = false;
+            }
+
+            let svgContent = `
+                <svg width="100%" height="100%" viewBox="0 -20 300 240" preserveAspectRatio="xMidYMid meet">
+                    <!-- Faded Background Curve -->
+                    <polyline points="${generatePath(-100, 130)}" class="graph-line-faded"></polyline>
+                    
+                    <!-- Axes -->
+                    <line x1="20" y1="125" x2="280" y2="125" stroke="#9ca3af" stroke-width="1"></line>
+                    <line x1="120" y1="210" x2="120" y2="10" stroke="#9ca3af" stroke-width="1"></line>
+                    
+                    <!-- Highlighted Domain -->
+                    <polyline points="${generatePath(highlightMin, highlightMax)}" class="${colorClass}"></polyline>
+                    
+            `;
+
+            // Draw the Horizontal Line Test and Intersection Dots
+            const svgY = mathModel.mapY(testY);
+            let testLineColor = isCorrect ? '#10b981' : '#ef4444';
+            
+            svgContent += `
+                <!-- Horizontal Test Line -->
+                <line x1="20" y1="${svgY}" x2="280" y2="${svgY}" stroke="${testLineColor}" stroke-width="2" stroke-dasharray="6,4"></line>
+            `;
+
+            intersectionX.forEach(x => {
+                svgContent += `<circle cx="${mathModel.mapX(x)}" cy="${svgY}" r="5" fill="${testLineColor}"></circle>`;
+            });
+
+            // Add result text box
+            let resultText = isCorrect ? "Passes HLT: 1 Intersection" : `Fails HLT: ${intersectionX.length} Intersections`;
+            svgContent += `
+                <rect x="75" y="-15" width="150" height="25" rx="5" fill="${isCorrect ? '#d1fae5' : '#fee2e2'}" stroke="${testLineColor}"></rect>
+                <text x="150" y="2" font-family="sans-serif" font-weight="bold" font-size="12" fill="${isCorrect ? '#065f46' : '#991b1b'}" text-anchor="middle">${resultText}</text>
+                </svg>
+            `;
+            return svgContent;
+        }
+
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4">You selected the interval from the first root \\( c \\) to the origin \\( 0 \\), but this interval fails the horizontal line test.</p>
+                    <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-2">
+                        <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> Because this interval contains the local minimum turning point \\( a \\), the graph dips down and comes back up. A horizontal line drawn through this section will intersect the curve <strong>twice</strong>, meaning the function is not one-to-one and cannot have an inverse here.</p>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <p class="text-gray-600 mb-4">You successfully recognised that to have an inverse function, a graph must be strictly increasing or strictly decreasing to pass the horizontal line test.</p>
+                    <div class="mt-2 p-3 bg-green-50 rounded-lg border border-green-100 text-sm text-green-800">
+                        <p><i class="fas fa-check-circle mr-1"></i> By restricting the domain to the interval exactly between the two turning points \\( [a, b] \\), the curve strictly increases. A horizontal line will only ever intersect it <strong>once</strong>, allowing an inverse function to exist.</p>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4">You selected the interval spanning from the outer roots \\( c \\) to \\( d \\), but this doesn't pass the horizontal line test.</p>
+                    <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800 space-y-2">
+                        <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> This section contains <strong>both</strong> turning points \\( a \\) and \\( b \\). The graph travels up and down. As shown in the visual above, a horizontal line can intersect the curve up to <strong>three times</strong> in this domain. It is definitely not one-to-one.</p>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4">You restricted the domain to \\( x \\ge 0 \\), a common restriction used for simple parabolas, but it doesn't work for this specific cubic.</p>
+                    <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-2">
+                        <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> While \\( x \\ge 0 \\) works perfectly to halve a standard parabola like \\( y = x^2 \\) at its turning point, this cubic function has a turning point at \\( x = b \\), which is <em>greater</em> than 0. Because the domain \\( [0, \\infty) \\) contains a turning point, the graph goes up and then comes back down, intersecting horizontal lines <strong>twice</strong>.</p>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 4;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        const feedbackSvgContainer = document.getElementById('feedback-svg-container');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; 
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+                
+                // Inject the dynamically generated SVG
+                feedbackSvgContainer.innerHTML = generateFeedbackSVG(selectedValue);
+
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-4 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
