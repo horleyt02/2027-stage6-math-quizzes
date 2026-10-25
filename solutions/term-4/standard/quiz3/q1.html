@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Data Set Median</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* SVG Graph Styling */
+        .dot {
+            fill: #1f2937;
+        }
+        .dot-eliminated-left {
+            fill: #d1d5db; /* Light gray */
+            text-decoration: line-through;
+        }
+        .dot-eliminated-right {
+            fill: #d1d5db; /* Light gray */
+        }
+        .dot-median {
+            fill: #10b981; /* Green */
+            stroke: #047857;
+            stroke-width: 2;
+        }
+        .graph-axis {
+            stroke: #1f2937;
+            stroke-width: 1.5;
+        }
+        .graph-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            fill: #1f2937;
+            text-anchor: middle;
+        }
+        .graph-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            fill: #1f2937;
+            text-anchor: middle;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-question text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-4 text-gray-800 text-base leading-relaxed">
+                    A sample of 25 residents were asked to indicate the time, in hours, spent using the internet across the past weekend. The results are displayed in the following graph.
+                </p>
+                
+                <div class="flex justify-center mb-6 overflow-x-auto bg-white">
+                    <svg width="400" height="240" viewBox="0 0 400 240">
+                        <!-- X Axis -->
+                        <line x1="30" y1="180" x2="370" y2="180" class="graph-axis"></line>
+                        
+                        <!-- X Labels & Ticks -->
+                        <!-- 0 to 8 -->
+                        <g class="graph-label">
+                            <text x="50" y="200">0</text>
+                            <text x="85" y="200">1</text>
+                            <text x="120" y="200">2</text>
+                            <text x="155" y="200">3</text>
+                            <text x="190" y="200">4</text>
+                            <text x="225" y="200">5</text>
+                            <text x="260" y="200">6</text>
+                            <text x="295" y="200">7</text>
+                            <text x="330" y="200">8</text>
+                        </g>
+                        
+                        <!-- Axis Title -->
+                        <text x="200" y="230" class="graph-title">Time spent using the internet in hours</text>
+
+                        <!-- DOTS -->
+                        <!-- Col 0: 2 dots -->
+                        <circle cx="50" cy="170" r="4" class="dot"></circle>
+                        <circle cx="50" cy="150" r="4" class="dot"></circle>
+                        <!-- Col 1: 3 dots -->
+                        <circle cx="85" cy="170" r="4" class="dot"></circle>
+                        <circle cx="85" cy="150" r="4" class="dot"></circle>
+                        <circle cx="85" cy="130" r="4" class="dot"></circle>
+                        <!-- Col 2: 1 dot -->
+                        <circle cx="120" cy="170" r="4" class="dot"></circle>
+                        <!-- Col 3: 3 dots -->
+                        <circle cx="155" cy="170" r="4" class="dot"></circle>
+                        <circle cx="155" cy="150" r="4" class="dot"></circle>
+                        <circle cx="155" cy="130" r="4" class="dot"></circle>
+                        <!-- Col 4: 3 dots -->
+                        <circle cx="190" cy="170" r="4" class="dot"></circle>
+                        <circle cx="190" cy="150" r="4" class="dot"></circle>
+                        <circle cx="190" cy="130" r="4" class="dot"></circle>
+                        <!-- Col 5: 3 dots -->
+                        <circle cx="225" cy="170" r="4" class="dot"></circle>
+                        <circle cx="225" cy="150" r="4" class="dot"></circle>
+                        <circle cx="225" cy="130" r="4" class="dot"></circle>
+                        <!-- Col 6: 7 dots -->
+                        <circle cx="260" cy="170" r="4" class="dot"></circle>
+                        <circle cx="260" cy="150" r="4" class="dot"></circle>
+                        <circle cx="260" cy="130" r="4" class="dot"></circle>
+                        <circle cx="260" cy="110" r="4" class="dot"></circle>
+                        <circle cx="260" cy="90" r="4" class="dot"></circle>
+                        <circle cx="260" cy="70" r="4" class="dot"></circle>
+                        <circle cx="260" cy="50" r="4" class="dot"></circle>
+                        <!-- Col 7: 3 dots -->
+                        <circle cx="295" cy="170" r="4" class="dot"></circle>
+                        <circle cx="295" cy="150" r="4" class="dot"></circle>
+                        <circle cx="295" cy="130" r="4" class="dot"></circle>
+                    </svg>
+                </div>
+
+                <p class="font-semibold mb-5 text-gray-800">What is the median number in hours?</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">4.0</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">4.5</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">5.0</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">6.0</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Understand the Median</p>
+                        <p>The <strong>median</strong> is the middle value when all the data points are placed in numerical order from smallest to largest.</p>
+                        <p class="mt-2 text-sm text-gray-700">A great way to find the median on a dot plot is to use the "crossing off" method: cross off the lowest dot, then the highest dot, and keep pairing them up working towards the centre.</p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Find the Middle Position</p>
+                        <p>We are told there are 25 residents in total (\( n = 25 \)).</p>
+                        <p class="mt-2 text-sm text-gray-700">Because 25 is an odd number, there will be exactly one middle dot. If we cross off 12 dots from the lowest end, and 12 dots from the highest end (using 24 dots), the <strong>13th dot</strong> remaining will be the median.</p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Visual "Crossing Off"</p>
+                        <p class="mb-3 text-sm text-gray-700">Let's cross off the lowest 12 dots (grey) and the highest 12 dots (grey). The remaining dot (green) is our median.</p>
+                        
+                        <div class="flex justify-center bg-white p-2 rounded-lg border border-gray-100 shadow-inner overflow-x-auto">
+                            <svg width="400" height="240" viewBox="0 0 400 240">
+                                <!-- X Axis -->
+                                <line x1="30" y1="180" x2="370" y2="180" class="graph-axis"></line>
+                                
+                                <!-- X Labels -->
+                                <g class="graph-label">
+                                    <text x="50" y="200">0</text><text x="85" y="200">1</text><text x="120" y="200">2</text>
+                                    <text x="155" y="200">3</text><text x="190" y="200">4</text><text x="225" y="200" font-weight="bold" fill="#10b981">5</text>
+                                    <text x="260" y="200">6</text><text x="295" y="200">7</text><text x="330" y="200">8</text>
+                                </g>
+
+                                <!-- Left 12 Dots (Crossed out/Grey) -->
+                                <!-- 0, 1, 2, 3, 4 columns (2+3+1+3+3 = 12 dots) -->
+                                <g class="dot-eliminated-left">
+                                    <circle cx="50" cy="170" r="4"></circle><circle cx="50" cy="150" r="4"></circle>
+                                    <circle cx="85" cy="170" r="4"></circle><circle cx="85" cy="150" r="4"></circle><circle cx="85" cy="130" r="4"></circle>
+                                    <circle cx="120" cy="170" r="4"></circle>
+                                    <circle cx="155" cy="170" r="4"></circle><circle cx="155" cy="150" r="4"></circle><circle cx="155" cy="130" r="4"></circle>
+                                    <circle cx="190" cy="170" r="4"></circle><circle cx="190" cy="150" r="4"></circle><circle cx="190" cy="130" r="4"></circle>
+                                </g>
+
+                                <!-- Right 12 Dots (Crossed out/Grey) -->
+                                <!-- Top 2 in col 5, all 7 in col 6, all 3 in col 7 (2+7+3 = 12 dots) -->
+                                <g class="dot-eliminated-right">
+                                    <circle cx="225" cy="150" r="4"></circle><circle cx="225" cy="130" r="4"></circle>
+                                    <circle cx="260" cy="170" r="4"></circle><circle cx="260" cy="150" r="4"></circle><circle cx="260" cy="130" r="4"></circle>
+                                    <circle cx="260" cy="110" r="4"></circle><circle cx="260" cy="90" r="4"></circle><circle cx="260" cy="70" r="4"></circle><circle cx="260" cy="50" r="4"></circle>
+                                    <circle cx="295" cy="170" r="4"></circle><circle cx="295" cy="150" r="4"></circle><circle cx="295" cy="130" r="4"></circle>
+                                </g>
+
+                                <!-- The 13th Median Dot (Green & Larger) -->
+                                <circle cx="225" cy="170" r="6" class="dot-median"></circle>
+                                
+                                <!-- Pointer Line -->
+                                <path d="M 225 220 L 225 185" fill="none" stroke="#10b981" stroke-width="2" marker-end="url(#arrowhead-green)"></path>
+                                
+                                <defs>
+                                    <marker id="arrowhead-green" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
+                                        <polygon points="0 0, 6 2, 0 4" fill="#10b981" />
+                                    </marker>
+                                </defs>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-4">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 4: Identify the Value</p>
+                        <p>The 13th dot sits in the column above <strong>5</strong> on the x-axis.</p>
+                        <p class="font-bold text-green-700 text-xl mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">5.0</p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option C is correct.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see common mistakes and detailed feedback.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4">You likely picked the number that sits in the physical middle of the numbers on the axis line.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3">
+                            <p class="text-sm text-gray-600">The axis runs from 0 to 8.</p>
+                            <p>Halfway between 0 and 8 is 4.</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> The median is the middle value of the <em>data points themselves</em> (the dots), not the middle of the number line. Because there are more dots clustered towards the higher numbers (especially the large stack at 6), the true median gets pulled higher up the number line past 4.
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4">You correctly started counting dots from left to right, but you averaged the 12th dot and the 13th dot.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-sm text-gray-700 space-y-2 mb-3">
+                            <p>You counted dots from left to right:</p>
+                            <ul class="list-disc pl-5">
+                                <li>The 12th dot is the very last dot in the <strong>4</strong> column.</li>
+                                <li>The 13th dot is the very first dot in the <strong>5</strong> column.</li>
+                            </ul>
+                            <div class="text-center mt-2 font-medium">\\[ \\frac{4 + 5}{2} = 4.5 \\]</div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> You apply the "average the two middle numbers" rule when there is an <strong>even</strong> number of data points (e.g., if there were 24 residents). </p>
+                            <p>However, the question states there are 25 residents (an odd number). For odd data sets, there is exactly one single middle dot: the 13th dot. You do not need to average it with the 12th dot.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-6">You successfully found the median. You recognised that for 25 data points, the median is the 13th value when ordered from smallest to largest. Counting the dots from left to right, the 13th dot lands perfectly in the 5 column.</p>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200">
+                            <i class="fas fa-info-circle mr-1"></i> Walk through the detailed solution steps below the problem to see a cool visual trick for finding the median on dot plots!
+                        </p>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4">You found the <strong>Mode</strong> instead of the Median.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Your likely process:</p>
+                        <div class="space-y-2 mb-3 text-sm text-gray-700">
+                            <p>You looked for the column with the highest stack of dots.</p>
+                            <p>The number 6 has 7 dots (the most frequent answer).</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Vocabulary Error:</strong> The <em>mode</em> is the most frequent value (which is 6). The <em>median</em> is the middle value when all the dots are placed in numerical order from lowest to highest.
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 4;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to typeset the newly injected math content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case new math was revealed
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
