@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Prism Volume</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* SVG Prism Styles */
+        .prism-line {
+            fill: none;
+            stroke: #1f2937;
+            stroke-width: 1.5;
+            stroke-linejoin: round;
+        }
+        .prism-dashed {
+            fill: none;
+            stroke: #4b5563;
+            stroke-width: 1.2;
+            stroke-dasharray: 5,5;
+        }
+        .prism-text {
+            font-family: 'Times New Roman', serif;
+            font-size: 14px;
+            fill: #111827;
+        }
+        .prism-math-text {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-size: 16px;
+            fill: #111827;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-question text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-4 text-gray-800">The diagram shows the dimensions of a rectangular prism.</p>
+                
+                <!-- SVG Diagram -->
+                <div class="flex justify-center mb-6 overflow-x-auto">
+                    <svg width="400" height="250" viewBox="0 0 400 250">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                                <polygon points="0,0 6,3 0,6" fill="#4b5563" />
+                            </marker>
+                            <marker id="arrowhead-rev" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                                <polygon points="6,0 0,3 6,6" fill="#4b5563" />
+                            </marker>
+                        </defs>
+                        
+                        <!-- Prism Faces -->
+                        <!-- Back/Hidden lines (not drawn to match original image style which only shows visible edges) -->
+                        
+                        <!-- Front Face -->
+                        <polygon points="50,180 220,180 220,60 50,60" class="prism-line" fill="#ffffff" />
+                        <!-- Top Face -->
+                        <polygon points="50,60 100,30 270,30 220,60" class="prism-line" fill="#ffffff" />
+                        <!-- Right Face -->
+                        <polygon points="220,180 270,150 270,30 220,60" class="prism-line" fill="#ffffff" />
+                        
+                        <!-- Dimension Lines (Dashed) -->
+                        <!-- Width: 90 cm -->
+                        <line x1="50" y1="195" x2="220" y2="195" class="prism-dashed" marker-end="url(#arrowhead)" marker-start="url(#arrowhead-rev)" />
+                        <rect x="110" y="185" width="55" height="20" fill="#ffffff" />
+                        <text x="115" y="199" class="prism-text">90 cm</text>
+                        
+                        <!-- Depth: 30 cm -->
+                        <line x1="230" y1="185" x2="280" y2="155" class="prism-dashed" marker-end="url(#arrowhead)" marker-start="url(#arrowhead-rev)" />
+                        <rect x="235" y="160" width="55" height="20" fill="#ffffff" />
+                        <text x="240" y="175" class="prism-text">30 cm</text>
+                        
+                        <!-- Height: h -->
+                        <line x1="285" y1="150" x2="285" y2="30" class="prism-dashed" marker-end="url(#arrowhead)" marker-start="url(#arrowhead-rev)" />
+                        <rect x="277" y="80" width="16" height="20" fill="#ffffff" />
+                        <text x="280" y="95" class="prism-math-text">h</text>
+                        
+                        <!-- NOT TO SCALE -->
+                        <text x="320" y="80" class="prism-text" text-anchor="middle">NOT TO</text>
+                        <text x="320" y="100" class="prism-text" text-anchor="middle">SCALE</text>
+                    </svg>
+                </div>
+
+                <p class="mb-4 text-gray-800">The prism has a capacity of 40.5 litres.</p>
+                <p class="font-semibold mb-5 text-gray-800">What is the height (\( h \)) of the prism?</p>
+                
+                <div class="grid grid-cols-1 gap-4 mt-6" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">0.015 cm</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">1.5 cm</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">15 cm</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">150 cm</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Convert Capacity to Volume</p>
+                        <p>We are given the capacity in litres (L), but the dimensions of the prism are in centimetres (cm). We need to convert the capacity into a volume of cubic centimetres (\(\text{cm}^3\)).</p>
+                        
+                        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 my-3 text-sm text-blue-900 shadow-sm">
+                            <div class="font-semibold mb-2"><i class="fas fa-book-open mr-1"></i> From your Reference Sheet:</div>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>\( 1 \text{ cm}^3 = 1 \text{ mL} \)</li>
+                                <li>\( 1 \text{ m}^3 = 1000 \text{ L} \) <span class="text-blue-600 italic">(Not needed here, but good to know!)</span></li>
+                            </ul>
+                            <div class="mt-3 pt-2 border-t border-blue-200">
+                                Since we know there are \( 1000 \text{ mL} \) in \( 1 \text{ L} \), the reference sheet confirms that \( \mathbf{1 \text{ L} = 1000 \text{ cm}^3} \).
+                            </div>
+                        </div>
+                        
+                        <p>Let's convert our specific capacity:</p>
+                        <div class="bg-white p-2 rounded-lg border border-gray-100 my-2 text-center font-medium shadow-sm">
+                            \[ \text{Volume (V)} = 40.5 \times 1000 = \mathbf{40,500 \text{ cm}^3} \]
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Find the Area of the Base (\(A\))</p>
+                        <p>The volume of any uniform prism can be found using the formula \( V = Ah \), where \( A \) is the area of the base.</p>
+                        <p class="mt-2">First, let's calculate the area of the rectangular base using the given dimensions:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium">
+                            \[ A = 90 \times 30 = \mathbf{2700 \text{ cm}^2} \]
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Substitute into the Volume Formula</p>
+                        <p>Now, substitute the volume (\(V\)) from Step 1 and the base area (\(A\)) from Step 2 into the prism volume formula:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto space-y-2">
+                            <div>\[ V = Ah \]</div>
+                            <div>\[ 40,500 = 2700 \times h \]</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-4">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 4: Solve for Height (\(h\) )</p>
+                        <p>Divide both sides of the equation by 2700 to isolate the height \( h \):</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium">
+                            \[ h = \frac{40,500}{2700} \]
+                            \[ h = 15 \text{ cm} \]
+                        </div>
+                        <p class="font-bold text-green-700 text-xl mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">15 cm</p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option C is correct.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see common mistakes and detailed feedback.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Note: Using \\( and \\) and \\[ and \\] for MathJax in JavaScript strings. 
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4">You successfully set up the volume equation, but you completely forgot to convert the units of capacity.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3">
+                            <div class="text-sm text-gray-500 italic">Using Litres directly alongside centimetres:</div>
+                            <div>\\[ V = A \\times h \\]</div>
+<div>\\[ A = 90 \\times 30 = 2700 \\]</div>
+                            <div>\\[ 40.5 = 2700 \\times h \\]</div>
+                            <div>\\[ h = \\frac{40.5}{2700} = 0.015 \\]</div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> You cannot mix units in a formula without converting them to match. You are trying to find the height in <strong>centimetres</strong>, so the volume must be in <strong>cubic centimetres</strong>. Since \\( 1 \\text{ L} = 1000 \\text{ cm}^3 \\), you must multiply \\( 40.5 \\) by \\( 1000 \\) before solving.
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4">You knew you had to convert Litres to cubic centimetres, but you used the wrong conversion factor.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3">
+                            <div class="text-sm text-gray-500 italic">Assuming 1 Litre = 100 cm³:</div>
+<div>\\[ V = A \\times h \\]</div>
+<div>\\[ A = 90 \\times 30 = 2700 \\]</div>
+                            <div>\\[ 40.5 \\text{ L} \\times 100 = 4050 \\text{ cm}^3 \\]</div>
+                            <div>\\[ 4050 = 2700 \\times h \\]</div>
+                            <div>\\[ h = \\frac{4050}{2700} = 1.5 \\]</div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conversion Error:</strong> It is a common mistake to think there are 100 cubic centimetres in a litre. Remember that \\( 1 \\text{ L} = 1000 \\text{ mL} \\), and \\( 1 \\text{ mL} \\) is exactly \\( 1 \\text{ cm}^3 \\). Therefore, you must multiply by <strong>1000</strong>, not 100.
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-6">You successfully recognised the need to convert units, correctly changed 40.5 Litres into 40,500 cm³, and algebraically solved the volume formula to find the missing height.</p>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200">
+                            <i class="fas fa-info-circle mr-1"></i> Explore the other options on the left to see common traps students fall into regarding unit conversions!
+                        </p>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4">You attempted to convert the side lengths into meters, but you mixed up your units when dealing with the volume.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3">
+                            <div class="text-sm text-gray-500 italic">Converting sides to meters:</div>
+                            <div>\\[ l = 0.9 \\text{ m}, \\quad w = 0.3 \\text{ m} \\]</div>
+<div>\\[ V = A \\times h \\]</div>
+<div>\\[ A = 0.9 \\times 0.3 = 0.27 \\]</div>
+<div>\\[ 40.5 = 0.27 \\times h \\]</div>
+                            <div>\\[ h = \\frac{40.5}{0.27} = 150 \\]</div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-3">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> You converted the base lengths to meters, but you left the volume as 40.5 <strong>litres</strong>. A litre is not equivalent to a cubic meter (\\( 1 \\text{ m}^3 = 1000 \\text{ L} \\)).</p>
+                            <p>To avoid getting tangled in complex mixed-unit conversions, it is much safer to convert the litres into cubic centimetres right at the start.</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 4;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset styling on all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Add styling to selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case new math was revealed
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

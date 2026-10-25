@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Skewness and Central Tendency</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* SVG Graph Styling */
+        .graph-axis {
+            stroke: #1f2937;
+            stroke-width: 1.5;
+        }
+        .graph-curve {
+            fill: none;
+            stroke: #2563eb;
+            stroke-width: 2;
+        }
+        .dist-fill {
+            fill: #eff6ff;
+            stroke: none;
+        }
+        .line-mode {
+            stroke: #ef4444; /* Red */
+            stroke-width: 2;
+            stroke-dasharray: 4, 2;
+        }
+        .line-median {
+            stroke: #10b981; /* Green */
+            stroke-width: 2;
+            stroke-dasharray: 4, 2;
+        }
+        .line-mean {
+            stroke: #f59e0b; /* Orange */
+            stroke-width: 2;
+            stroke-dasharray: 4, 2;
+        }
+        .label-mode { fill: #ef4444; font-size: 10px; font-weight: bold; }
+        .label-median { fill: #10b981; font-size: 10px; font-weight: bold; }
+        .label-mean { fill: #f59e0b; font-size: 10px; font-weight: bold; }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-question text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-6 text-lg">
+                <p class="mb-4 text-gray-800">Which of the following graphs represents a dataset in which the mode is larger than both the median and mean?</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center relative overflow-hidden" data-value="A">
+                        <div class="absolute top-2 left-2 w-8 h-8 flex-shrink-0 z-10">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <div class="w-full flex justify-center mt-6">
+                            <svg width="200" height="120" viewBox="0 0 200 120">
+                                <defs>
+                                    <marker id="arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                                        <polygon points="0,0 6,3 0,6" fill="#1f2937" />
+                                    </marker>
+                                    <marker id="arrow-rev" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                                        <polygon points="6,0 0,3 6,6" fill="#1f2937" />
+                                    </marker>
+                                </defs>
+                                <line x1="10" y1="100" x2="190" y2="100" class="graph-axis" marker-end="url(#arrow)" marker-start="url(#arrow-rev)"></line>
+                                <path d="M 20 100 C 60 100 80 30 100 30 C 120 30 140 100 180 100" class="graph-curve"></path>
+                            </svg>
+                        </div>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center relative overflow-hidden" data-value="B">
+                        <div class="absolute top-2 left-2 w-8 h-8 flex-shrink-0 z-10">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <div class="w-full flex justify-center mt-6">
+                            <svg width="200" height="120" viewBox="0 0 200 120">
+                                <line x1="10" y1="100" x2="190" y2="100" class="graph-axis" marker-end="url(#arrow)" marker-start="url(#arrow-rev)"></line>
+                                <path d="M 20 100 C 40 100 60 20 70 20 C 80 20 90 70 100 70 C 110 70 120 20 130 20 C 140 20 160 100 180 100" class="graph-curve"></path>
+                            </svg>
+                        </div>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center relative overflow-hidden" data-value="C">
+                        <div class="absolute top-2 left-2 w-8 h-8 flex-shrink-0 z-10">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <div class="w-full flex justify-center mt-6">
+                            <svg width="200" height="120" viewBox="0 0 200 120">
+                                <line x1="10" y1="100" x2="190" y2="100" class="graph-axis" marker-end="url(#arrow)" marker-start="url(#arrow-rev)"></line>
+                                <path d="M 20 100 C 50 100 50 20 70 20 C 100 20 130 100 180 100" class="graph-curve"></path>
+                            </svg>
+                        </div>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center relative overflow-hidden" data-value="D">
+                        <div class="absolute top-2 left-2 w-8 h-8 flex-shrink-0 z-10">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <div class="w-full flex justify-center mt-6">
+                            <svg width="200" height="120" viewBox="0 0 200 120">
+                                <line x1="10" y1="100" x2="190" y2="100" class="graph-axis" marker-end="url(#arrow)" marker-start="url(#arrow-rev)"></line>
+                                <path d="M 20 100 C 70 100 100 20 130 20 C 150 20 150 100 180 100" class="graph-curve"></path>
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Identify the Mode</p>
+                        <p>The <strong>mode</strong> is the most frequent value in a dataset. On a curve or histogram, this always corresponds to the <strong>highest peak</strong> of the graph.</p>
+                        <p class="mt-2 text-sm text-gray-700">We are looking for a graph where the highest peak (Mode) is further to the right (larger) than the Mean and Median.</p>
+                    </div>
+                    
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Understand the Rule for Skewness</p>
+                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-blue-900 font-medium mb-3">
+                            <strong>Rule:</strong> The Mean is heavily influenced by outliers, so it is always pulled in the direction of the "tail" of the distribution. The Median sits between the Mode and the Mean.
+                        </div>
+                    </div>
+
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Visualizing the Measures</p>
+                        <p class="text-sm text-gray-800 mb-3">In a <strong>negatively skewed</strong> distribution, the "tail" extends to the left, containing extreme low values. These low values pull the mean down.</p>
+                        
+                        <div class="flex justify-center my-4 bg-white p-4 rounded-lg border border-gray-100 shadow-inner">
+                            <svg width="280" height="180" viewBox="0 0 280 180">
+                                <line x1="20" y1="140" x2="260" y2="140" class="graph-axis"></line>
+                                <!-- Negatively skewed curve -->
+                                <path d="M 30 140 C 90 140 140 40 180 40 C 200 40 210 140 240 140" class="graph-curve dist-fill"></path>
+                                
+                                <!-- Mode Line (Peak) -->
+                                <line x1="180" y1="40" x2="180" y2="140" class="line-mode"></line>
+                                <text x="180" y="30" class="label-mode" text-anchor="middle">MODE</text>
+                                
+                                <!-- Median Line -->
+                                <line x1="160" y1="60" x2="160" y2="140" class="line-median"></line>
+                                <text x="160" y="155" class="label-median" text-anchor="middle">MEDIAN</text>
+                                
+                                <!-- Mean Line -->
+                                <line x1="135" y1="95" x2="135" y2="140" class="line-mean"></line>
+                                <text x="135" y="170" class="label-mean" text-anchor="middle">MEAN</text>
+                            </svg>
+                        </div>
+                        
+                        <p class="text-sm text-gray-700">As shown above, the order from smallest to largest along the axis is Mean &lt; Median &lt; Mode. Therefore, the Mode is the largest.</p>
+                    </div>
+
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-4">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 4: Conclusion</p>
+                        <p>We need Mode > Median > Mean (the Mode is the largest/furthest right). This occurs in a <strong>negatively skewed</strong> distribution (tail on the left, peak on the right).</p>
+                        <p class="font-bold text-green-700 text-xl mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">Graph D</p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option D is correct.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see a visual breakdown of where the Mean, Median, and Mode lie.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-4 w-max text-sm uppercase tracking-wider"></div>
+                    
+                    <!-- Dynamic Feedback SVG Container -->
+                    <div class="w-full flex justify-center bg-white border border-gray-200 rounded-xl p-4 mb-4 shadow-inner min-h-[160px]" id="feedback-svg-container">
+                    </div>
+                    
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-sm md:text-base"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Use double escaping for MathJax inside JS strings if needed.
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                svgContent: `
+                    <svg width="240" height="150" viewBox="0 0 240 150">
+                        <line x1="10" y1="120" x2="230" y2="120" class="graph-axis"></line>
+                        <path d="M 20 120 C 70 120 90 40 120 40 C 150 40 170 120 220 120" class="graph-curve dist-fill"></path>
+                        <line x1="120" y1="40" x2="120" y2="120" stroke="#1f2937" stroke-width="2" stroke-dasharray="4,2"></line>
+                        <text x="120" y="30" font-size="10" font-weight="bold" fill="#1f2937" text-anchor="middle">Mean = Median = Mode</text>
+                    </svg>
+                `,
+                body: `
+                    <p>This is a <strong>symmetrical distribution</strong> (like a normal bell curve). The left side is a perfect mirror image of the right side.</p>
+                    <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> Because the distribution is perfectly balanced, the balance point (Mean), the 50th percentile mark (Median), and the highest peak (Mode) all sit exactly at the same centre point. The mode is not larger than the others; they are all equal.
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                svgContent: `
+                    <svg width="240" height="150" viewBox="0 0 240 150">
+                        <line x1="10" y1="120" x2="230" y2="120" class="graph-axis"></line>
+                        <path d="M 20 120 C 40 120 60 40 70 40 C 80 40 90 90 100 90 C 110 90 120 40 130 40 C 140 40 160 120 180 120" class="graph-curve dist-fill"></path>
+                        <line x1="70" y1="40" x2="70" y2="120" class="line-mode"></line>
+                        <line x1="130" y1="40" x2="130" y2="120" class="line-mode"></line>
+                        <text x="70" y="30" class="label-mode" text-anchor="middle">Mode 1</text>
+                        <text x="130" y="30" class="label-mode" text-anchor="middle">Mode 2</text>
+                        <line x1="100" y1="90" x2="100" y2="120" stroke="#1f2937" stroke-width="2" stroke-dasharray="4,2"></line>
+                        <text x="100" y="135" font-size="10" font-weight="bold" fill="#1f2937" text-anchor="middle">Mean/Median</text>
+                    </svg>
+                `,
+                body: `
+                    <p>This is a <strong>bimodal distribution</strong> because it has two distinct peaks.</p>
+                    <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> Because there are two peaks, this dataset has two modes. It's impossible to simply state "the mode is larger than the mean" because there isn't just one mode to compare. One mode is smaller than the mean, and the other is larger.
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'purple',
+                svgContent: `
+                    <svg width="240" height="150" viewBox="0 0 240 150">
+                        <line x1="10" y1="120" x2="230" y2="120" class="graph-axis"></line>
+                        <path d="M 20 120 C 50 120 50 30 70 30 C 100 30 140 120 200 120" class="graph-curve dist-fill"></path>
+                        
+                        <line x1="70" y1="30" x2="70" y2="120" class="line-mode"></line>
+                        <text x="70" y="20" class="label-mode" text-anchor="middle">MODE</text>
+                        
+                        <line x1="85" y1="45" x2="85" y2="120" class="line-median"></line>
+                        <text x="85" y="135" class="label-median" text-anchor="middle">MEDIAN</text>
+                        
+                        <line x1="105" y1="75" x2="105" y2="120" class="line-mean"></line>
+                        <text x="105" y="148" class="label-mean" text-anchor="middle">MEAN</text>
+                    </svg>
+                `,
+                body: `
+                    <p>This is a <strong>positively skewed</strong> distribution. The "tail" extends far to the right.</p>
+                    <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> You might have confused the direction of the skew. The long tail on the right contains extreme high values, which pull the <strong>Mean</strong> to the right (making it larger). The Mode (the peak) is actually the <em>smallest</em> of the three measures here. <br><br><strong>Order: Mean > Median > Mode.</strong>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                svgContent: `
+                    <svg width="240" height="150" viewBox="0 0 240 150">
+                        <line x1="10" y1="120" x2="230" y2="120" class="graph-axis"></line>
+                        <path d="M 20 120 C 80 120 120 30 150 30 C 170 30 170 120 200 120" class="graph-curve dist-fill"></path>
+                        
+                        <line x1="150" y1="30" x2="150" y2="120" class="line-mode"></line>
+                        <text x="150" y="20" class="label-mode" text-anchor="middle">MODE</text>
+                        
+                        <line x1="135" y1="45" x2="135" y2="120" class="line-median"></line>
+                        <text x="135" y="135" class="label-median" text-anchor="middle">MEDIAN</text>
+                        
+                        <line x1="115" y1="75" x2="115" y2="120" class="line-mean"></line>
+                        <text x="115" y="148" class="label-mean" text-anchor="middle">MEAN</text>
+                    </svg>
+                `,
+                body: `
+                    <p>This is a <strong>negatively skewed</strong> distribution. The "tail" extends to the left, containing extreme low values.</p>
+                    <div class="mt-4 p-3 bg-green-50 rounded-lg border border-green-100 text-sm text-green-800">
+                        <i class="fas fa-check-circle mr-1"></i> <strong>Correct!</strong> These extreme low values in the tail pull the Mean downwards (to the left), while the peak (the Mode) remains anchored on the far right. Therefore, the Mode is the largest value.<br><br><strong>Order: Mode > Median > Mean.</strong>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 4;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        const feedbackSvgContainer = document.getElementById('feedback-svg-container');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+                
+                // Inject the specific SVG for the chosen option
+                feedbackSvgContainer.innerHTML = data.svgContent;
+
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-4 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

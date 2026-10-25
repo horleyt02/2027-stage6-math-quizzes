@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Minimum Spanning Tree (Prim's)</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* SVG Network Styles */
+        .node {
+            fill: #ffffff;
+            stroke: #1f2937;
+            stroke-width: 2;
+            transition: all 0.3s ease;
+        }
+        .node-active {
+            fill: #d1fae5; /* Light green */
+            stroke: #059669;
+            stroke-width: 3;
+        }
+        .node-text {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-size: 16px;
+            fill: #1f2937;
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+        .node-sub {
+            font-size: 10px;
+        }
+        .edge {
+            stroke: #9ca3af;
+            stroke-width: 2;
+            transition: stroke 0.3s, stroke-width 0.3s;
+        }
+        .edge-weight {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            fill: #1f2937;
+            background-color: white;
+        }
+        
+        /* Highlight States */
+        .edge-accepted {
+            stroke: #10b981; /* Green */
+            stroke-width: 4;
+        }
+        .edge-rejected {
+            stroke: #ef4444; /* Red */
+            stroke-width: 4;
+            stroke-dasharray: 6,4;
+        }
+        .edge-candidate {
+            stroke: #3b82f6; /* Blue */
+            stroke-width: 3;
+            stroke-dasharray: 4,4;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-question text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-4 text-gray-800">The diagram shows 6 depots (\(D_1 - D_6\)) connected by a road network with distances (km) between them.</p>
+                
+                <div class="flex justify-center mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                    <svg width="300" height="280" viewBox="0 0 300 280">
+                        <!-- Edges -->
+                        <line x1="150" y1="50" x2="60" y2="100" class="edge"></line>
+                        <line x1="150" y1="50" x2="240" y2="100" class="edge"></line>
+                        <line x1="150" y1="50" x2="150" y2="130" class="edge"></line>
+                        
+                        <line x1="60" y1="100" x2="80" y2="210" class="edge"></line>
+                        <line x1="60" y1="100" x2="150" y2="130" class="edge"></line>
+                        
+                        <line x1="80" y1="210" x2="220" y2="210" class="edge"></line>
+                        <line x1="80" y1="210" x2="150" y2="130" class="edge"></line>
+                        
+                        <line x1="220" y1="210" x2="240" y2="100" class="edge"></line>
+                        <line x1="220" y1="210" x2="150" y2="130" class="edge"></line>
+                        
+                        <line x1="240" y1="100" x2="150" y2="130" class="edge"></line>
+                        
+                        <!-- Edge Weights -->
+                        <rect x="95" y="60" width="12" height="16" fill="#f9fafb"></rect>
+                        <text x="100" y="72" class="edge-weight text-center">6</text>
+                        
+                        <rect x="195" y="60" width="12" height="16" fill="#f9fafb"></rect>
+                        <text x="200" y="72" class="edge-weight">5</text>
+                        
+                        <rect x="145" y="80" width="12" height="16" fill="#f9fafb"></rect>
+                        <text x="148" y="92" class="edge-weight">3</text>
+                        
+                        <rect x="60" y="150" width="12" height="16" fill="#f9fafb"></rect>
+                        <text x="64" y="162" class="edge-weight">3</text>
+                        
+                        <rect x="95" y="102" width="12" height="16" fill="#f9fafb"></rect>
+                        <text x="100" y="114" class="edge-weight">5</text>
+                        
+                        <rect x="145" y="210" width="12" height="16" fill="#f9fafb"></rect>
+                        <text x="145" y="222" class="edge-weight">6</text>
+                        
+                        <rect x="100" y="165" width="12" height="16" fill="#f9fafb"></rect>
+                        <text x="105" y="177" class="edge-weight">6</text>
+                        
+                        <rect x="230" y="150" width="12" height="16" fill="#f9fafb"></rect>
+                        <text x="234" y="162" class="edge-weight">2</text>
+                        
+                        <rect x="180" y="155" width="12" height="16" fill="#f9fafb"></rect>
+                        <text x="185" y="167" class="edge-weight">4</text>
+                        
+                        <rect x="195" y="102" width="12" height="16" fill="#f9fafb"></rect>
+                        <text x="200" y="114" class="edge-weight">5</text>
+
+                        <!-- Nodes -->
+                        <circle cx="150" cy="50" r="20" class="node"></circle>
+                        <text x="150" y="50" class="node-text">D<tspan class="node-sub" dy="4">1</tspan></text>
+                        
+                        <circle cx="60" cy="100" r="20" class="node"></circle>
+                        <text x="60" y="100" class="node-text">D<tspan class="node-sub" dy="4">2</tspan></text>
+                        
+                        <circle cx="80" cy="210" r="20" class="node"></circle>
+                        <text x="80" y="210" class="node-text">D<tspan class="node-sub" dy="4">3</tspan></text>
+                        
+                        <circle cx="220" cy="210" r="20" class="node"></circle>
+                        <text x="220" y="210" class="node-text">D<tspan class="node-sub" dy="4">4</tspan></text>
+                        
+                        <circle cx="240" cy="100" r="20" class="node"></circle>
+                        <text x="240" y="100" class="node-text">D<tspan class="node-sub" dy="4">5</tspan></text>
+                        
+                        <circle cx="150" cy="130" r="20" class="node"></circle>
+                        <text x="150" y="130" class="node-text">D<tspan class="node-sub" dy="4">6</tspan></text>
+                    </svg>
+                </div>
+
+                <p class="font-semibold mb-5 text-gray-800">Which of these roads connecting the depots would NOT form part of the minimum spanning tree for this road network?</p>
+                
+                <div class="grid grid-cols-1 gap-3" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow py-1">\( D_2 - D_6 \)</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow py-1">\( D_2 - D_3 \)</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow py-1">\( D_4 - D_6 \)</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow py-1">\( D_5 - D_6 \)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Prim's Algorithm</p>
+                        <p>To find the Minimum Spanning Tree (MST), we can use Prim's algorithm. We start at any vertex and "grow" the tree by always picking the <strong>shortest edge</strong> that connects a node currently <em>in the tree</em> to a node currently <em>outside the tree</em>.</p>
+                        <p class="mt-2 text-sm text-gray-700">Let's start our tree at \( D_1 \).</p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Start growing the tree</p>
+                        <p>From \( D_1 \), the available edges are 6, 3, and 5. We pick the shortest: \( D_1 - D_6 \) (Weight 3).</p>
+                        <p class="mt-2">Now from our tree \(\{D_1, D_6\}\), the available edges to new nodes are 6, 5, 5, 4, 6. The shortest is \( D_6 - D_4 \) (Weight 4).</p>
+                        <div class="flex justify-center my-4 bg-white p-2 rounded-xl border border-gray-100 shadow-sm">
+                            <svg width="210" height="196" viewBox="0 0 300 280">
+                                <line x1="150" y1="50" x2="60" y2="100" class="edge"></line>
+                                <line x1="150" y1="50" x2="240" y2="100" class="edge"></line>
+                                <line x1="150" y1="50" x2="150" y2="130" class="edge edge-accepted"></line>
+                                <line x1="60" y1="100" x2="80" y2="210" class="edge"></line>
+                                <line x1="60" y1="100" x2="150" y2="130" class="edge"></line>
+                                <line x1="80" y1="210" x2="220" y2="210" class="edge"></line>
+                                <line x1="80" y1="210" x2="150" y2="130" class="edge"></line>
+                                <line x1="220" y1="210" x2="240" y2="100" class="edge"></line>
+                                <line x1="220" y1="210" x2="150" y2="130" class="edge edge-accepted"></line>
+                                <line x1="240" y1="100" x2="150" y2="130" class="edge"></line>
+                                <circle cx="150" cy="50" r="20" class="node node-active"></circle><text x="150" y="50" class="node-text">D<tspan class="node-sub" dy="4">1</tspan></text>
+                                <circle cx="60" cy="100" r="20" class="node"></circle><text x="60" y="100" class="node-text">D<tspan class="node-sub" dy="4">2</tspan></text>
+                                <circle cx="80" cy="210" r="20" class="node"></circle><text x="80" y="210" class="node-text">D<tspan class="node-sub" dy="4">3</tspan></text>
+                                <circle cx="220" cy="210" r="20" class="node node-active"></circle><text x="220" y="210" class="node-text">D<tspan class="node-sub" dy="4">4</tspan></text>
+                                <circle cx="240" cy="100" r="20" class="node"></circle><text x="240" y="100" class="node-text">D<tspan class="node-sub" dy="4">5</tspan></text>
+                                <circle cx="150" cy="130" r="20" class="node node-active"></circle><text x="150" y="130" class="node-text">D<tspan class="node-sub" dy="4">6</tspan></text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Connect D5</p>
+                        <p>From our tree \(\{D_1, D_6, D_4\}\), we have edges of weight 2, 5, 5, 6, 6 connecting to nodes outside the tree. We select the cheapest: \( D_4 - D_5 \) (Weight 2).</p>
+                        <div class="flex justify-center my-4 bg-white p-2 rounded-xl border border-gray-100 shadow-sm">
+                            <svg width="210" height="196" viewBox="0 0 300 280">
+                                <line x1="150" y1="50" x2="60" y2="100" class="edge"></line>
+                                <line x1="150" y1="50" x2="240" y2="100" class="edge"></line>
+                                <line x1="150" y1="50" x2="150" y2="130" class="edge edge-accepted"></line>
+                                <line x1="60" y1="100" x2="80" y2="210" class="edge"></line>
+                                <line x1="60" y1="100" x2="150" y2="130" class="edge"></line>
+                                <line x1="80" y1="210" x2="220" y2="210" class="edge"></line>
+                                <line x1="80" y1="210" x2="150" y2="130" class="edge"></line>
+                                <line x1="220" y1="210" x2="240" y2="100" class="edge edge-accepted"></line>
+                                <line x1="220" y1="210" x2="150" y2="130" class="edge edge-accepted"></line>
+                                <line x1="240" y1="100" x2="150" y2="130" class="edge"></line>
+                                <circle cx="150" cy="50" r="20" class="node node-active"></circle><text x="150" y="50" class="node-text">D<tspan class="node-sub" dy="4">1</tspan></text>
+                                <circle cx="60" cy="100" r="20" class="node"></circle><text x="60" y="100" class="node-text">D<tspan class="node-sub" dy="4">2</tspan></text>
+                                <circle cx="80" cy="210" r="20" class="node"></circle><text x="80" y="210" class="node-text">D<tspan class="node-sub" dy="4">3</tspan></text>
+                                <circle cx="220" cy="210" r="20" class="node node-active"></circle><text x="220" y="210" class="node-text">D<tspan class="node-sub" dy="4">4</tspan></text>
+                                <circle cx="240" cy="100" r="20" class="node node-active"></circle><text x="240" y="100" class="node-text">D<tspan class="node-sub" dy="4">5</tspan></text>
+                                <circle cx="150" cy="130" r="20" class="node node-active"></circle><text x="150" y="130" class="node-text">D<tspan class="node-sub" dy="4">6</tspan></text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-4">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 4: Preventing Cycles</p>
+                        <p>Our tree now contains \(\{D_1, D_6, D_4, D_5\}\). We need to connect \(D_2\) and \(D_3\).</p>
+                        <p class="mt-2 text-sm text-gray-700">Notice the edges \( D_1 - D_5 \) (5) and \( D_5 - D_6 \) (5). Even though they have a weight of 5, they connect nodes that are <strong>already inside our tree</strong>. Including them would create a loop (cycle), so we must explicitly <strong>reject</strong> them.</p>
+                        <p class="mt-2">The cheapest valid edge to expand the tree to a new node is \( D_6 - D_2 \) (Weight 5).</p>
+                        <div class="flex justify-center my-4 bg-white p-2 rounded-xl border border-gray-100 shadow-sm">
+                            <svg width="210" height="196" viewBox="0 0 300 280">
+                                <line x1="150" y1="50" x2="60" y2="100" class="edge"></line>
+                                <line x1="150" y1="50" x2="240" y2="100" class="edge edge-rejected"></line>
+                                <line x1="150" y1="50" x2="150" y2="130" class="edge edge-accepted"></line>
+                                <line x1="60" y1="100" x2="80" y2="210" class="edge"></line>
+                                <line x1="60" y1="100" x2="150" y2="130" class="edge edge-accepted"></line>
+                                <line x1="80" y1="210" x2="220" y2="210" class="edge"></line>
+                                <line x1="80" y1="210" x2="150" y2="130" class="edge"></line>
+                                <line x1="220" y1="210" x2="240" y2="100" class="edge edge-accepted"></line>
+                                <line x1="220" y1="210" x2="150" y2="130" class="edge edge-accepted"></line>
+                                <line x1="240" y1="100" x2="150" y2="130" class="edge edge-rejected"></line>
+                                <circle cx="150" cy="50" r="20" class="node node-active"></circle><text x="150" y="50" class="node-text">D<tspan class="node-sub" dy="4">1</tspan></text>
+                                <circle cx="60" cy="100" r="20" class="node node-active"></circle><text x="60" y="100" class="node-text">D<tspan class="node-sub" dy="4">2</tspan></text>
+                                <circle cx="80" cy="210" r="20" class="node"></circle><text x="80" y="210" class="node-text">D<tspan class="node-sub" dy="4">3</tspan></text>
+                                <circle cx="220" cy="210" r="20" class="node node-active"></circle><text x="220" y="210" class="node-text">D<tspan class="node-sub" dy="4">4</tspan></text>
+                                <circle cx="240" cy="100" r="20" class="node node-active"></circle><text x="240" y="100" class="node-text">D<tspan class="node-sub" dy="4">5</tspan></text>
+                                <circle cx="150" cy="130" r="20" class="node node-active"></circle><text x="150" y="130" class="node-text">D<tspan class="node-sub" dy="4">6</tspan></text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-5">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 5: Finish the Tree</p>
+                        <p>Finally, to connect \( D_3 \), the cheapest available valid edge is \( D_2 - D_3 \) (Weight 3).</p>
+                        <p class="mt-2 text-sm text-gray-700">The Minimum Spanning Tree is complete. The edge \( D_5 - D_6 \) was explicitly rejected because it would have caused a cycle with nodes already in the tree.</p>
+                        <p class="font-bold text-green-700 text-xl mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">Option D</p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option D is correct.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see why they are incorrect.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4">Let's prove this is incorrect by looking at Prim's algorithm.</p>
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <div class="space-y-3 text-sm text-gray-700">
+                            <p>You might have thought that because \\( D_2 - D_6 \\) has a weight of 5 (which is higher than the 2s, 3s, and 4s), it wouldn't be included.</p>
+                            <p>However, imagine our growing tree has reached nodes \\( \\{D_1, D_6, D_4, D_5\\} \\). We still need to connect \\( D_2 \\).</p>
+                            <p>To connect \\( D_2 \\) to the tree, our options are \\( D_1-D_2 \\) (weight 6) or \\( D_6-D_2 \\) (weight 5). Because Prim's algorithm always picks the cheapest connection to a new node, \\( D_2 - D_6 \\) <strong>must</strong> be included in the Minimum Spanning Tree.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4">Let's prove this is incorrect.</p>
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <div class="space-y-3 text-sm text-gray-700">
+                            <p>You might have misread the question. The question asks which road would <strong>NOT</strong> form part of the Minimum Spanning Tree.</p>
+                            <p>The road \\( D_2 - D_3 \\) has a weight of only 3. It is the absolute cheapest way to connect depot \\( D_3 \\) to the rest of the network.</p>
+                            <p>According to Prim's Algorithm, we always select the shortest available edge that reaches a new node. Therefore, \\( D_2 - D_3 \\) is absolutely guaranteed to be <strong>IN</strong> the Minimum Spanning Tree.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4">Let's prove this is incorrect by looking at Prim's algorithm.</p>
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <div class="space-y-3 text-sm text-gray-700">
+                            <p>The road \\( D_4 - D_6 \\) has a weight of 4. </p>
+                            <p>If our growing tree has connected \\( D_1 \\) and \\( D_6 \\), we need to reach the right side of the graph. The edges available are \\( D_6-D_4 \\) (4) or \\( D_6-D_5 \\) (5) or \\( D_1-D_5 \\) (5). </p>
+                            <p>Since 4 is the cheapest edge extending outwards to a new node, the algorithm will <strong>accept</strong> \\( D_4 - D_6 \\). Therefore, it <em>is</em> part of the Minimum Spanning Tree.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-6">You correctly identified that \\( D_5 - D_6 \\) would form a cycle. If we use Prim's algorithm to grow the tree, by the time we consider the edge \\( D_5 - D_6 \\) (weight 5), the nodes \\( D_5 \\) and \\( D_6 \\) are already safely inside our tree (connected via the much cheaper path through \\( D_4 \\)). Thus, this edge is rejected.</p>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200">
+                            <i class="fas fa-info-circle mr-1"></i> Walk through the detailed solution steps below to see Prim's algorithm dynamically build the tree!
+                        </p>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 5;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        // Handle multiple choice clicks
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset styling
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selection
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case new math was revealed
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
