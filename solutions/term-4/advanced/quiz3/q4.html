@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Triangle Area Formula</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Geometric SVG Styling */
+        .triangle-shape {
+            fill: none;
+            stroke: #1f2937;
+            stroke-width: 1.5;
+        }
+        .triangle-tick {
+            stroke: #1f2937;
+            stroke-width: 1.5;
+        }
+        .arc-line {
+            fill: none;
+            stroke: #1f2937;
+            stroke-width: 1;
+        }
+        .math-text {
+            font-family: 'Times New Roman', Times, serif;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-question text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-2 text-gray-800">The diagram shows an isosceles triangle with an area of \( 48 \text{ cm}^2 \) and equal sides of length \( x \text{ cm} \).</p>
+                <p class="mb-4 text-gray-800">The angle between the equal sides is \( 36^\circ \).</p>
+                
+                <div class="flex justify-center items-center mb-6 py-4">
+                    <div class="relative">
+                        <svg width="200" height="200" viewBox="0 0 200 200">
+                            <!-- Triangle -->
+                            <polygon points="100,20 40,160 160,160" class="triangle-shape"></polygon>
+                            <!-- Angle Arc -->
+                            <path d="M 85 55 A 40 40 0 0 0 115 55" class="arc-line"></path>
+                            <!-- Ticks -->
+                            <line x1="65" y1="85" x2="75" y2="95" class="triangle-tick"></line>
+                            <line x1="125" y1="95" x2="135" y2="85" class="triangle-tick"></line>
+                            <!-- Text -->
+                            <text x="100" y="75" font-family="sans-serif" font-size="14" text-anchor="middle">36&deg;</text>
+                        </svg>
+                    </div>
+                    <div class="ml-8 text-center text-sm font-serif">
+                        NOT TO<br>SCALE
+                    </div>
+                </div>
+
+                <p class="font-semibold mb-5 text-gray-800">Which of the following expressions represents the length of the equal sides?</p>
+                
+                <div class="grid grid-cols-1 gap-4 mt-6" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( \frac{x}{\sin(72^\circ)} = \frac{48}{\sin(36^\circ)} \)</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( 48^2 = x^2 + x^2 - 2x^2 \times \cos(36^\circ) \)</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( x^2 \times \sin(36^\circ) = 96 \)</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( x = \frac{24}{\sin(18^\circ)} \)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Use the Reference Sheet</p>
+                        <p>We are given the Area, two adjacent sides, and the included angle. Look at your reference sheet for the area of a non-right-angled triangle:</p>
+                        
+                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 my-3 shadow-sm text-center">
+                            <p class="font-bold text-blue-900 text-lg">\( \text{Area } = \frac{1}{2}\color{#2563eb}{(a)}\color{#059669}{(b)}\color{#dc2626}{\sin}(\color{#dc2626}{C}) \)</p>
+                        </div>
+                        
+                        <div class="flex justify-center mb-2">
+                            <svg width="200" height="180" viewBox="0 0 200 180">
+                                <polygon points="100,20 40,160 160,160" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"></polygon>
+                                <path d="M 85 55 A 40 40 0 0 0 115 55" fill="#fee2e2" stroke="#dc2626" stroke-width="2"></path>
+                                <text x="100" y="75" font-family="sans-serif" font-size="14" fill="#dc2626" text-anchor="middle" font-weight="bold">36&deg; (C)</text>
+                                <text x="30" y="85" font-family="Times New Roman" font-size="16" fill="#2563eb" font-style="italic" font-weight="bold">x (a)</text>
+                                <text x="150" y="85" font-family="Times New Roman" font-size="16" fill="#059669" font-style="italic" font-weight="bold">x (b)</text>
+                                <text x="100" y="130" font-family="sans-serif" font-size="14" fill="#1f2937" text-anchor="middle">Area = 48</text>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Substitute the known values</p>
+                        <p>Substitute the values from our specific triangle into the formula:</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-1 text-sm text-gray-700 font-medium">
+                            <li>Area = \( 48 \)</li>
+                            <li>Side \( a \) = \( x \)</li>
+                            <li>Side \( b \) = \( x \)</li>
+                            <li>Angle \( C \) = \( 36^\circ \)</li>
+                        </ul>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-3 shadow-sm text-center text-lg overflow-x-auto">
+                            \[ 48 = \frac{1}{2}\color{#2563eb}{(x)}\color{#059669}{(x)}\color{#dc2626}{\sin}(\color{#dc2626}{36^\circ}) \]
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Simplify and Rearrange</p>
+                        <p>Combine the \( x \) terms (\( x \times x = x^2 \)):</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto space-y-2">
+                            <div>\[ 48 = \frac{1}{2} x^2 \sin(36^\circ) \]</div>
+                            <div class="text-sm text-gray-500 italic mt-2">To match the options, remove the fraction by multiplying both sides by 2:</div>
+                            <div class="text-blue-700">\[ 48 \times 2 = x^2 \sin(36^\circ) \]</div>
+                            <div class="font-bold text-gray-900 text-xl">\[ 96 = x^2 \sin(36^\circ) \]</div>
+                        </div>
+                        
+                        <p class="font-bold text-green-700 text-xl mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">Option C</p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option C is correct.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see common mistakes and detailed feedback.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Note: Double escaping backslashes \\( and \\) and \\[ and \\] for MathJax inside JS strings.
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4">You attempted to use the <strong>Sine Rule</strong> formula from your reference sheet.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Analysing your formula:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3">
+                            <div>\\[ \\frac{a}{\\sin A} = \\frac{b}{\\sin B} \\]</div>
+                            <div>\\[ \\frac{x}{\\sin(72^\\circ)} = \\frac{48}{\\sin(36^\\circ)} \\]</div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-3">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> The Sine Rule establishes a relationship between the lengths of <em>sides</em> and their opposite angles. The value \\(48\\) represents the <strong>Area</strong> of the triangle, not a side length!</p>
+                            <p>You cannot substitute an Area value into the Sine Rule formula.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4">You attempted to use the <strong>Cosine Rule</strong> formula from your reference sheet.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Analysing your formula:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3">
+                            <div>\\[ c^2 = a^2 + b^2 - 2ab \\cos C \\]</div>
+                            <div>\\[ 48^2 = x^2 + x^2 - 2(x)(x) \\cos(36^\\circ) \\]</div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800 space-y-3">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> The Cosine Rule is used to find a missing <em>side length</em> (\\(c\\)). The value \\(48\\) is the <strong>Area</strong> of the triangle, not the length of the third side at the bottom of the triangle.</p>
+                            <p>You cannot substitute an Area value where a side length belongs.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-6">You successfully recognised that you needed the Area formula from the reference sheet (\\(A = \\frac{1}{2}ab \\sin C\\)). By substituting the known area and the two equal sides \\(x\\), you correctly set up the equation and algebraically rearranged it by multiplying by 2.</p>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200">
+                            <i class="fas fa-info-circle mr-1"></i> Explore the other options on the left to see common traps, like incorrectly applying the Sine Rule or trying to use Right-Angled Trigonometry!
+                        </p>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4">You used a property of isosceles triangles by splitting it down the middle to create a right-angled triangle, but you misinterpreted the Area value.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <div class="flex justify-center mb-3">
+                            <svg width="120" height="160" viewBox="0 0 120 160">
+                                <polygon points="10,130 110,130 110,10" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.5"></polygon>
+                                <polyline points="95,130 95,115 110,115" fill="none" stroke="#9333ea" stroke-width="1"></polyline>
+                                <path d="M 98 24 A 15 15 0 0 0 110 25" fill="none" stroke="#9333ea"></path>
+                                <text x="88" y="44" font-family="sans-serif" font-size="12" fill="#9333ea">18&deg;</text>
+                                <text x="40" y="65" font-family="Times New Roman" font-size="14" font-style="italic" fill="#1f2937">x</text>
+                                <text x="60" y="148" font-family="sans-serif" font-size="12" fill="#ef4444" font-weight="bold">Opp = 24?</text>
+                            </svg>
+                        </div>
+                        <p class="font-bold text-purple-800 mb-2 text-center">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3">
+                            <div>\\[ \\sin(18^\\circ) = \\frac{\\text{Opp}}{\\text{Hyp}} = \\frac{24}{x} \\]</div>
+                            <div>\\[ x = \\frac{24}{\\sin(18^\\circ)} \\]</div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-3">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> You halved the <strong>Area</strong> (48 to 24) and mistakenly used it as the length of the <em>Opposite side</em> at the base of your right-angled triangle.</p>
+                            <p>Area (\\(\\text{cm}^2\\)) and side length (\\(\\text{cm}\\)) are entirely different properties and cannot be swapped in a SOH CAH TOA calculation.</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to typeset the newly injected math content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case new math was revealed
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

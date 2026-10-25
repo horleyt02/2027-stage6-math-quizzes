@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Domain and Range</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* SVG Graph Styling */
+        .graph-axis {
+            stroke: #1f2937;
+            stroke-width: 1.5;
+        }
+        .graph-dashed {
+            stroke: #4b5563;
+            stroke-width: 1.5;
+            stroke-dasharray: 4,4;
+        }
+        .graph-line {
+            fill: none;
+            stroke: #0f172a;
+            stroke-width: 2.5;
+        }
+        .graph-point-open {
+            fill: #ffffff;
+            stroke: #0f172a;
+            stroke-width: 2;
+        }
+        .graph-point-closed {
+            fill: #0f172a;
+        }
+        .graph-text {
+            font-family: 'Times New Roman', serif;
+            font-size: 14px;
+            fill: #1f2937;
+        }
+        .graph-label-math {
+            font-style: italic;
+        }
+        
+        /* Interactive Highlight Styles */
+        .highlight-group {
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .highlight-visible {
+            opacity: 1;
+        }
+        .domain-highlight {
+            stroke: #3b82f6;
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+        .range-highlight {
+            stroke: #ef4444;
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-question text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-2 text-gray-800">The graph of a function \( y = f(x) \) is shown below.</p>
+                <p class="mb-4 text-gray-800">It has an asymptote at \( y = -2.5 \).</p>
+                
+                <div class="flex justify-center mb-6 border border-gray-100 rounded-lg p-4 bg-gray-50 overflow-x-auto">
+                    <svg width="350" height="230" viewBox="0 0 350 230">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                                <polygon points="0,0 6,3 0,6" fill="#1f2937"></polygon>
+                            </marker>
+                            <marker id="arrowhead-curve" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+                                <polygon points="0,0 5,2.5 0,5" fill="#0f172a"></polygon>
+                            </marker>
+                            <marker id="arrowhead-dashed" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                                <polygon points="0,0 6,3 0,6" fill="#4b5563"></polygon>
+                            </marker>
+                        </defs>
+                        
+                        <!-- Axes (Origin at 80, 100. Scale: 1 unit = 30px) -->
+                        <line x1="20" y1="100" x2="330" y2="100" class="graph-axis" marker-end="url(#arrowhead)" marker-start="url(#arrowhead)"></line>
+                        <line x1="80" y1="210" x2="80" y2="20" class="graph-axis" marker-end="url(#arrowhead)" marker-start="url(#arrowhead)"></line>
+                        
+                        <!-- Asymptote y = -2.5 (100 - (-2.5 * 30) = 175) -->
+                        <line x1="20" y1="175" x2="330" y2="175" class="graph-dashed" marker-end="url(#arrowhead-dashed)" marker-start="url(#arrowhead-dashed)"></line>
+                        
+                        <!-- Function Curve -->
+                        <!-- Points: (2, -3) -> (140, 190). (3, -1) -> (170, 130). Asymptote -> y=175 -->
+                        <path d="M 140 190 C 135 135, 150 130, 170 130 C 240 130, 280 160, 320 165" class="graph-line" marker-end="url(#arrowhead-curve)"></path>
+                        
+                        <!-- Points -->
+                        <circle cx="140" cy="190" r="4" class="graph-point-open"></circle>
+                        <circle cx="170" cy="130" r="4" class="graph-point-closed"></circle>
+                        
+                        <!-- Labels -->
+                        <text x="335" y="104" class="graph-text graph-label-math text-sm">x</text>
+                        <text x="75" y="15" class="graph-text graph-label-math text-sm">y</text>
+                        <text x="135" y="208" class="graph-text text-sm">(2, -3)</text>
+                        <text x="165" y="120" class="graph-text text-sm">(3, -1)</text>
+                        <text x="240" y="125" class="graph-text graph-label-math text-sm">y = f(x)</text>
+                        <text x="235" y="190" class="graph-text graph-label-math text-sm">y = -2.5</text>
+                    </svg>
+                </div>
+
+                <p class="font-semibold mb-5 text-gray-800">Which statement correctly describes its domain and range?</p>
+                
+                <div class="grid grid-cols-1 gap-3" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow py-1">Domain: \( [2, \infty) \) ; Range: \( [-3, -1] \)</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow py-1">Domain: \( (-3, -1] \) ; Range: \( (2, \infty) \)</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow py-1">Domain: \( [2, \infty) \) ; Range: \( [-3, -1) \)</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow py-1">Domain: \( (2, \infty) \) ; Range: \( (-3, -1] \)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Finding the Domain (Left-to-Right)</p>
+                        <p>The domain refers to all possible \( x \)-values for the function. We look at the graph horizontally from left to right.</p>
+                        
+                        <!-- Domain Graph -->
+                        <div class="bg-white border border-gray-100 rounded-lg p-2 w-full overflow-x-auto flex justify-center my-4">
+                            <svg width="300" height="220" viewBox="0 0 350 230">
+                                <defs>
+                                    <marker id="arrowhead-s1" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                                        <polygon points="0,0 6,3 0,6" fill="#1f2937"></polygon>
+                                    </marker>
+                                    <marker id="arrowhead-curve-s1" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+                                        <polygon points="0,0 5,2.5 0,5" fill="#0f172a"></polygon>
+                                    </marker>
+                                    <marker id="arrowhead-domain" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                                        <polygon points="0,0 6,3 0,6" fill="#3b82f6"></polygon>
+                                    </marker>
+                                </defs>
+                                <line x1="20" y1="100" x2="330" y2="100" class="graph-axis" marker-end="url(#arrowhead-s1)"></line>
+                                <line x1="80" y1="210" x2="80" y2="20" class="graph-axis" marker-end="url(#arrowhead-s1)"></line>
+                                <line x1="20" y1="175" x2="330" y2="175" class="graph-dashed"></line>
+                                <path d="M 140 190 C 135 135, 150 130, 170 130 C 240 130, 280 160, 320 165" class="graph-line" marker-end="url(#arrowhead-curve-s1)"></path>
+                                <rect x="140" y="20" width="190" height="190" fill="#3b82f6" opacity="0.1"></rect>
+                                <line x1="140" y1="100" x2="320" y2="100" class="domain-highlight" marker-end="url(#arrowhead-domain)"></line>
+                                <circle cx="140" cy="100" r="5" fill="#ffffff" stroke="#3b82f6" stroke-width="2"></circle>
+                                <line x1="140" y1="100" x2="140" y2="190" stroke="#3b82f6" stroke-width="1" stroke-dasharray="4,4"></line>
+                                <text x="140" y="85" font-family="sans-serif" font-weight="bold" font-size="14" fill="#1d4ed8" text-anchor="middle">2</text>
+                                <circle cx="140" cy="190" r="4" class="graph-point-open"></circle>
+                                <circle cx="170" cy="130" r="4" class="graph-point-closed"></circle>
+                            </svg>
+                        </div>
+
+                        <ul class="list-disc pl-5 mt-2 space-y-2 text-sm text-gray-700">
+                            <li>The graph starts at \( x = 2 \). Because there is an <strong>open circle</strong> at this point, the value 2 is <em>excluded</em>. We use a round parenthesis: \( (2 \).</li>
+                            <li>The graph continues infinitely to the right, indicated by the arrow. This goes to \( \infty \).</li>
+                        </ul>
+                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 my-3 shadow-sm text-center font-medium text-blue-900">
+                            Domain: \( (2, \infty) \)
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Finding the Range (Bottom-to-Top)</p>
+                        <p>The range refers to all possible \( y \)-values. We look at the graph vertically from bottom to top to find the absolute minimum and absolute maximum boundaries.</p>
+                        
+                        <!-- Range Graph -->
+                        <div class="bg-white border border-gray-100 rounded-lg p-2 w-full overflow-x-auto flex justify-center my-4">
+                            <svg width="300" height="220" viewBox="0 0 350 230">
+                                <defs>
+                                    <marker id="arrowhead-s2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                                        <polygon points="0,0 6,3 0,6" fill="#1f2937"></polygon>
+                                    </marker>
+                                    <marker id="arrowhead-curve-s2" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+                                        <polygon points="0,0 5,2.5 0,5" fill="#0f172a"></polygon>
+                                    </marker>
+                                </defs>
+                                <line x1="20" y1="100" x2="330" y2="100" class="graph-axis" marker-end="url(#arrowhead-s2)"></line>
+                                <line x1="80" y1="210" x2="80" y2="20" class="graph-axis" marker-end="url(#arrowhead-s2)"></line>
+                                <line x1="20" y1="175" x2="330" y2="175" class="graph-dashed"></line>
+                                <path d="M 140 190 C 135 135, 150 130, 170 130 C 240 130, 280 160, 320 165" class="graph-line" marker-end="url(#arrowhead-curve-s2)"></path>
+                                <rect x="20" y="130" width="310" height="60" fill="#ef4444" opacity="0.1"></rect>
+                                <line x1="80" y1="190" x2="80" y2="130" class="range-highlight"></line>
+                                <circle cx="80" cy="190" r="5" fill="#ffffff" stroke="#ef4444" stroke-width="2"></circle>
+                                <circle cx="80" cy="130" r="5" fill="#ef4444"></circle>
+                                <line x1="80" y1="190" x2="140" y2="190" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,4"></line>
+                                <line x1="80" y1="130" x2="170" y2="130" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,4"></line>
+                                <text x="65" y="195" font-family="sans-serif" font-weight="bold" font-size="14" fill="#b91c1c" text-anchor="end">-3</text>
+                                <text x="65" y="135" font-family="sans-serif" font-weight="bold" font-size="14" fill="#b91c1c" text-anchor="end">-1</text>
+                                <circle cx="140" cy="190" r="4" class="graph-point-open"></circle>
+                                <circle cx="170" cy="130" r="4" class="graph-point-closed"></circle>
+                            </svg>
+                        </div>
+
+                        <ul class="list-disc pl-5 mt-2 space-y-2 text-sm text-gray-700">
+                            <li>The lowest point the graph reaches is at \( y = -3 \). This is an <strong>open circle</strong>, so -3 is <em>excluded</em>: \( (-3 \).</li>
+                            <li>The highest point the graph reaches is the peak at \( y = -1 \). This is a <strong>solid dot</strong>, meaning -1 is <em>included</em> in the range. We use a square bracket: \( -1] \).</li>
+                            <li class="italic text-gray-500">Note: The arrow on the right approaches the asymptote \( y = -2.5 \), but since this value falls comfortably inside the interval between -3 and -1, it doesn't change our absolute boundaries.</li>
+                        </ul>
+                        <div class="bg-red-50 p-3 rounded-lg border border-red-100 my-3 shadow-sm text-center font-medium text-red-900">
+                            Range: \( (-3, -1] \)
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Conclusion</p>
+                        <p>Combining our findings, we have a domain of \( (2, \infty) \) and a range of \( (-3, -1] \).</p>
+                        <p class="font-bold text-green-700 text-xl mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">Option D</p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option D is correct.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see common mistakes involving bracket notation and definitions.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4">You correctly identified the numerical boundaries for the domain and range, but you used the wrong bracket notation.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Analyzing the Brackets:</p>
+                        <div class="space-y-3 text-sm text-gray-700">
+                            <p>You used <strong>square brackets</strong> for the start of the Domain: \\( [2 \\) and the start of the Range: \\( [-3 \\).</p>
+                            <p>Square brackets mean "inclusive". However, on the graph, the point \\( (2, -3) \\) has an <strong>open circle</strong>. An open circle explicitly means the function does <em>not</em> exist at that exact point; it only approaches it.</p>
+                            <p>Therefore, you must use <strong>round parentheses</strong> (exclusive) for those boundaries: \\( (2 \\) and \\( (-3 \\).</p>
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4">You completely swapped the definitions of Domain and Range.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Conceptual Error:</p>
+                        <div class="space-y-3 text-sm text-gray-700">
+                            <p><i class="fas fa-exclamation-triangle text-orange-500 mr-1"></i> <strong>Domain</strong> refers to all the possible <strong>\\(x\\)-values</strong> (the horizontal spread of the graph).</p>
+                            <p><i class="fas fa-exclamation-triangle text-orange-500 mr-1"></i> <strong>Range</strong> refers to all the possible <strong>\\(y\\)-values</strong> (the vertical spread of the graph).</p>
+                            <p>You listed the \\(y\\)-values for the Domain and the \\(x\\)-values for the Range.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4">You correctly identified the numerical boundaries, but you reversed the rules for which bracket types to use.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Analyzing the Brackets:</p>
+                        <div class="space-y-3 text-sm text-gray-700">
+                            <p><strong>Open Circle</strong> at \\( x = 2 \\) and \\( y = -3 \\): This means the value is <em>excluded</em>. You should use a round parenthesis \\( ( \\).</p>
+                            <p><strong>Solid Dot</strong> at \\( y = -1 \\): This means the value is <em>included</em>. You should use a square bracket \\( ] \\).</p>
+                            <p>You used a square bracket for the open circle boundary and a round parenthesis for the solid dot boundary. It should be the exact opposite!</p>
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-6">You successfully found the horizontal spread for the Domain \\( (2, \\infty) \\) and the vertical spread for the Range \\( (-3, -1] \\). Crucially, you paid close attention to the open circle (using exclusive round brackets) and the closed dot peak (using an inclusive square bracket).</p>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200">
+                            <i class="fas fa-info-circle mr-1"></i> Walk through the detailed solution steps below to see visual highlights of the domain and range on the graph!
+                        </p>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case new math was revealed
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
