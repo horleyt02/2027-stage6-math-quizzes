@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Trapezoidal Rule Error</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-shapes text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-6 text-lg">
+                <p class="font-medium mb-5 text-gray-800">Which of the following figures would have the <strong>least amount of error</strong> if two applications of the trapezoidal rule were used to approximate its shaded area?</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="multiple-choice">
+                    
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center" data-value="A">
+                        <div class="w-full flex items-center justify-between mb-2">
+                            <span class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 text-sm">A</span>
+                            <span class="text-xs text-gray-500 font-semibold">Figure A</span>
+                        </div>
+                        <div class="w-full h-28 flex items-center justify-center bg-slate-50 rounded-lg p-1 border border-slate-100">
+                            <svg viewBox="0 0 160 110" class="w-full h-full max-w-[140px]">
+                                <!-- Outline & Shading -->
+                                <path d="M 20 100 L 20 28 C 30 18, 45 18, 55 35 C 68 55, 75 70, 80 72 C 85 72, 115 72, 140 45 L 140 100 Z" fill="#cbd5e1" stroke="#334155" stroke-width="1.8"/>
+                                <!-- Strip divider line -->
+                                <line x1="80" y1="72" x2="80" y2="100" stroke="#334155" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                    </button>
+                    
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center" data-value="B">
+                        <div class="w-full flex items-center justify-between mb-2">
+                            <span class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 text-sm">B</span>
+                            <span class="text-xs text-gray-500 font-semibold">Figure B</span>
+                        </div>
+                        <div class="w-full h-28 flex items-center justify-center bg-slate-50 rounded-lg p-1 border border-slate-100">
+                            <svg viewBox="0 0 160 110" class="w-full h-full max-w-[140px]">
+                                <path d="M 20 100 L 20 22 C 30 45, 55 68, 80 68 C 105 68, 125 65, 140 38 L 140 100 Z" fill="#cbd5e1" stroke="#334155" stroke-width="1.8"/>
+                                <line x1="80" y1="68" x2="80" y2="100" stroke="#334155" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                    </button>
+
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center" data-value="C">
+                        <div class="w-full flex items-center justify-between mb-2">
+                            <span class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 text-sm">C</span>
+                            <span class="text-xs text-gray-500 font-semibold">Figure C</span>
+                        </div>
+                        <div class="w-full h-28 flex items-center justify-center bg-slate-50 rounded-lg p-1 border border-slate-100">
+                            <svg viewBox="0 0 160 110" class="w-full h-full max-w-[140px]">
+                                <path d="M 20 100 L 20 25 C 45 28, 65 38, 80 75 C 95 60, 120 50, 140 52 L 140 100 Z" fill="#cbd5e1" stroke="#334155" stroke-width="1.8"/>
+                                <line x1="80" y1="75" x2="80" y2="100" stroke="#334155" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                    </button>
+
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center" data-value="D">
+                        <div class="w-full flex items-center justify-between mb-2">
+                            <span class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 text-sm">D</span>
+                            <span class="text-xs text-gray-500 font-semibold">Figure D</span>
+                        </div>
+                        <div class="w-full h-28 flex items-center justify-center bg-slate-50 rounded-lg p-1 border border-slate-100">
+                            <svg viewBox="0 0 160 110" class="w-full h-full max-w-[140px]">
+                                <path d="M 20 100 L 20 25 L 80 70 L 140 45 L 140 100 Z" fill="#cbd5e1" stroke="#334155" stroke-width="1.8"/>
+                                <line x1="80" y1="70" x2="80" y2="100" stroke="#334155" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                    </button>
+
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: The Principle of the Trapezoidal Rule</p>
+                        <p class="text-gray-700">The trapezoidal rule approximates the area of irregular shapes by constructing trapeziums of <strong>equal height</strong>.</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center text-sm md:text-base text-blue-900 font-medium">
+                            \[ \text{Approximation} = \text{Area of Trapezoids formed} \]
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">If the shape does not have straight edges then an <em>error gap</em> is created.</p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Curvature Creates Approximation Errors</p>
+                        <p class="text-gray-700 mb-2">When a boundary is curved, replacing it with a straight edge always introduces non-zero error:</p>
+                        <ul class="list-disc list-inside space-y-4 text-sm text-gray-700 font-medium mb-3">
+    <!-- Concave Up Section -->
+    <li>
+      <strong>Concave Up:</strong> Straight chords sit above the curve (producing an <span class="text-amber-700">overestimate</span>).
+      
+      <!-- Diagram 1: Overestimate Only -->
+      <div class="bg-white border border-gray-100 rounded-lg p-3 my-2 shadow-sm flex flex-col items-center w-full max-w-[160px]">
+        <svg viewBox="99 30 78 82" class="w-full">
+          <!-- Shaded original area -->
+          <path d="M 25 110 L 25 35 C 37 22, 55 22, 68 43 C 84 68, 93 84, 100 87 C 106 87, 143 87, 175 52 L 175 110 Z" fill="#dbe8f0" stroke="#475569" stroke-width="1.8"/>
+          <line x1="100" y1="87" x2="100" y2="110" stroke="#475569" stroke-width="1.5"/>
+          <!-- Dashed straight chord -->
+          <line x1="100" y1="87" x2="175" y2="52" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5,4"/>
+          <!-- Error zone -->
+          <path d="M 100 87 L 175 52 C 143 87, 106 87, 100 87 Z" fill="#fdba74" opacity="0.6"/>
+        </svg>
+        <div class="flex items-center text-xs font-semibold text-amber-700 mt-2">
+          <span class="w-3 h-3 bg-orange-300 rounded mr-1"></span>Overestimate
+        </div>
+      </div>
+    </li>
+
+    <!-- Concave Down Section -->
+    <li>
+      <strong>Concave Down:</strong> Straight chords cut below the curve (producing an <span class="text-rose-700">underestimate</span>).
+      
+      <!-- Diagram 2: Underestimate Only -->
+      <div class="bg-white border border-gray-100 rounded-lg p-3 my-2 shadow-sm flex flex-col items-center w-full max-w-[160px]">
+        <svg viewBox="23 15 79 97" class="w-full">
+          <!-- Shaded original area -->
+          <path d="M 25 110 L 25 35 C 37 22, 55 22, 68 43 C 84 68, 93 84, 100 87 C 106 87, 143 87, 175 52 L 175 110 Z" fill="#dbe8f0" stroke="#475569" stroke-width="1.8"/>
+          <line x1="100" y1="87" x2="100" y2="110" stroke="#475569" stroke-width="1.5"/>
+          <!-- Dashed straight chord -->
+          <line x1="25" y1="35" x2="100" y2="87" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5,4"/>
+          <!-- Error zone -->
+          <path d="M 25 35 C 37 22, 55 22, 68 43 C 84 68, 93 84, 100 87 Z" fill="#fca5a5" opacity="0.6"/>
+        </svg>
+        <div class="flex items-center text-xs font-semibold text-rose-700 mt-2">
+          <span class="w-3 h-3 bg-red-300 rounded mr-1"></span>Underestimate
+        </div>
+      </div>
+    </li>
+  </ul>
+ 
+                        <p class="text-sm text-gray-700">Because Figures A, B, and C all possess curved upper boundaries, each will have a definite, non-zero approximation error.</p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Analyze Figure D (Straight Line Segments)</p>
+                        <p class="text-gray-700 mb-2">Observe the top boundary of Figure D closely:</p>
+                        
+                        <!-- SVG Demonstration of Figure D with exact matching trapezoid chords -->
+                        <div class="bg-white border border-gray-100 rounded-lg p-4 my-3 shadow-sm w-full flex flex-col items-center">
+                            <svg viewBox="0 0 240 130" class="w-full max-w-[260px]">
+                                <!-- Base shape -->
+                                <path d="M 30 110 L 30 25 L 120 75 L 210 45 L 210 110 Z" fill="#dbeafe" stroke="#1e293b" stroke-width="2"/>
+                                <line x1="120" y1="75" x2="120" y2="110" stroke="#1e293b" stroke-width="1.8"/>
+                                
+                                <!-- Red dashed chords (coinciding exactly) -->
+                                <line x1="30" y1="25" x2="120" y2="75" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5,4"/>
+                                <line x1="120" y1="75" x2="210" y2="45" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5,4"/>
+                                
+                                <!-- Endpoints -->
+                                <circle cx="30" cy="25" r="3.5" fill="#ef4444"/>
+                                <circle cx="120" cy="75" r="3.5" fill="#ef4444"/>
+                                <circle cx="210" cy="45" r="3.5" fill="#ef4444"/>
+
+                                <text x="75" y="95" font-family="sans-serif" font-size="11" font-weight="bold" fill="#dc2626" text-anchor="middle">Trapezium 1</text>
+                                <text x="165" y="95" font-family="sans-serif" font-size="11" font-weight="bold" fill="#dc2626" text-anchor="middle">Trapezium 2</text>
+                            </svg>
+                            <span class="text-xs text-gray-500 mt-1 italic font-medium">Dashed red chords coincide perfectly with the straight edges</span>
+                        </div>
+
+                        <p class="text-gray-700 text-sm">Because each strip's upper boundary is already a <strong>straight edge</strong>, the two trapeziums formed by the trapezoidal rule match the true region <em>identically</em>.</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-lg text-emerald-800">
+                            \[ \text{Error} = \text{True Area} - \text{Trapezoidal Area} = \mathbf{0} \]
+                        </div>
+
+                        <p class="font-bold text-green-700 text-lg mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">Figure D (Zero Error)</p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option D has the least amount of error.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the figures to see how curvature impacts trapezoidal approximation error.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-base md:text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-3">You may have reasoned that an overestimation in one section might cancel out an underestimation in the other.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-orange-100 shadow-sm my-3 flex flex-col items-center">
+                        <svg viewBox="0 0 200 130" class="w-full max-w-[220px]">
+                            <!-- Shaded original area -->
+                            <path d="M 25 110 L 25 35 C 37 22, 55 22, 68 43 C 84 68, 93 84, 100 87 C 106 87, 143 87, 175 52 L 175 110 Z" fill="#e2e8f0" stroke="#475569" stroke-width="1.8"/>
+                            <line x1="100" y1="87" x2="100" y2="110" stroke="#475569" stroke-width="1.5"/>
+                            
+                            <!-- Dashed straight chords -->
+                            <line x1="25" y1="35" x2="100" y2="87" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5,4"/>
+                            <line x1="100" y1="87" x2="175" y2="52" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5,4"/>
+
+                            <!-- Shaded error zones -->
+                            <!-- Strip 1: Curve exceeds chord (Underestimate) -->
+                            <path d="M 25 35 C 37 22, 55 22, 68 43 C 84 68, 93 84, 100 87 Z" fill="#fca5a5" opacity="0.6"/>
+                            <!-- Strip 2: Chord exceeds curve (Overestimate) -->
+                            <path d="M 100 87 L 175 52 C 143 87, 106 87, 100 87 Z" fill="#fdba74" opacity="0.6"/>
+                        </svg>
+                        <div class="flex gap-4 mt-2 text-xs font-semibold">
+                            <span class="flex items-center text-rose-700"><span class="w-3 h-3 bg-red-300 rounded mr-1"></span> Underestimate</span>
+                            <span class="flex items-center text-amber-700"><span class="w-3 h-3 bg-orange-300 rounded mr-1"></span> Overestimate</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800 space-y-2">
+                        <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Trap:</strong> In Strip 1, the hump sticks out above the straight edge (<strong>underestimate</strong>). In Strip 2, the concave dip leaves empty space below the straight edge (<strong>overestimate</strong>).</p>
+                        <p>While opposite signs can partially offset in total area calculation, each application still suffers from noticeable approximation error. Can another figure avoid curvature entirely?</p>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'red',
+                body: `
+                    <p class="mb-3">Figure B has an upward-curving boundary (concave up) across both trapeziums.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-red-100 shadow-sm my-3 flex flex-col items-center">
+                        <svg viewBox="0 0 200 130" class="w-full max-w-[220px]">
+                            <path d="M 25 110 L 25 28 C 37 54, 68 82, 100 82 C 130 82, 155 78, 175 45 L 175 110 Z" fill="#e2e8f0" stroke="#475569" stroke-width="1.8"/>
+                            <line x1="100" y1="82" x2="100" y2="110" stroke="#475569" stroke-width="1.5"/>
+                            
+                            <!-- Dashed Chords -->
+                            <line x1="25" y1="28" x2="100" y2="82" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5,4"/>
+                            <line x1="100" y1="82" x2="175" y2="45" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5,4"/>
+
+                            <!-- Shaded Error (Chord above curve -> Overestimate in both) -->
+                            <path d="M 25 28 L 100 82 C 68 82, 37 54, 25 28 Z" fill="#fdba74" opacity="0.65"/>
+                            <path d="M 100 82 L 175 45 C 155 78, 130 82, 100 82 Z" fill="#fdba74" opacity="0.65"/>
+                        </svg>
+                        <span class="text-xs text-amber-800 font-semibold mt-2">Both strips produce significant overestimates</span>
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-2">
+                        <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Concavity Error:</strong> When a shape has a boundary curving upwards, the trapezium edge is strictly <strong>above</strong> the shape.</p>
+                        <p>Because both strips lie completely below their trapezium edges, both strips result in substantial <strong>overestimates</strong>, yielding a large total error.</p>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-3">Figure C features arches and domes that bend outwards away from the base.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-purple-100 shadow-sm my-3 flex flex-col items-center">
+                        <svg viewBox="0 0 200 130" class="w-full max-w-[220px]">
+                            <path d="M 25 110 L 25 30 C 56 34, 80 46, 100 90 C 118 72, 150 60, 175 62 L 175 110 Z" fill="#e2e8f0" stroke="#475569" stroke-width="1.8"/>
+                            <line x1="100" y1="90" x2="100" y2="110" stroke="#475569" stroke-width="1.5"/>
+                            
+                            <!-- Dashed Chords -->
+                            <line x1="25" y1="30" x2="100" y2="90" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5,4"/>
+                            <line x1="100" y1="90" x2="175" y2="62" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5,4"/>
+
+                            <!-- Shaded Error (Curve above chord -> Underestimate in both) -->
+                            <path d="M 25 30 C 56 34, 80 46, 100 90 Z" fill="#fca5a5" opacity="0.65"/>
+                            <path d="M 100 90 C 118 72, 150 60, 175 62 Z" fill="#fca5a5" opacity="0.65"/>
+                        </svg>
+                        <span class="text-xs text-rose-800 font-semibold mt-2">Both strips produce significant underestimates</span>
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-2">
+                        <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Concavity Error:</strong> Because both sections bow outwards (concave down), the trapezium edges cut straight through the shape <em>underneath</em> the actual boundary.</p>
+                        <p>This leaves behind missing slices of area across both applications, resulting in two large <strong>underestimates</strong>.</p>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-3">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-check text-3xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-3 text-left">You recognised that Figure D has an upper boundary made entirely of <strong>straight line segments</strong>.</p>
+                        
+                        <div class="bg-white p-4 rounded-xl border-2 border-green-200 shadow-sm my-3 flex flex-col items-center">
+                            <svg viewBox="0 0 200 120" class="w-full max-w-[220px]">
+                                <path d="M 25 105 L 25 28 L 100 75 L 175 50 L 175 105 Z" fill="#d1fae5" stroke="#047857" stroke-width="2"/>
+                                <line x1="100" y1="75" x2="100" y2="105" stroke="#047857" stroke-width="1.8"/>
+                                
+                                <line x1="25" y1="28" x2="100" y2="75" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5,4"/>
+                                <line x1="100" y1="75" x2="175" y2="50" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5,4"/>
+                            </svg>
+                            <span class="text-xs text-green-800 font-bold mt-1">Zero Gap between Chord and Boundary</span>
+                        </div>
+
+                        <div class="bg-emerald-50 text-emerald-900 p-3 rounded-lg border border-emerald-200 text-left text-sm space-y-1">
+                            <p>• The trapezoidal rule works by constructing trapeziums inside of shapes.</p>
+                            <p>• Since the boundary of Figure D is already composed of straight lines, the constructed trapeziums <strong>match the exact area</strong> identically.</p>
+                            <p>• Therefore, the error is exactly <strong>0</strong>.</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    const badge = b.querySelector('span:first-child');
+                    badge.classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    badge.classList.add('bg-gray-100', 'text-gray-700');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span:first-child');
+                badge.classList.remove('bg-gray-100', 'text-gray-700');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case new math was revealed
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

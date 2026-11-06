@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Linear Graphs</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* SVG Animation Classes */
+        .draw-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: draw 1.5s ease-out forwards;
+        }
+        .fade-in-svg {
+            opacity: 0;
+            animation: fade 1s ease-out forwards;
+            animation-delay: 1.5s;
+        }
+        @keyframes draw { to { stroke-dashoffset: 0; } }
+        @keyframes fade { to { opacity: 1; } }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-chart-line text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-6 text-lg">
+                <p class="font-semibold mb-3 text-gray-800">Consider the following line. Which equation best represents the line?</p>
+                
+                <!-- Static Problem Image Placeholder -->
+                <div id="problem-diagram" class="w-full bg-white border border-slate-200 rounded-lg mb-6 shadow-sm overflow-hidden flex justify-center">
+                    <!-- Injected via JS on load -->
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow py-2">\( y = 3x - 6 \)</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow py-2">\( y = \frac{x}{3} - 6 \)</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow py-2">\( y = -3x - 6 \)</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow py-2">\( y = -\frac{x}{3} - 6 \)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Identify the y-intercept (\( c \))</p>
+                        <p class="text-gray-700 mb-2">First, find where the line crosses the vertical \( y \)-axis. This point is called the y-intercept.</p>
+                        
+                        <div id="svg-step-1" class="w-full bg-white border border-gray-100 rounded-lg mb-3 overflow-hidden shadow-inner flex justify-center"></div>
+                        
+                        <p class="text-gray-700 text-sm">The line crosses the axis at \( (0, -6) \). Therefore, the y-intercept is:</p>
+                        <div class="bg-white p-2 rounded-lg border border-gray-100 mt-2 shadow-sm text-center font-medium text-lg text-blue-900">
+                            \( c = -6 \)
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Calculate the Gradient (\( m \))</p>
+                        <p class="text-gray-700 mb-2">Next, we pick a second clear point on the grid, such as \( (9, -3) \), to find the gradient (\( m = \frac{\text{rise}}{\text{run}} \)).</p>
+                        
+                        <div id="svg-step-2" class="w-full bg-white border border-gray-100 rounded-lg mb-3 overflow-hidden shadow-inner flex justify-center"></div>
+                        
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-lg space-y-2">
+                            <div>\[ m = \frac{\text{Rise}}{\text{Run}} \]</div>
+                            <div>\[ m = \frac{+3}{+9} = \frac{1}{3} \]</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Combine into the Equation</p>
+                        <p class="mb-2 text-gray-700">The general form of a straight line is \( y = mx + c \). Substitute the values we found:</p>
+                        
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-lg space-y-2">
+                            <div>\[ y = \left(\frac{1}{3}\right)x - 6 \]</div>
+                            <div>\[ y = \frac{x}{3} - 6 \]</div>
+                        </div>
+                        <p class="font-bold text-green-700 text-xl mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">Option B</p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option B is correct.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see common traps involving slope calculation.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-base md:text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- SVG Generator Function for Dynamic Graph Visuals ---
+        function getGraphSVG(step = 0) {
+            // Coordinate mapping: Center is (200, 200). 1 unit = 15 pixels.
+            const scale = 15;
+            const cx = 200;
+            const cy = 200;
+            
+            // Map mathematical (x, y) to SVG (px, py)
+            const mapX = (x) => cx + (x * scale);
+            const mapY = (y) => cy - (y * scale);
+            
+            let svg = `<svg width="420" height="400" viewBox="-10 0 430 400" xmlns="http://www.w3.org/2000/svg">`;
+            
+            // 1. Draw Grid lines
+            svg += `<g stroke="#e2e8f0" stroke-width="1">`;
+            for (let i = -12; i <= 12; i++) {
+                let px = mapX(i);
+                let py = mapY(i);
+                svg += `<line x1="${px}" y1="${mapY(-12)}" x2="${px}" y2="${mapY(12)}"></line>`; // vertical
+                svg += `<line x1="${mapX(-12)}" y1="${py}" x2="${mapX(12)}" y2="${py}"></line>`; // horizontal
+            }
+            svg += `</g>`;
+            
+            // 2. Draw Axes
+            svg += `<g stroke="#334155" stroke-width="2">`;
+            svg += `<line x1="${mapX(-12)}" y1="${cy}" x2="${mapX(12)}" y2="${cy}"></line>`; // X axis
+            svg += `<line x1="${cx}" y1="${mapY(12)}" x2="${cx}" y2="${mapY(-12)}"></line>`; // Y axis
+            // Arrows
+            svg += `<polygon points="${mapX(12)},${cy} ${mapX(12)-6},${cy-4} ${mapX(12)-6},${cy+4}" fill="#334155"/>`;
+            svg += `<polygon points="${mapX(-12)},${cy} ${mapX(-12)+6},${cy-4} ${mapX(-12)+6},${cy+4}" fill="#334155"/>`;
+            svg += `<polygon points="${cx},${mapY(12)} ${cx-4},${mapY(12)+6} ${cx+4},${mapY(12)+6}" fill="#334155"/>`;
+            svg += `<polygon points="${cx},${mapY(-12)} ${cx-4},${mapY(-12)-6} ${cx+4},${mapY(-12)-6}" fill="#334155"/>`;
+            svg += `</g>`;
+            
+            // Labels
+            svg += `<g font-family="serif" font-style="italic" font-size="14" fill="#334155">`;
+            svg += `<text x="${mapX(11)}" y="${cy-8}">x</text>`;
+            svg += `<text x="${cx-15}" y="${mapY(11)}">y</text>`;
+            svg += `</g>`;
+            
+            // Tick marks and numbers (5, 10, -5, -10)
+            svg += `<g font-family="sans-serif" font-size="12" fill="#475569" text-anchor="middle">`;
+            [-10, -5, 5, 10].forEach(val => {
+                svg += `<line x1="${mapX(val)}" y1="${cy-3}" x2="${mapX(val)}" y2="${cy+3}" stroke="#334155" stroke-width="1.5"></line>`;
+                svg += `<text x="${mapX(val)}" y="${cy+18}">${val}</text>`;
+                
+                svg += `<line x1="${cx-3}" y1="${mapY(val)}" x2="${cx+3}" y2="${mapY(val)}" stroke="#334155" stroke-width="1.5"></line>`;
+                // offset text slightly for y-axis
+                let txtX = (val < 0) ? cx - 18 : cx - 15;
+                svg += `<text x="${txtX}" y="${mapY(val)+4}" text-anchor="end">${val}</text>`;
+            });
+            svg += `</g>`;
+            
+            // Origin
+            svg += `<text x="${cx-10}" y="${cy+14}" font-family="sans-serif" font-size="12" fill="#475569">0</text>`;
+
+            // 3. Draw The Main Line (y = x/3 - 6)
+            // Extrapolate endpoints to reach edge of grid
+            const x1 = -12; const y1 = -10;
+            const x2 = 12;  const y2 = -2;
+            svg += `<line x1="${mapX(x1)}" y1="${mapY(y1)}" x2="${mapX(x2)}" y2="${mapY(y2)}" stroke="#1e293b" stroke-width="2.5"></line>`;
+            
+            // Step 1 additions: Y-Intercept
+            if (step >= 1) {
+                const yiX = mapX(0);
+                const yiY = mapY(-6);
+                svg += `<circle cx="${yiX}" cy="${yiY}" r="5" fill="#ef4444" stroke="white" stroke-width="2" class="fade-in-svg" style="animation-delay: 0.2s;"></circle>`;
+                svg += `<rect x="${yiX-110}" y="${yiY+10}" width="115" height="24" rx="4" fill="white" stroke="#fca5a5" class="fade-in-svg" style="animation-delay: 0.4s;"></rect>`;
+                svg += `<text x="${yiX-52}" y="${yiY+26}" font-family="sans-serif" font-size="12" font-weight="bold" fill="#b91c1c" text-anchor="middle" class="fade-in-svg" style="animation-delay: 0.4s;">y-int (0, -6)</text>`;
+            }
+
+            // Step 2 additions: Slope Triangle
+            if (step >= 2) {
+                const ptX = mapX(9);
+                const ptY = mapY(-3);
+                const cornerX = mapX(9);
+                const cornerY = mapY(-6);
+                
+                // Second point
+                svg += `<circle cx="${ptX}" cy="${ptY}" r="5" fill="#3b82f6" stroke="white" stroke-width="2" class="fade-in-svg" style="animation-delay: 0.2s;"></circle>`;
+                svg += `<rect x="${ptX+10}" y="${ptY-20}" width="55" height="24" rx="4" fill="white" stroke="#93c5fd" class="fade-in-svg" style="animation-delay: 0.4s;"></rect>`;
+                svg += `<text x="${ptX+37}" y="${ptY-4}" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1d4ed8" text-anchor="middle" class="fade-in-svg" style="animation-delay: 0.4s;">(9, -3)</text>`;
+                
+                // Slope lines (animated)
+                svg += `<line x1="${mapX(0)}" y1="${mapY(-6)}" x2="${cornerX}" y2="${cornerY}" stroke="#10b981" stroke-width="3" stroke-dasharray="6,6" class="draw-line"></line>`;
+                svg += `<line x1="${cornerX}" y1="${cornerY}" x2="${ptX}" y2="${ptY}" stroke="#f59e0b" stroke-width="3" stroke-dasharray="6,6" class="draw-line" style="animation-delay: 1.5s;"></line>`;
+                
+                // Labels for Run and Rise
+                svg += `<rect x="${mapX(4.5)-30}" y="${mapY(-6)+10}" width="60" height="22" rx="4" fill="white" stroke="#a7f3d0" class="fade-in-svg" style="animation-delay: 1s;"></rect>`;
+                svg += `<text x="${mapX(4.5)}" y="${mapY(-6)+25}" font-family="sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle" class="fade-in-svg" style="animation-delay: 1s;">Run = +9</text>`;
+
+                svg += `<rect x="${mapX(9)+10}" y="${mapY(-4.5)-11}" width="65" height="22" rx="4" fill="white" stroke="#fde68a" class="fade-in-svg" style="animation-delay: 2.5s;"></rect>`;
+                svg += `<text x="${mapX(9)+42}" y="${mapY(-4.5)+4}" font-family="sans-serif" font-size="12" font-weight="bold" fill="#b45309" text-anchor="middle" class="fade-in-svg" style="animation-delay: 2.5s;">Rise = +3</text>`;
+            }
+
+            svg += `</svg>`;
+            return svg;
+        }
+
+        // Initialize static problem diagram
+        document.getElementById('problem-diagram').innerHTML = getGraphSVG(0);
+
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4">You correctly found the y-intercept, but you calculated the gradient (slope) upside down.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3">
+                            <div class="text-sm text-gray-500 italic">Calculating the slope as "Run over Rise":</div>
+                            <div>\\[ \\frac{\\text{Run}}{\\text{Rise}} = \\frac{9}{3} = 3 \\]</div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Formula Error:</strong> The gradient is always defined as the change in the vertical axis divided by the change in the horizontal axis (\\(\\frac{\\text{Rise}}{\\text{Run}}\\)). You accidentally swapped them!</p>
+                            <p>It should be \\(\\frac{3}{9} = \\frac{1}{3}\\).</p>
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-2">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-check text-3xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-4 text-left">You successfully found the equation of the line. You correctly identified the y-intercept at \\((0, -6)\\), and accurately calculated the positive gradient of \\(\\frac{1}{3}\\) by identifying the rise of 3 for every run of 9.</p>
+                        
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Explore the other options on the left to see common traps involving upside-down slopes and negative signs!
+                        </p>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4">You made two very common errors: calculating the slope upside down <em>and</em> getting the sign backwards.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-left space-y-4 mb-3">
+                            <div>
+                                <span class="text-sm text-gray-500 italic block mb-1">Error 1: The Magnitude</span>
+                                Calculating the slope as 'Run over Rise' (\\(\\frac{9}{3} = 3\\)) instead of 'Rise over Run' (\\(\\frac{3}{9} = \\frac{1}{3}\\)).
+                            </div>
+                            <hr class="border-orange-200">
+                            <div>
+                                <span class="text-sm text-gray-500 italic block mb-1">Error 2: The Sign</span>
+                                Assuming the slope should be negative.
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Visual Check:</strong> Read the graph like a book—from left to right. Because the line is climbing <strong>UPWARDS</strong> as you move to the right, the gradient must be <strong>positive</strong>.
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4">You correctly calculated the magnitude of the slope \\( \\frac{1}{3} \\) and found the y-intercept, but you added a negative sign.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3">
+                            <div class="text-sm text-gray-500 italic">Finding the fraction:</div>
+                            <div>\\[ \\frac{\\text{Rise}}{\\text{Run}} = \\frac{3}{9} = \\frac{1}{3} \\]</div>
+                            <div class="text-sm text-gray-500 italic mt-2">Assuming it goes downwards:</div>
+                            <div>\\[ m = -\\frac{1}{3} \\]</div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Sign Error:</strong> A negative slope means the line goes <em>down</em> from left to right. Notice how this line starts low on the left and climbs higher as it moves right? That means the \\(y\\)-values are increasing, which requires a <strong>positive</strong> slope.</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax just in case
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                // Inject animated SVGs exactly when the step is revealed so the animation plays for the user
+                if (currentStep === 1) {
+                    document.getElementById('svg-step-1').innerHTML = getGraphSVG(1);
+                } else if (currentStep === 2) {
+                    document.getElementById('svg-step-2').innerHTML = getGraphSVG(2);
+                }
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
