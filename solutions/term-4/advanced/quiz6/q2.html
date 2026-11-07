@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Discrete Probability Distribution</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-table text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-6 text-lg">
+                <p class="mb-2 text-gray-800">Students were required to write a report of at least ten pages for an assessment.</p>
+                <p class="mb-3 text-gray-800">The table below shows the discrete probability distribution for the number of pages (\( X \)) for the reports which were submitted.</p>
+                <p class="mb-4 text-sm text-gray-600">All reports were at least ten pages long and the longest reports were fifteen pages.</p>
+                
+                <!-- Probability Table -->
+                <div class="overflow-x-auto mb-5">
+                    <table class="w-full max-w-md border-collapse border border-slate-300 text-center text-sm md:text-base">
+                        <thead>
+                            <tr class="bg-slate-100 border-b border-slate-300">
+                                <th class="p-2 border-r border-slate-300 font-bold text-gray-700 italic">x</th>
+                                <th class="p-2 border-r border-slate-300 font-semibold">10</th>
+                                <th class="p-2 border-r border-slate-300 font-semibold">11</th>
+                                <th class="p-2 border-r border-slate-300 font-semibold">12</th>
+                                <th class="p-2 border-r border-slate-300 font-semibold">13</th>
+                                <th class="p-2 border-r border-slate-300 font-semibold text-blue-700 font-bold bg-blue-50/70">14</th>
+                                <th class="p-2 font-semibold">15</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="p-2.5 border-r border-slate-300 font-medium text-gray-700 bg-slate-50 italic whitespace-nowrap">\( P(X = x) \)</td>
+                                <td class="p-2.5 border-r border-slate-300">0.32</td>
+                                <td class="p-2.5 border-r border-slate-300">0.21</td>
+                                <td class="p-2.5 border-r border-slate-300">0.13</td>
+                                <td class="p-2.5 border-r border-slate-300">0.05</td>
+                                <td class="p-2.5 border-r border-slate-300 font-bold text-blue-600 bg-blue-50/50">?</td>
+                                <td class="p-2.5">0.03</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="font-semibold mb-4 text-gray-800">What is the value of \( P(X = 14 \text{ or } 15) \)?</p>
+                
+                <div class="grid grid-cols-2 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="A">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">A</div>
+                        <div class="flex-grow py-2 text-center text-lg ">0.23</div>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="B">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">B</div>
+                        <div class="flex-grow py-2 text-center text-lg ">0.26</div>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="C">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">C</div>
+                        <div class="flex-grow py-2 text-center text-lg ">0.29</div>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="D">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">D</div>
+                        <div class="flex-grow py-2 text-center text-lg ">0.74</div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: All Probabilities Must Add to 1</p>
+                        <p class="text-gray-700">In any complete probability distribution, the sum of all individual probabilities for all possible outcomes must always equal 1 (representing 100% of all submitted reports):</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-sm md:text-base text-blue-900">
+                            \[ 
+\begin{gathered}
+P(X=10) + P(X=11) + P(X=12) + P(X=13) +\\
+P(X=14) + P(X=15) = 1 
+\end{gathered}
+\]
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Find the Missing Value \( P(X = 14) \)</p>
+                        <p class="text-gray-700 mb-2">First, sum the five given probabilities in the table:</p>
+                        <div class="bg-white p-2.5 rounded-lg border border-gray-100 my-1 shadow-sm text-center text-sm md:text-base text-gray-800">
+                            \[ 0.32 + 0.21 + 0.13 + 0.05 + 0.03 = \mathbf{0.74} \]
+                        </div>
+                        <p class="text-gray-700 text-sm mt-2 mb-2">Subtract this sum from 1 to find the missing probability for 14 pages:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-base md:text-lg text-blue-800">
+                            \[ P(X = 14) = 1 - 0.74 = \mathbf{0.26} \]
+                        </div>
+
+                        <!-- Tape Diagram Visual -->
+                        <div class="bg-white border border-gray-100 rounded-lg p-3 my-3 shadow-sm w-full flex flex-col items-center">
+                            <span class="text-xs uppercase font-bold text-slate-500 tracking-wider mb-1">Total Probability Tape Model (Sum = 1)</span>
+                            <svg viewBox="0 0 460 70" class="w-full max-w-[440px]">
+                                <!-- Given Block: 0.74 (width = 340px) -->
+                                <rect x="15" y="15" width="340" height="28" rx="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1.5"/>
+                                <text x="185" y="34" font-family="sans-serif" font-size="12" font-weight="bold" fill="#334155" text-anchor="middle">Five Known Values = 0.74</text>
+                                
+                                <!-- Missing P(X=14): 0.26 (width = 120px) -->
+                                <rect x="360" y="15" width="85" height="28" rx="4" fill="#bfdbfe" stroke="#3b82f6" stroke-width="2"/>
+                                <text x="402" y="34" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1d4ed8" text-anchor="middle">14: 0.26</text>
+
+                                <!-- Total Bracket -->
+                                <path d="M 15 48 L 15 54 L 445 54 L 445 48" fill="none" stroke="#64748b" stroke-width="1.5"/>
+                                <text x="230" y="66" font-family="sans-serif" font-size="10" font-weight="bold" fill="#64748b" text-anchor="middle">Total Sum = 1.00</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 3: Calculate \( P(X = 14 \text{ or } 15) \)</p>
+                        <p class="text-gray-700 mb-2">The question asks for the probability that a report was <strong>14 or 15 pages</strong>. Because these are mutually exclusive outcomes, we add their probabilities:</p>
+                        
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-lg text-emerald-800 space-y-1">
+                            <div>\[ P(X = 14 \text{ or } 15) = P(X = 14) + P(X = 15) \]</div>
+                            <div>\[ P(X = 14 \text{ or } 15) = 0.26 + 0.03 = \mathbf{0.29} \]</div>
+                        </div>
+
+                        <!-- Bar Chart SVG showing all 6 outcomes with 14 & 15 highlighted -->
+                        <div class="bg-white border border-gray-100 rounded-lg p-3 my-3 shadow-sm w-full flex flex-col items-center">
+                
+                        </div>
+
+                        <p class="font-bold text-green-700 text-lg mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg font-mono">
+                            0.29
+                        </p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600">
+                            <i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option C is correct.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the options to review common two-step probability traps.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-base md:text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-3">You likely calculated the missing probability for 14 pages correctly, but then accidentally <strong>subtracted</strong> 0.03 instead of adding it.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-gray-500 italic">Finding the missing probability:</div>
+                            <div>\\[ P(X = 14) = 1 - 0.74 = 0.26 \\]</div>
+                            <div class="text-xs text-red-600 italic">Subtracting 0.03 instead of adding:</div>
+                            <div>\\[ 0.26 - 0.03 = \\mathbf{0.23} \\quad \\text{❌} \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Operation Error:</strong> In probability, the word <strong>"or"</strong> between mutually exclusive outcomes indicates <strong>addition</strong>, not subtraction:</p>
+                            <div class="text-center font-semibold text-emerald-800">\\[ P(X = 14 \\text{ or } 15) = P(X = 14) + P(X = 15) = 0.26 + 0.03 = 0.29 \\]</div>
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-3">You completed the first step successfully by finding the missing probability in the table, but you stopped too early!</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-green-700 italic">Correctly found the missing table value:</div>
+                            <div>\\[ P(X = 14) = 1 - 0.74 = \\mathbf{0.26} \\]</div>
+                            <div class="text-xs text-orange-700 italic">Assumed 0.26 was the final answer.</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Incomplete Solution Trap:</strong> The value \\(0.26\\) only represents \\(P(X = 14)\\).</p>
+                            <p>The question specifically asks for \\( P(X = 14 \\text{ or } 15) \\). You must complete the final step by adding \\(P(X = 15) = 0.03\\):
+                            \\[ 0.26 + 0.03 = 0.29 \\]</p>
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-3">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-check text-3xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-3 text-left">You completed both steps of the problem with total precision:</p>
+                        
+                        <div class="bg-emerald-50 text-emerald-900 p-4 rounded-xl border border-emerald-200 text-left space-y-2 text-sm md:text-base">
+                            <div>1. Sum known probabilities: \\[ 0.32 + 0.21 + 0.13 + 0.05 + 0.03 = 0.74 \\]</div>
+                            <div>2. Find missing value: \\[ P(X = 14) = 1 - 0.74 = 0.26 \\]</div>
+                            <div>3. Add required outcomes: \\[ P(X = 14 \\text{ or } 15) = 0.26 + 0.03 = \\mathbf{0.29} \\]</div>
+                        </div>
+                        
+                        <p class="text-sm bg-blue-50 text-blue-800 p-3 rounded-lg border border-blue-200 mt-3 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Check out Option B to see why so many students lose marks on this question by stopping after step 2!
+                        </p>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-3">You added up all five given numbers from the table, but forgot to subtract from 1 to find the missing value.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-purple-700 italic">Summing all given values in the table:</div>
+                            <div>\\[ 0.32 + 0.21 + 0.13 + 0.05 + 0.03 = \\mathbf{0.74} \\]</div>
+                            <div class="text-xs text-red-600 italic">Assuming 0.74 is the final answer.</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Trap:</strong> The sum \\(0.74\\) represents the probability that a report was <em>not</em> 14 pages long (i.e., \\(10, 11, 12, 13, \\text{ or } 15\\)).</p>
+                            <p>Because the total probability of all outcomes must equal 1, you must subtract \\(0.74\\) from 1 to find \\(P(X = 14) = 0.26\\), and then add \\(0.03\\) to get \\(0.29\\).</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    const badge = b.querySelector('div:first-child');
+                    badge.classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    badge.classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('div:first-child');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case new math was revealed
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

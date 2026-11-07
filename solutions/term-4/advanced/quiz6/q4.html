@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Function Transformations</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-arrows-spin text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-6 text-lg">
+                <p class="mb-3 text-gray-800 font-medium">
+                    To obtain the graph of \( y = -3(x + 1)^2 + 5 \) from \( y = x^2 \), which sequence of transformations can be applied?
+                </p>
+                
+                <div class="space-y-3" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn w-full p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left flex items-start" data-value="A">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 mr-3 mt-0.5 flex-shrink-0">A</div>
+                        <div class="text-sm md:text-base text-gray-800 font-medium leading-relaxed">
+                            Translate 1 unit left, dilate vertically by a factor 3, reflect in the \( x \)-axis, translate 5 units up.
+                        </div>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn w-full p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left flex items-start" data-value="B">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 mr-3 mt-0.5 flex-shrink-0">B</div>
+                        <div class="text-sm md:text-base text-gray-800 font-medium leading-relaxed">
+                            Translate 1 unit right, dilate vertically by a factor 3, reflect in the \( y \)-axis, translate 5 units up.
+                        </div>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn w-full p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left flex items-start" data-value="C">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 mr-3 mt-0.5 flex-shrink-0">C</div>
+                        <div class="text-sm md:text-base text-gray-800 font-medium leading-relaxed">
+                            Translate 1 unit left, dilate horizontally by a factor 3, reflect in the \( x \)-axis, translate 5 units up.
+                        </div>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn w-full p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left flex items-start" data-value="D">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 mr-3 mt-0.5 flex-shrink-0">D</div>
+                        <div class="text-sm md:text-base text-gray-800 font-medium leading-relaxed">
+                            Translate 1 unit right, dilate horizontally by a factor 3, reflect in the \( y \)-axis, translate 5 units up.
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Horizontal Translation (Inside the Bracket)</p>
+                        <p class="text-gray-700">We start with the base parabola \( y = x^2 \). To affect horizontal movement, we replace \( x \):</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-base text-blue-900 space-y-1">
+                            <div>Replace \( x \) with \( (x + 1) \):</div>
+                            <div>\[ y = (x + 1)^2 \]</div>
+                        </div>
+                        <p class="text-sm text-gray-700 mt-2">
+                            Replacing \( x \) with \( x + c \) where \( c > 0 \) shifts the graph <strong>left by 1 unit</strong> (the new vertex shifts from \( (0,0) \) to \( (-1, 0) \)).
+                        </p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Vertical Dilation & Reflection</p>
+                        <p class="text-gray-700 mb-2">Next, consider the coefficient \( -3 \) applied to the squared term:</p>
+                        
+                        <div class="space-y-2 text-sm text-gray-800 bg-white p-3 rounded-lg border border-gray-100">
+                            <div>
+                                <strong class="text-blue-700">• Dilation:</strong> Replace \( y \) with \( \frac{y}{3} \):
+                                <div class="text-center font-medium text-base my-1">\[ \frac{y}{3} = (x + 1)^2 \implies y = 3(x + 1)^2 \]</div>
+                                This represents a <strong>vertical dilation by a factor of 3</strong> (all \( y \)-values are stretched by 3 away from the \( x \)-axis).
+                            </div>
+                            <hr class="border-gray-200 my-2">
+                            <div>
+                                <strong class="text-rose-700">• Reflection:</strong> Replace \( y \) with \( -y \):
+                                <div class="text-center font-medium text-base my-1">\[ -y = 3(x + 1)^2 \implies y = -3(x + 1)^2 \]</div>
+                                Negating the \( y \)-values inverts the curve across the horizontal axis: <strong>reflection in the \( x \)-axis</strong>.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Vertical Translation & Full Transformation Visual</p>
+                        <p class="text-gray-700 mb-2">To shift the graph vertically upwards by 5 units, we replace \( y \) with \( (y - 5) \):</p>
+                        
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-base text-emerald-800 space-y-1">
+                            <div>Replace \( y \) with \( (y - 5) \):</div>
+                            <div>\[ (y - 5) = -3(x + 1)^2 \]</div>
+                            <div class="text-xs text-gray-500 italic">Transposing \( -5 \) to the other side:</div>
+                            <div class="text-lg font-bold">\[ y = -3(x + 1)^2 + 5 \]</div>
+                        </div>
+
+                        <!-- Step-by-Step Evolution SVG Diagram -->
+                        <div class="bg-white border border-gray-100 rounded-lg p-3 my-3 shadow-sm w-full flex flex-col items-center">
+                            
+                        </div>
+
+                        <p class="font-bold text-green-700 text-base md:text-lg mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">
+                            Option A
+                        </p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600">
+                            <i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option A accurately lists all four transformations in proper order.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the options to review common traps with horizontal shifts, dilations, and reflection axes.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-base md:text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const feedbackData = {
+            'A': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-3">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-check text-3xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-3 text-left">You analysed each component of the transformed function with complete accuracy:</p>
+                        
+                        <div class="bg-emerald-50 text-emerald-900 p-4 rounded-xl border border-emerald-200 text-left space-y-2 text-sm md:text-base">
+                            <div>1. <strong>Left 1:</strong> Replace \\( x \\) with \\( x + 1 \\implies y = (x + 1)^2 \\)</div>
+                            <div>2. <strong>Vertical dilation by 3:</strong> Replace \\( y \\) with \\( \\frac{y}{3} \\implies y = 3(x + 1)^2 \\)</div>
+                            <div>3. <strong>Reflect in \\( x \\)-axis:</strong> Replace \\( y \\) with \\( -y \\implies y = -3(x + 1)^2 \\)</div>
+                            <div>4. <strong>Up 5:</strong> Replace \\( y \\) with \\( y - 5 \\implies y - 5 = -3(x + 1)^2 \\implies y = -3(x + 1)^2 + 5 \\)</div>
+                        </div>
+                        
+                        <p class="text-sm bg-blue-50 text-blue-800 p-3 rounded-lg border border-blue-200 mt-3 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Explore Options B, C, and D to review why horizontal vs. vertical dilations and reflection axes are common pitfalls!
+                        </p>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'red',
+                body: `
+                    <p class="mb-3">You made two common errors: assuming \\( +1 \\) moves right, and confusing a reflection in the \\( x \\)-axis with a reflection in the \\( y \\)-axis.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-left space-y-2 mb-3 text-sm md:text-base">
+                            <p>• <strong>Shift Error:</strong> Seeing \\( (x + 1) \\) and assuming it shifts towards positive numbers (right by 1).</p>
+                            <p>• <strong>Reflection Error:</strong> Thinking the negative sign out front causes a reflection in the \\( y \\)-axis.</p>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Key Clarification:</strong></p>
+                            <p>1. Solving \\( x + 1 = 0 \\) gives \\( x = -1 \\), meaning the vertex moves <strong>1 unit left</strong>.</p>
+                            <p>2. The minus sign is outside the function (multiplying \\( y \\)), which flips positive \\( y \\)-values to negative \\( y \\)-values across the horizontal line—that is a <strong>reflection in the \\( x \\)-axis</strong>.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-3">You correctly identified the horizontal shift, reflection axis, and vertical shift, but you misidentified the <strong>type of dilation</strong>.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-orange-700 italic">Treating the external multiplier 3 as a horizontal stretch:</div>
+                            <div>\\[ y = -3(x + 1)^2 + 5 \\rightarrow \\text{'dilate horizontally by factor 3'} \\quad \\text{❌} \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Dilation Location Rule:</strong></p>
+                            <p>• A <strong>horizontal dilation</strong> occurs when \\( x \\) is replaced with \\( \\frac{x}{k} \\) <em>inside</em> the bracket: \\( (3x + 1)^2 \\) or \\( (\\frac{x}{3} + 1)^2 \\).</p>
+                            <p>• Here, the factor 3 sits <strong>outside</strong> the squared bracket: \\( y = 3f(x) \\). This replaces \\( y \\) with \\( \\frac{y}{3} \\), which is a <strong>vertical dilation by factor 3</strong>.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-3">You fell into all three common pitfalls simultaneously: the shift direction, the dilation orientation, and the axis of reflection.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-left space-y-1 mb-3 text-sm md:text-base">
+                            <p>1. Thinking \\( (x + 1) \\) translates 1 unit right (should be <strong>left</strong>).</p>
+                            <p>2. Calling the leading multiplier 3 a horizontal dilation (should be <strong>vertical</strong>).</p>
+                            <p>3. Calling the leading negative a reflection in the \\( y \\)-axis (should be the <strong>\\( x \\)-axis</strong>).</p>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Summary of Correct Rules:</strong></p>
+                            <p>• Inside with \\( x \\): \\( (x + 1) \\implies \\text{1 unit left} \\)</p>
+                            <p>• Outside multiplier: \\( 3 \\implies \\text{vertical dilation by factor 3} \\)</p>
+                            <p>• Outside negative: \\( - \\implies \\text{reflect in } x\\text{-axis} \\)</p>
+                            <p>• Outside addition: \\( +5 \\implies \\text{5 units up} \\)</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    const badge = b.querySelector('div:first-child');
+                    badge.classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    badge.classList.add('bg-gray-100', 'text-gray-700');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('div:first-child');
+                badge.classList.remove('bg-gray-100', 'text-gray-700');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case new math was revealed
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

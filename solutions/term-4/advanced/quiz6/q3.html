@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Domain of Radical Function</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-square-root-alt text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-6 text-lg">
+                <p class="mb-3 text-gray-800 font-medium">What is the domain of the following?</p>
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6 text-center">
+                    <span class="text-2xl text-blue-950 font-serif font-bold">\[ y = \sqrt{4x - 9} \]</span>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="A">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">A</div>
+                        <div class="flex-grow py-2 text-center text-lg">
+                            \[ x < 2.25 \]
+                        </div>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center" data-value="B">
+                        <div class="w-full flex items-center justify-between mb-1">
+                            <span class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 text-sm">B</span>
+                            
+                        </div>
+                        <div class="w-full h-16 flex items-center justify-center bg-slate-50 rounded-lg p-1 border border-slate-100">
+                            <!-- SVG Number Line with open circle at 2.25 -->
+                            <svg viewBox="0 0 220 50" class="w-full max-w-[210px]">
+                                <!-- Main Axis with double arrows -->
+                                <line x1="15" y1="32" x2="205" y2="32" stroke="#334155" stroke-width="1.8"/>
+                                <polygon points="15,32 21,29 21,35" fill="#334155"/>
+                                <polygon points="205,32 199,29 199,35" fill="#334155"/>
+
+                                <!-- Ticks: Scale 0 to 4 (0->35, 1->65, 2->95, 3->125, 4->155) -->
+                                <!-- 0 -->
+                                <line x1="35" y1="28" x2="35" y2="36" stroke="#475569" stroke-width="1.5"/>
+                                <text x="35" y="47" font-family="sans-serif" font-size="10" fill="#475569" text-anchor="middle">0</text>
+                                <!-- 0.5 -->
+                                <line x1="50" y1="30" x2="50" y2="34" stroke="#94a3b8" stroke-width="1"/>
+                                <!-- 1 -->
+                                <line x1="65" y1="28" x2="65" y2="36" stroke="#475569" stroke-width="1.5"/>
+                                <text x="65" y="47" font-family="sans-serif" font-size="10" fill="#475569" text-anchor="middle">1</text>
+                                <!-- 1.5 -->
+                                <line x1="80" y1="30" x2="80" y2="34" stroke="#94a3b8" stroke-width="1"/>
+                                <!-- 2 -->
+                                <line x1="95" y1="28" x2="95" y2="36" stroke="#475569" stroke-width="1.5"/>
+                                <text x="95" y="47" font-family="sans-serif" font-size="10" fill="#475569" text-anchor="middle">2</text>
+                                <!-- 2.5 -->
+                                <line x1="110" y1="30" x2="110" y2="34" stroke="#94a3b8" stroke-width="1"/>
+                                <!-- 3 -->
+                                <line x1="125" y1="28" x2="125" y2="36" stroke="#475569" stroke-width="1.5"/>
+                                <text x="125" y="47" font-family="sans-serif" font-size="10" fill="#475569" text-anchor="middle">3</text>
+                                <!-- 3.5 -->
+                                <line x1="140" y1="30" x2="140" y2="34" stroke="#94a3b8" stroke-width="1"/>
+                                <!-- 4 -->
+                                <line x1="155" y1="28" x2="155" y2="36" stroke="#475569" stroke-width="1.5"/>
+                                <text x="155" y="47" font-family="sans-serif" font-size="10" fill="#475569" text-anchor="middle">4</text>
+
+                                <!-- Open Circle Ray at 2.25 (x = 95 + 7.5 = 102.5px, y = 14) -->
+                                <circle cx="102.5" cy="14" r="3.5" fill="#ffffff" stroke="#334155" stroke-width="1.5"/>
+                                <line x1="106" y1="14" x2="160" y2="14" stroke="#334155" stroke-width="1.8"/>
+                                <polygon points="160,14 153,11 153,17" fill="#334155"/>
+                            </svg>
+                        </div>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="C">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">C</div>
+                        <div class="flex-grow py-2 text-center text-lg font-medium">
+                            \[ \left[2\frac{1}{4}, \infty\right) \]
+                        </div>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="D">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">D</div>
+                        <div class="flex-grow py-2 text-center text-base md:text-lg">
+                            \[ (-\infty, 0] \cup \left[\frac{9}{4}, \infty\right) \]
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: The Non-Negative Radicand Condition</p>
+                        <p class="text-gray-700">The <strong>domain</strong> of a function is the set of all allowable real input values (\( x \)). For real values of \( y \), the quantity under a square root (the radicand) cannot be negative:</p>
+                        
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-base text-blue-900">
+                            \[ \text{Radicand} \ge 0 \implies 4x - 9 \ge 0 \]
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">Notice the inequality is <strong>greater than or equal to zero (\( \ge \))</strong> because \( \sqrt{0} = 0 \), which is a completely valid real number.</p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Solve the Linear Inequality</p>
+                        <p class="text-gray-700 mb-2">Isolate \( x \) using standard inverse operations:</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-1 mb-2 font-medium">
+                            <li>Add \( 9 \) to both sides: \( 4x \ge 9 \)</li>
+                            <li>Divide both sides by \( 4 \): \( x \ge \frac{9}{4} \)</li>
+                        </ul>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-lg text-slate-800 space-y-1">
+                            <div>\[ x \ge \frac{9}{4} = 2.25 = \mathbf{2\frac{1}{4}} \]</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Convert to Interval Notation & Visualise</p>
+                        <p class="text-gray-700 mb-2">Because the inequality includes the endpoint (\( \ge \)), it must be represented with a <strong>solid closed circle</strong> on a number line and a <strong>square bracket</strong> in interval notation:</p>
+                        
+                        <!-- SVG Comparison Number Line -->
+                        <div class="bg-white border border-gray-100 rounded-lg p-4 my-3 shadow-sm w-full flex flex-col items-center">
+                            <span class="text-xs uppercase font-bold text-slate-500 tracking-wider mb-2">Correct Number Line Representation</span>
+                            <svg viewBox="0 0 360 70" class="w-full max-w-[340px]">
+                                <!-- Main axis -->
+                                <line x1="20" y1="40" x2="340" y2="40" stroke="#334155" stroke-width="2"/>
+                                <polygon points="20,40 28,36 28,44" fill="#334155"/>
+                                <polygon points="340,40 332,36 332,44" fill="#334155"/>
+
+                                <!-- Ticks: 0, 1, 2, 2.25, 3, 4 -->
+                                <line x1="50" y1="35" x2="50" y2="45" stroke="#64748b" stroke-width="1.5"/>
+                                <text x="50" y="58" font-family="sans-serif" font-size="11" fill="#64748b" text-anchor="middle">0</text>
+
+                                <line x1="100" y1="35" x2="100" y2="45" stroke="#64748b" stroke-width="1.5"/>
+                                <text x="100" y="58" font-family="sans-serif" font-size="11" fill="#64748b" text-anchor="middle">1</text>
+
+                                <line x1="150" y1="35" x2="150" y2="45" stroke="#64748b" stroke-width="1.5"/>
+                                <text x="150" y="58" font-family="sans-serif" font-size="11" fill="#64748b" text-anchor="middle">2</text>
+
+                                <!-- 2.25 marker (162.5px) -->
+                                <line x1="162.5" y1="32" x2="162.5" y2="48" stroke="#16a34a" stroke-width="2"/>
+                                <text x="162.5" y="65" font-family="sans-serif" font-size="11" font-weight="bold" fill="#15803d" text-anchor="middle">2¼</text>
+
+                                <line x1="200" y1="35" x2="200" y2="45" stroke="#64748b" stroke-width="1.5"/>
+                                <text x="200" y="58" font-family="sans-serif" font-size="11" fill="#64748b" text-anchor="middle">3</text>
+
+                                <line x1="250" y1="35" x2="250" y2="45" stroke="#64748b" stroke-width="1.5"/>
+                                <text x="250" y="58" font-family="sans-serif" font-size="11" fill="#64748b" text-anchor="middle">4</text>
+
+                                <!-- Ray with Solid Closed Circle -->
+                                <circle cx="162.5" cy="18" r="5" fill="#16a34a" stroke="#15803d" stroke-width="1.5"/>
+                                <line x1="167" y1="18" x2="280" y2="18" stroke="#16a34a" stroke-width="3"/>
+                                <polygon points="280,18 270,13 270,23" fill="#16a34a"/>
+                                <text x="215" y="11" font-family="sans-serif" font-size="11" font-weight="bold" fill="#15803d" text-anchor="middle">x ≥ 2¼</text>
+                            </svg>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-xl text-emerald-800">
+                            \[ \text{Domain: } \mathbf{\left[2\frac{1}{4}, \infty\right)} \]
+                        </div>
+
+                        <p class="font-bold text-green-700 text-lg mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg font-mono">
+                            \(\left[2\frac{1}{4}, \infty\right)\)
+                        </p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600">
+                            <i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option C is correct.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the options to review common domain, bracket, and inequality traps.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-base md:text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-3">You set up the inequality in reverse or reversed the inequality sign during your rearrangement.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-red-600 italic">Setting the radicand as less than zero or flipping the sign:</div>
+                            <div>\\[ 4x - 9 < 0 \\implies 4x < 9 \\implies x < 2.25 \\quad \\text{❌} \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Direction Trap:</strong> If \\( x < 2.25 \\) (for example, try testing \\( x = 0 \\)):
+                            \\[ y = \\sqrt{4(0) - 9} = \\sqrt{-9} \\]</p>
+                            <p>Square rooting a negative number yields a non-real/imaginary result! Therefore, \\( x \\) must be <strong>greater than or equal to</strong> \\( 2.25 \\), not less.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-3">You correctly solved the algebra to get \( 2.25 \) pointing to the right, but you were caught by the <strong>open circle endpoint trap</strong>.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-orange-700 italic">Assuming a strict inequality (excluding zero):</div>
+                            <div>\\[ 4x - 9 > 0 \\implies x > 2.25 \\]</div>
+                            <div class="text-xs text-orange-700 italic">Represented with an open (hollow) circle:</div>
+                            <div>\\[ (2.25, \\infty) \\quad \\text{❌} \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Inclusion Trap:</strong> The number under a square root is allowed to equal zero:
+                            \\[ \\sqrt{0} = 0 \\]</p>
+                            <p>Because \\( x = 2.25 \\) gives \\( \\sqrt{4(2.25) - 9} = \\sqrt{0} = 0 \\), \\( 2.25 \\) <strong>is included</strong> in the domain. On a number line, this requires a <strong>solid closed circle</strong>, not an open one!</p>
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-3">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-check text-3xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-3 text-left">You applied the square root domain rule with complete precision:</p>
+                        
+                        <div class="bg-emerald-50 text-emerald-900 p-4 rounded-xl border border-emerald-200 text-left space-y-2 text-sm md:text-base">
+                            <div>1. Radicand must be non-negative: \\[ 4x - 9 \\ge 0 \\]</div>
+                            <div>2. Solve the linear inequality: \\[ 4x \\ge 9 \\implies x \\ge \\frac{9}{4} = 2\\frac{1}{4} \\]</div>
+                            <div>3. Since \\( 2\\frac{1}{4} \\) is included (because \\(\\sqrt{0} = 0\\) is defined), we write:</div>
+                            <div class="text-center font-bold text-lg text-emerald-800 my-1">\\[ \\left[2\\frac{1}{4}, \\infty\\right) \\]</div>
+                        </div>
+                        
+                        <p class="text-sm bg-blue-50 text-blue-800 p-3 rounded-lg border border-blue-200 mt-3 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Check out Option B to see why an open circle vs. a closed bracket is one of the most common test traps!
+                        </p>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-3">You assumed that negative \\( x \\)-values would be acceptable, likely thinking that squaring makes negatives positive.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-left space-y-2 mb-3 text-sm md:text-base">
+                            <p>• Correctly identifying that \\( x \\ge \\frac{9}{4} \\) works.</p>
+                            <p>• Mistakenly assuming that negative numbers (such as \\( x \\le 0 \\)) are also permitted because you thought of "squaring a negative" or confused this linear expression with a quadratic radicand like \\( \\sqrt{x^2 - 9} \\).</p>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> The expression inside is <strong>linear</strong> (\\( 4x - 9 \\)), not squared (\\( 4x^2 - 9 \\)).</p>
+                            <p>If you plug in any negative number, such as \\( x = -1 \\):
+                            \\[ 4(-1) - 9 = -4 - 9 = -13 \\]
+                            This yields \\( \\sqrt{-13} \\), which is undefined in real numbers. Hence, the interval \\( (-\\infty, 0] \\) cannot be part of the domain.</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    const badge = b.querySelector('div:first-child, span:first-child');
+                    if (badge) {
+                        badge.classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                        badge.classList.add('bg-gray-100', 'text-gray-600');
+                    }
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('div:first-child, span:first-child');
+                if (badge) {
+                    badge.classList.remove('bg-gray-100', 'text-gray-600');
+                }
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    if (badge) badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    if (badge) badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case new math was revealed
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
