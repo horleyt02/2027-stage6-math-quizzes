@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Increasing Functions & Derivatives</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-svg {
+            opacity: 0;
+            animation: fade 1s ease-out forwards;
+        }
+        @keyframes fade { to { opacity: 1; } }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-chart-line text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-6 text-lg">
+                <p class="mb-3 text-gray-800 font-medium">The graph of \( y = f'(x) \) is shown below.</p>
+                
+                <!-- SVG Recreation of the Derivative Graph -->
+                <div id="problem-diagram" class="w-full bg-white border border-slate-200 rounded-xl mb-5 shadow-sm p-2 flex justify-center">
+                    <svg viewBox="0 0 460 260" class="w-full max-w-[440px]">
+                        <!-- Coordinate Axes -->
+                        <line x1="30" y1="170" x2="430" y2="170" stroke="#1e293b" stroke-width="1.8"/>
+                        <polygon points="430,170 422,166 422,174" fill="#1e293b"/>
+                        <text x="435" y="174" font-family="serif" font-style="italic" font-size="14" fill="#1e293b">x</text>
+
+                        <line x1="210" y1="245" x2="210" y2="20" stroke="#1e293b" stroke-width="1.8"/>
+                        <polygon points="210,20 206,28 214,28" fill="#1e293b"/>
+                        <text x="195" y="24" font-family="serif" font-style="italic" font-size="14" fill="#1e293b">y</text>
+
+                        <!-- Origin -->
+                        <text x="192" y="185" font-family="serif" font-style="italic" font-size="16" fill="#1e293b">O</text>
+
+                        <!-- f'(x) Curve: Mathematically accurate cubic spline passing precisely through:
+                             Start: (50, 235)
+                             Root 1: (-6, 0) -> (85, 170)
+                             Local Max: (-3, 4) -> (145, 60)
+                             Root 2: (1, 0) -> (235, 170)
+                             Local Min: (3, -2) -> (285, 215)
+                             Root 3: (5, 0) -> (335, 170)
+                             End: (385, 30)
+                        -->
+                        <path d="M 50 235 C 65 210, 75 190, 85 170 C 105 130, 125 60, 145 60 C 175 60, 210 130, 235 170 C 255 202, 270 215, 285 215 C 305 215, 323 195, 335 170 C 352 135, 370 75, 385 30" 
+                              fill="none" stroke="#0f172a" stroke-width="2.4"/>
+
+                        <!-- Curve Label -->
+                        <text x="390" y="55" font-family="serif" font-style="italic" font-size="14" font-weight="bold" fill="#0f172a">y = f '(x)</text>
+
+                        <!-- Key Intercepts & Labels (Aligned exactly on curve roots) -->
+                        <!-- x = -6 -->
+                        <circle cx="85" cy="170" r="3.5" fill="#0f172a"/>
+                        <text x="85" y="190" font-family="sans-serif" font-size="13" font-weight="bold" fill="#334155" text-anchor="middle">-6</text>
+
+                        <!-- x = 1 -->
+                        <circle cx="235" cy="170" r="3.5" fill="#0f172a"/>
+                        <text x="235" y="190" font-family="sans-serif" font-size="13" font-weight="bold" fill="#334155" text-anchor="middle">1</text>
+
+                        <!-- x = 5 -->
+                        <circle cx="335" cy="170" r="3.5" fill="#0f172a"/>
+                        <text x="335" y="190" font-family="sans-serif" font-size="13" font-weight="bold" fill="#334155" text-anchor="middle">5</text>
+
+                        <!-- Turning Points -->
+                        <!-- (-3, 4) -->
+                        <circle cx="145" cy="60" r="3.5" fill="#0f172a"/>
+                        <text x="145" y="48" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1e293b" text-anchor="middle">(-3, 4)</text>
+
+                        <!-- (3, -2) -->
+                        <circle cx="285" cy="215" r="3.5" fill="#0f172a"/>
+                        <text x="285" y="235" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1e293b" text-anchor="middle">(3, -2)</text>
+                    </svg>
+                </div>
+
+                <p class="font-semibold mb-4 text-gray-800">For what values of \( x \) is the function \( f(x) \) increasing?</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="A">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">A</div>
+                        <div class="flex-grow py-2 text-center text-base md:text-lg">
+                            \[ (-\infty, -3) \cup (3, \infty) \]
+                        </div>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="B">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">B</div>
+                        <div class="flex-grow py-2 text-center text-base md:text-lg">
+                            \[ (-6, 1) \cup (5, \infty) \]
+                        </div>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="C">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">C</div>
+                        <div class="flex-grow py-2 text-center text-base md:text-lg">
+                            \[ (-\infty, -3] \cup [3, \infty) \]
+                        </div>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="D">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">D</div>
+                        <div class="flex-grow py-2 text-center text-base md:text-lg">
+                            \[ [-6, 1] \cup [5, \infty) \]
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: The Condition for an Increasing Function</p>
+                        <p class="text-gray-700">A function \( f(x) \) is strictly <strong>increasing</strong> when its rate of change (first derivative) is strictly positive:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-base text-blue-900">
+                            \[ f(x) \text{ is increasing} \iff f'(x) > 0 \]
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">Because the given graph is <strong>already the derivative</strong> \( y = f'(x) \), we look for where the graph lies <strong>strictly above the \( x \)-axis</strong> (where \( y > 0 \)).</p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Highlight Regions Above the Axis</p>
+                        <p class="text-gray-700 mb-2">Examining the \( x \)-intercepts of \( y = f'(x) \) at \( x = -6, 1, 5 \):</p>
+                        
+                        <!-- Highlighting SVG with perfectly aligned shading -->
+                        <div class="bg-white border border-gray-100 rounded-lg p-3 my-3 shadow-sm w-full flex justify-center">
+                            <svg viewBox="0 0 460 260" class="w-full max-w-[430px]">
+                                <!-- Green Shaded Zones precisely tracing curve above the x-axis -->
+                                <!-- Interval 1: between -6 and 1 -->
+                                <path d="M 85 170 C 105 130, 125 60, 145 60 C 175 60, 210 130, 235 170 Z" fill="#bbf7d0" opacity="0.75"/>
+                                <!-- Interval 2: from 5 upward -->
+                                <path d="M 335 170 C 352 135, 370 75, 385 30 L 385 170 Z" fill="#bbf7d0" opacity="0.75"/>
+
+                                <!-- Coordinate Axes -->
+                                <line x1="30" y1="170" x2="430" y2="170" stroke="#1e293b" stroke-width="1.8"/>
+                                <polygon points="430,170 422,166 422,174" fill="#1e293b"/>
+                                <text x="435" y="174" font-family="serif" font-style="italic" font-size="14" fill="#1e293b">x</text>
+
+                                <line x1="210" y1="245" x2="210" y2="20" stroke="#1e293b" stroke-width="1.8"/>
+                                <polygon points="210,20 206,28 214,28" fill="#1e293b"/>
+                                <text x="195" y="24" font-family="serif" font-style="italic" font-size="14" fill="#1e293b">y</text>
+
+                                <!-- Origin -->
+                                <text x="192" y="185" font-family="serif" font-style="italic" font-size="16" fill="#1e293b">O</text>
+
+                                <!-- Curve -->
+                                <path d="M 50 235 C 65 210, 75 190, 85 170 C 105 130, 125 60, 145 60 C 175 60, 210 130, 235 170 C 255 202, 270 215, 285 215 C 305 215, 323 195, 335 170 C 352 135, 370 75, 385 30" 
+                                      fill="none" stroke="#0f172a" stroke-width="2.4"/>
+
+                                <!-- Intercept markers with open hollow circles indicating f'(x) = 0 is not increasing -->
+                                <circle cx="85" cy="170" r="4.5" fill="#ffffff" stroke="#16a34a" stroke-width="2.5"/>
+                                <text x="85" y="190" font-family="sans-serif" font-size="13" font-weight="bold" fill="#15803d" text-anchor="middle">-6</text>
+
+                                <circle cx="235" cy="170" r="4.5" fill="#ffffff" stroke="#16a34a" stroke-width="2.5"/>
+                                <text x="235" y="190" font-family="sans-serif" font-size="13" font-weight="bold" fill="#15803d" text-anchor="middle">1</text>
+
+                                <circle cx="335" cy="170" r="4.5" fill="#ffffff" stroke="#16a34a" stroke-width="2.5"/>
+                                <text x="335" y="190" font-family="sans-serif" font-size="13" font-weight="bold" fill="#15803d" text-anchor="middle">5</text>
+
+                                <!-- Labels for regions -->
+                                <rect x="120" y="105" width="85" height="24" rx="4" fill="#ffffff" stroke="#86efac" stroke-width="1.5"/>
+                                <text x="162" y="121" font-family="sans-serif" font-size="11" font-weight="bold" fill="#166534" text-anchor="middle">f '(x) &gt; 0</text>
+
+                                <rect x="340" y="95" width="85" height="24" rx="4" fill="#ffffff" stroke="#86efac" stroke-width="1.5"/>
+                                <text x="382" y="111" font-family="sans-serif" font-size="11" font-weight="bold" fill="#166534" text-anchor="middle">f '(x) &gt; 0</text>
+                            </svg>
+                        </div>
+
+                        <div class="space-y-1 text-sm text-gray-700 bg-white p-3 rounded-lg border border-gray-100 font-medium">
+                            <p>• Between \( x = -6 \) and \( x = 1 \), the curve is strictly above the axis (\( f'(x) > 0 \)).</p>
+                            <p>• For \( x > 5 \), the curve climbs infinitely above the axis (\( f'(x) > 0 \)).</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Stationary Points & Interval Notation</p>
+                        <p class="text-gray-700 mb-2">At \( x = -6, 1, 5 \), we have \( f'(x) = 0 \). At these exact points, the function is <strong>stationary</strong>, not increasing.</p>
+                        
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-lg text-emerald-800">
+                            \[ x \in (-6, 1) \cup (5, \infty) \]
+                        </div>
+
+                        <p class="text-sm text-gray-600 mt-2">Therefore, we use <strong>open round brackets</strong> \( (-6, 1) \) rather than closed square brackets.</p>
+
+                        <p class="font-bold text-green-700 text-lg mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">
+                            \( (-6, 1) \cup (5, \infty) \)
+                        </p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600">
+                            <i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option B is correct.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the options to review common traps when reading derivative graphs.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-base md:text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-3">You fell into the most famous calculus graph trap: <strong>treating the derivative graph as if it were the original function \\( f(x) \\)</strong>.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-left space-y-2 mb-3 text-sm md:text-base">
+                            <p>• Looking at where the drawn graph slopes upward: climbing from \\( (-\\infty) \\) to the local maximum at \\( x = -3 \\).</p>
+                            <p>• Then climbing again upward from the local minimum at \\( x = 3 \\) to \\( \\infty \\).</p>
+                            <div class="text-center text-red-600 font-semibold my-2">\\[ (-\\infty, -3) \\cup (3, \\infty) \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> Where the graph of \\( f'(x) \\) slopes upward indicates where the <em>second derivative</em> is positive (\\( f''(x) > 0 \\)), which means \\( f(x) \\) is concave up!</p>
+                            <p>To find where \\( f(x) \\) is <strong>increasing</strong>, you only care whether the derivative's \\( y \\)-values are positive: \\( f'(x) > 0 \\) (regions strictly above the \\( x \\)-axis).</p>
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-3">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-check text-3xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-3 text-left">You correctly identified that a function is strictly increasing where its derivative is positive (\\( f'(x) > 0 \\)):</p>
+                        
+                        <div class="bg-emerald-50 text-emerald-900 p-4 rounded-xl border border-emerald-200 text-left space-y-2 text-sm md:text-base">
+                            <div>• Look strictly <strong>above the \\( x \\)-axis</strong> on the \\( y = f'(x) \\) graph.</div>
+                            <div>• The curve is above the axis between \\( x = -6 \\) and \\( x = 1 \\), and again for \\( x > 5 \\).</div>
+                            <div>• At \\( x = -6, 1, 5 \\), the derivative equals zero (\\( f'(x) = 0 \\)). Because the function is stationary rather than increasing at these points, we use <strong>open intervals</strong>:</div>
+                            <div class="text-center font-bold text-lg text-emerald-800 my-2">\\[ (-6, 1) \\cup (5, \\infty) \\]</div>
+                        </div>
+                        
+                        <p class="text-sm bg-blue-50 text-blue-800 p-3 rounded-lg border border-blue-200 mt-3 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Check out Option D to see why using square brackets is a common mistake when dealing with stationary endpoints!
+                        </p>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-3">You looked at where the given curve slopes upward (treating it as the original function), and also included the turning points in closed brackets.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-left space-y-2 mb-3 text-sm md:text-base">
+                            <p>• Noticed the curve going upwards from left to right until the peak at \\((-3, 4)\\) and from the trough at \\((3, -2)\\) upwards.</p>
+                            <p>• Used closed brackets \\([-\\infty, -3] \\cup [3, \\infty)\\) to include the turning points.</p>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Double Error:</strong> Remember that the graph shows the <strong>gradient function</strong> \\( y = f'(x) \\), not the original curve \\( y = f(x) \\).</p>
+                            <p>For \\( f(x) \\) to increase, the gradient values must be positive (\\( f'(x) > 0 \\)). You must look above the \\( x \\)-axis, which occurs on \\( (-6, 1) \\cup (5, \\infty) \\).</p>
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-3">You correctly identified the intervals above the \\( x \\)-axis, but you included the stationary points using <strong>closed brackets</strong>.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-gray-500 italic">Correctly looking above the \\( x \\)-axis:</div>
+                            <div>Between \\(-6\\) and \\(1\\), and to the right of \\(5\\)</div>
+                            <div class="text-xs text-purple-700 italic mt-2">Including the intercept endpoints with square brackets:</div>
+                            <div class="my-2">\\[ [-6, 1] \\cup [5, \\infty) \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Endpoint Convention Error:</strong> At \\( x = -6, 1, 5 \\), the derivative is exactly zero (\\( f'(x) = 0 \\)).</p>
+                            <p>When the derivative equals zero, the tangent is horizontal and the function is <strong>stationary</strong>. Because it is stationary at those exact moments, it is not strictly increasing. Therefore, the endpoints must be excluded using <strong>open round brackets</strong>: \\( (-6, 1) \\cup (5, \\infty) \\).</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    const badge = b.querySelector('div:first-child');
+                    badge.classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    badge.classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('div:first-child');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case new math was revealed
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

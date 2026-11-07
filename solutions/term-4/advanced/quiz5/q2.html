@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Trigonometric Quadrants</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-compass text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-6 text-lg">
+                <p class="mb-2 text-gray-800">It is known for the angle \( \varphi \) that</p>
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-4 text-center">
+                    \[ \tan(\varphi) = \frac{12}{5} \quad \text{and} \quad \cos(\varphi) = -\frac{5}{13} \]
+                </div>
+                <p class="font-semibold mb-5 text-gray-800">Which of the following graphs best represents the angle \( \varphi \)?</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="multiple-choice">
+                    
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center" data-value="A">
+                        <div class="w-full flex items-center justify-between mb-2">
+                            <span class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 text-sm">A</span>
+                        </div>
+                        <div class="w-full h-32 flex items-center justify-center bg-slate-50 rounded-lg p-1 border border-slate-100">
+                            <svg viewBox="0 0 160 140" class="w-full h-full max-w-[150px]">
+                                <!-- Axes -->
+                                <line x1="20" y1="90" x2="140" y2="90" stroke="#334155" stroke-width="1.5"/>
+                                <polygon points="140,90 134,87 134,93" fill="#334155"/>
+                                <text x="142" y="103" font-family="serif" font-style="italic" font-size="13" fill="#334155">x</text>
+
+                                <line x1="75" y1="130" x2="75" y2="20" stroke="#334155" stroke-width="1.5"/>
+                                <polygon points="75,20 72,26 78,26" fill="#334155"/>
+                                <text x="68" y="22" font-family="serif" font-style="italic" font-size="13" fill="#334155">y</text>
+                                <text x="63" y="106" font-family="serif" font-style="italic" font-size="14" font-weight="bold" fill="#334155">O</text>
+
+                                <!-- Terminal Ray (Q1) -->
+                                <line x1="75" y1="90" x2="125" y2="25" stroke="#1e293b" stroke-width="2"/>
+                                <!-- Arc phi -->
+                                <path d="M 98 90 A 23 23 0 0 0 91 69" fill="none" stroke="#1e293b" stroke-width="1.5"/>
+                                <text x="104" y="80" font-family="serif" font-style="italic" font-size="14" fill="#1e293b">φ</text>
+                            </svg>
+                        </div>
+                    </button>
+                    
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center" data-value="B">
+                        <div class="w-full flex items-center justify-between mb-2">
+                            <span class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 text-sm">B</span>
+                        </div>
+                        <div class="w-full h-32 flex items-center justify-center bg-slate-50 rounded-lg p-1 border border-slate-100">
+                            <svg viewBox="0 0 160 140" class="w-full h-full max-w-[150px]">
+                                <!-- Axes -->
+                                <line x1="20" y1="90" x2="140" y2="90" stroke="#334155" stroke-width="1.5"/>
+                                <polygon points="140,90 134,87 134,93" fill="#334155"/>
+                                <text x="142" y="103" font-family="serif" font-style="italic" font-size="13" fill="#334155">x</text>
+
+                                <line x1="85" y1="130" x2="85" y2="20" stroke="#334155" stroke-width="1.5"/>
+                                <polygon points="85,20 82,26 88,26" fill="#334155"/>
+                                <text x="78" y="22" font-family="serif" font-style="italic" font-size="13" fill="#334155">y</text>
+                                <text x="73" y="106" font-family="serif" font-style="italic" font-size="14" font-weight="bold" fill="#334155">O</text>
+
+                                <!-- Terminal Ray (Q2) -->
+                                <line x1="85" y1="90" x2="35" y2="25" stroke="#1e293b" stroke-width="2"/>
+                                <!-- Arc phi -->
+                                <path d="M 110 90 A 25 25 0 0 0 67 72" fill="none" stroke="#1e293b" stroke-width="1.5"/>
+                                <text x="105" y="65" font-family="serif" font-style="italic" font-size="14" fill="#1e293b">φ</text>
+                            </svg>
+                        </div>
+                    </button>
+
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center" data-value="C">
+                        <div class="w-full flex items-center justify-between mb-2">
+                            <span class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 text-sm">C</span>
+                        </div>
+                        <div class="w-full h-32 flex items-center justify-center bg-slate-50 rounded-lg p-1 border border-slate-100">
+                            <svg viewBox="0 0 160 140" class="w-full h-full max-w-[150px]">
+                                <!-- Axes -->
+                                <line x1="20" y1="75" x2="140" y2="75" stroke="#334155" stroke-width="1.5"/>
+                                <polygon points="140,75 134,72 134,78" fill="#334155"/>
+                                <text x="142" y="88" font-family="serif" font-style="italic" font-size="13" fill="#334155">x</text>
+
+                                <line x1="85" y1="130" x2="85" y2="15" stroke="#334155" stroke-width="1.5"/>
+                                <polygon points="85,15 82,21 88,21" fill="#334155"/>
+                                <text x="78" y="17" font-family="serif" font-style="italic" font-size="13" fill="#334155">y</text>
+                                <text x="92" y="88" font-family="serif" font-style="italic" font-size="14" font-weight="bold" fill="#334155">O</text>
+
+                                <!-- Terminal Ray (Q3) -->
+                                <line x1="85" y1="75" x2="55" y2="135" stroke="#1e293b" stroke-width="2"/>
+                                <!-- Arc phi (rotates anticlockwise past 180 into Q3) -->
+                                <path d="M 110 75 A 25 25 0 1 0 71 103" fill="none" stroke="#1e293b" stroke-width="1.5"/>
+                                <text x="59" y="58" font-family="serif" font-style="italic" font-size="14" fill="#1e293b">φ</text>
+                            </svg>
+                        </div>
+                    </button>
+
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center" data-value="D">
+                        <div class="w-full flex items-center justify-between mb-2">
+                            <span class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 text-sm">D</span>
+                        </div>
+                        <div class="w-full h-32 flex items-center justify-center bg-slate-50 rounded-lg p-1 border border-slate-100">
+                            <svg viewBox="0 0 160 140" class="w-full h-full max-w-[150px]">
+                                <!-- Axes -->
+                                <line x1="20" y1="75" x2="140" y2="75" stroke="#334155" stroke-width="1.5"/>
+                                <polygon points="140,75 134,72 134,78" fill="#334155"/>
+                                <text x="142" y="88" font-family="serif" font-style="italic" font-size="13" fill="#334155">x</text>
+
+                                <line x1="75" y1="130" x2="75" y2="15" stroke="#334155" stroke-width="1.5"/>
+                                <polygon points="75,15 72,21 78,21" fill="#334155"/>
+                                <text x="68" y="17" font-family="serif" font-style="italic" font-size="13" fill="#334155">y</text>
+                                <text x="63" y="68" font-family="serif" font-style="italic" font-size="14" font-weight="bold" fill="#334155">O</text>
+
+                                <!-- Terminal Ray (Q4) -->
+                                <line x1="75" y1="75" x2="135" y2="98" stroke="#1e293b" stroke-width="2"/>
+                                <!-- Arc phi measured from vertical axis -->
+                                <path d="M 75 100 A 25 25 0 0 0 97 83" fill="none" stroke="#1e293b" stroke-width="1.5"/>
+                                <text x="91" y="112" font-family="serif" font-style="italic" font-size="14" fill="#1e293b">φ</text>
+                            </svg>
+                        </div>
+                    </button>
+
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs normal-case tracking-wider mb-2">Step 1: Check the Sign of \(\tan(\varphi)\)</p>
+                        <p class="text-gray-700">We are given that:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-base text-blue-900">
+                            \[ \tan(\varphi) = \frac{12}{5} > 0 \]
+                        </div>
+                        <p class="text-sm text-gray-700 mt-2">Tangent is positive in <strong>Quadrant 1</strong> and in <strong>Quadrant 3</strong>.</p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs normal-case tracking-wider mb-2">Step 2: Check the Sign of \(\cos(\varphi)\)</p>
+                        <p class="text-gray-700">We are also given that:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-base text-rose-800">
+                            \[ \cos(\varphi) = -\frac{5}{13} < 0 \]
+                        </div>
+                        <p class="text-sm text-gray-700 mt-2">Cosine is negative in <strong>Quadrant 2</strong> and <strong>Quadrant 3</strong>.</p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Combine with the ASTC Diagram</p>
+                        <p class="text-gray-700 mb-2">To satisfy both conditions simultaneously, the angle must lie in the quadrant where both conditions overlap:</p>
+                        
+                        <!-- ASTC Diagram SVG -->
+                        <div class="bg-white border border-gray-100 rounded-lg p-4 my-3 shadow-sm w-full flex flex-col items-center">
+                            <svg viewBox="0 0 260 220" class="w-full max-w-[270px]">
+                                <!-- Quadrant boxes -->
+                                <!-- Q2 -->
+                                <rect x="25" y="15" width="100" height="90" fill="#f8fafc" stroke="#e2e8f0"/>
+                                <!-- Q1 -->
+                                <rect x="135" y="15" width="100" height="90" fill="#f8fafc" stroke="#e2e8f0"/>
+                                <!-- Q3 (Highlighted) -->
+                                <rect x="25" y="115" width="100" height="90" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+                                <!-- Q4 -->
+                                <rect x="135" y="115" width="100" height="90" fill="#f8fafc" stroke="#e2e8f0"/>
+
+                                <!-- Axes dividing lines -->
+                                <line x1="130" y1="10" x2="130" y2="210" stroke="#475569" stroke-width="2"/>
+                                <line x1="20" y1="110" x2="240" y2="110" stroke="#475569" stroke-width="2"/>
+
+                                <!-- ASTC Letters & Labels -->
+                                <!-- Quadrant 1: A -->
+                                <text x="185" y="55" font-family="sans-serif" font-size="28" font-weight="bold" fill="#3b82f6" text-anchor="middle">A</text>
+                                <text x="185" y="78" font-family="sans-serif" font-size="11" font-weight="bold" fill="#64748b" text-anchor="middle">ALL positive</text>
+                                <text x="185" y="93" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">Quadrant I</text>
+
+                                <!-- Quadrant 2: S -->
+                                <text x="75" y="55" font-family="sans-serif" font-size="28" font-weight="bold" fill="#64748b" text-anchor="middle">S</text>
+                                <text x="75" y="78" font-family="sans-serif" font-size="11" font-weight="bold" fill="#64748b" text-anchor="middle">SIN positive</text>
+                                <text x="75" y="93" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">Quadrant II</text>
+
+                                <!-- Quadrant 3: T (Highlighted Target) -->
+                                <text x="75" y="155" font-family="sans-serif" font-size="30" font-weight="bold" fill="#047857" text-anchor="middle">T</text>
+                                <text x="75" y="178" font-family="sans-serif" font-size="11" font-weight="bold" fill="#065f46" text-anchor="middle">TAN positive</text>
+                                <text x="75" y="193" font-family="sans-serif" font-size="10" font-weight="bold" fill="#10b981" text-anchor="middle">cos &lt; 0 ✓ tan &gt; 0 ✓</text>
+
+                                <!-- Quadrant 4: C -->
+                                <text x="185" y="155" font-family="sans-serif" font-size="28" font-weight="bold" fill="#64748b" text-anchor="middle">C</text>
+                                <text x="185" y="178" font-family="sans-serif" font-size="11" font-weight="bold" fill="#64748b" text-anchor="middle">COS positive</text>
+                                <text x="185" y="193" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">Quadrant IV</text>
+                            </svg>
+                            <span class="text-xs text-gray-500 mt-1 italic font-medium">ASTC: All Stations To Central</span>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-base text-emerald-800 space-y-1">
+                            <div>\[ \tan(\varphi) > 0 \implies \text{Quadrant 1 or 3} \]</div>
+                            <div>\[ \cos(\varphi) < 0 \implies \text{Quadrant 2 or 3} \]</div>
+                            <div class="font-bold text-lg pt-1">\[ \text{Overlap} = \mathbf{\text{Quadrant 3}} \]</div>
+                        </div>
+
+                        <p class="font-bold text-green-700 text-lg mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">Graph C (Quadrant 3)</p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Graph C correctly shows the ray in Quadrant 3 measured anticlockwise from the positive \(x\)-axis.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different graphs to analyze ASTC quadrant rules and standard position traps.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-base md:text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-3">You only considered the sign of the tangent ratio and assumed the angle had to be acute.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-gray-500 italic">Looking only at the positive ratio:</div>
+                            <div>\\[ \\tan(\\varphi) = \\frac{12}{5} > 0 \\]</div>
+                            <div class="text-xs text-red-600 italic">Defaulting to an acute angle in Quadrant 1:</div>
+                            <div>\\[ 0^\\circ < \\varphi < 90^\\circ \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Conceptual Error:</strong> In Quadrant 1, <strong>all</strong> trigonometric ratios are positive (\\(A\\) in ASTC).</p>
+                            <p>However, the question explicitly states that \\( \\cos(\\varphi) = -\\frac{5}{13} < 0 \\). An angle in Quadrant 1 cannot have a negative cosine value.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-3">You focused on the negative cosine value and correctly knew cosine was negative in Quadrant 2, but you overlooked the sign of tangent.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-gray-500 italic">Noticing that cosine is negative:</div>
+                            <div>\\[ \\cos(\\varphi) = -\\frac{5}{13} < 0 \\]</div>
+                            <div class="text-xs text-orange-700 italic">Selecting an obtuse angle in Quadrant 2:</div>
+                            <div>\\[ 90^\\circ < \\varphi < 180^\\circ \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>ASTC Trap:</strong> In Quadrant 2, only <strong>sine</strong> is positive (\\(S\\) in ASTC).</p>
+                            <p>In Quadrant 2, \\(\\tan(\\varphi)\\) would have to be <strong>negative</strong>. Since the question states \\(\\tan(\\varphi) = +\\frac{12}{5}\\), the angle cannot be in Quadrant 2.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-3">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-check text-3xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-3 text-left">You successfully used the signs of both trigonometric ratios to identify that \\( \\varphi \\) must lie in <strong>Quadrant 3</strong>:</p>
+                        
+                        <div class="bg-emerald-50 text-emerald-900 p-4 rounded-xl border border-emerald-200 text-left space-y-2 text-sm md:text-base">
+                            <div>• \\(\\tan(\\varphi) = +\\frac{12}{5} > 0 \\implies\\) Quadrant 1 or 3 (\\(A\\) or \\(T\\))</div>
+                            <div>• \\(\\cos(\\varphi) = -\\frac{5}{13} < 0 \\implies\\) Quadrant 2 or 3 (\\(S\\) or \\(T\\))</div>
+                            <div class="font-bold text-emerald-800 pt-1">• Both statements are satisfied only in Quadrant 3 (\\(180^\\circ < \\varphi < 270^\\circ\\)).</div>
+                        </div>
+                        
+                        <p class="text-sm bg-blue-50 text-blue-800 p-3 rounded-lg border border-blue-200 mt-3 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Check out Option D to see how non-standard angle measurement conventions can mislead students into picking the wrong quadrant!
+                        </p>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-3">This option represents a common trap where the angle is measured from the <strong>vertical axis</strong> instead of the positive horizontal axis.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-left space-y-2 mb-3 text-sm md:text-base">
+                            <p>• Noticing the terminal arm is in the lower half of the Cartesian plane (\\(y < 0\\)).</p>
+                            <p>• Because the angle arc \\(\\varphi\\) is drawn starting from the <em>negative vertical axis</em> (\\(y\\)-axis), you may have mistakenly thought that \\(\\cos(\\varphi)\\) would be negative.</p>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Standard Position Error:</strong> In trigonometry, angles in standard position are <strong>always</strong> measured starting from the <strong>positive \\(x\\)-axis</strong>.</p>
+                            <p>Graph D shows an angle measured from the negative \\(y\\)-axis into Quadrant 4. In Quadrant 4, the true standard angle has \\(x > 0\\), meaning \\(\\cos(\\varphi)\\) would actually be <strong>positive</strong> (\\(C\\) in ASTC), which contradicts our given \\(\\cos(\\varphi) = -\\frac{5}{13}\\).</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    const badge = b.querySelector('span:first-child');
+                    badge.classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    badge.classList.add('bg-gray-100', 'text-gray-700');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span:first-child');
+                badge.classList.remove('bg-gray-100', 'text-gray-700');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case new math was revealed
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Points of Intersection</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-calculator text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-6 text-lg">
+                <p class="mb-5 text-gray-800 font-medium">
+                    What is the \( x \) coordinate of the point/s of intersection of \( y = x^2 + x - 3 \) and \( y = 2x + 3 \)?
+                </p>
+                
+                <div class="grid grid-cols-1 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow py-2">\( x = -3 \) and \( x = 0 \)</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow py-2">\( x = -3 \) and \( x = 2 \)</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow py-2">\( x = -2 \) and \( x = 3 \)</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow py-2">\( x = -3 \)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Equate Both Expressions for \( y \)</p>
+                        <p class="text-gray-700">At points of intersection, both functions share identical \( y \)-values for the same \( x \)-value. Set the two equations equal to each other:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-lg text-blue-900">
+                            \[ x^2 + x - 3 = 2x + 3 \]
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Rearrange into Standard Quadratic Form</p>
+                        <p class="text-gray-700 mb-2">To solve any quadratic equation, gather all terms onto one side so the equation equals zero (\( ax^2 + bx + c = 0 \)):</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-1 mb-2 font-medium">
+                            <li>Subtract \( 2x \) from both sides: \( x - 2x = -x \)</li>
+                            <li>Subtract \( 3 \) from both sides: \( -3 - 3 = -6 \)</li>
+                        </ul>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-lg text-slate-800 space-y-1">
+                            <div>\[ x^2 + x - 2x - 3 - 3 = 0 \]</div>
+                            <div>\[ x^2 - x - 6 = 0 \]</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Factorise and Apply the Null Factor Law</p>
+                        <p class="text-gray-700 mb-2">Find two numbers that multiply to \( -6 \) and add up to \( -1 \). These numbers are \( -3 \) and \( +2 \):</p>
+                        
+                        <!-- Visual Factoring SVG Diagram -->
+                        <div class="bg-white border border-gray-100 rounded-lg p-4 my-3 shadow-sm w-full flex justify-center">
+                            <svg width="100%" height="135" viewBox="0 0 460 135" preserveAspectRatio="xMidYMid meet">
+                                <!-- Quadratic Box -->
+                                <rect x="150" y="8" width="160" height="34" rx="6" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+                                <text x="230" y="30" font-family="sans-serif" font-size="14" font-weight="bold" fill="#0369a1" text-anchor="middle">x² - x - 6 = 0</text>
+                                
+                                <!-- Factor Branches -->
+                                <path d="M 200 42 L 120 70" stroke="#64748b" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M 260 42 L 340 70" stroke="#64748b" stroke-width="2" stroke-linecap="round"/>
+                                
+                                <!-- Branch 1 -->
+                                <rect x="55" y="70" width="130" height="28" rx="5" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+                                <text x="120" y="89" font-family="sans-serif" font-size="13" font-weight="bold" fill="#334155" text-anchor="middle">x - 3 = 0</text>
+                                <text x="120" y="122" font-family="sans-serif" font-size="14" font-weight="bold" fill="#16a34a" text-anchor="middle">x = 3</text>
+                                
+                                <!-- Branch 2 -->
+                                <rect x="275" y="70" width="130" height="28" rx="5" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+                                <text x="340" y="89" font-family="sans-serif" font-size="13" font-weight="bold" fill="#334155" text-anchor="middle">x + 2 = 0</text>
+                                <text x="340" y="122" font-family="sans-serif" font-size="14" font-weight="bold" fill="#16a34a" text-anchor="middle">x = -2</text>
+                            </svg>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-lg space-y-1">
+                            <div>\[ (x - 3)(x + 2) = 0 \]</div>
+                            <div>\[ x = 3 \quad \text{or} \quad x = -2 \]</div>
+                        </div>
+
+                        <p class="font-bold text-green-700 text-lg mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">
+                            \( x = -2 \) and \( x = 3 \)
+                        </p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600">
+                            <i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option C is correct.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the options to review algebraic rearrangement and factorising traps.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-base md:text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-3">You likely made an algebraic rearrangement error by adding terms instead of subtracting them when moving everything to one side.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-gray-500 italic">Incorrectly moving \(2x\) and \(3\) across:</div>
+                            <div>\\[ x^2 + x - 3 = 2x + 3 \\]</div>
+                            <div class="text-xs text-gray-500 italic">Adding terms instead of subtracting:</div>
+                            <div>\\[ x^2 + 3x = 0 \\]</div>
+                            <div class="text-xs text-gray-500 italic">Factoring out \(x\):</div>
+                            <div>\\[ x(x + 3) = 0 \\implies x = 0 \\text{ and } x = -3 \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Algebraic Trap:</strong> To eliminate \\(+2x\\) and \\(+3\\) from the right side, you must <strong>subtract</strong> both:
+                            \\[ x - 2x = -x \\]
+                            \\[ -3 - 3 = -6 \\]
+                            This leads to \\(x^2 - x - 6 = 0\\), not \\(x^2 + 3x = 0\\).</p>
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-3">You successfully rearranged the equation to \\(x^2 - x - 6 = 0\\), but you swapped the positive and negative signs when factorising.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-gray-500 italic">Correct standard form:</div>
+                            <div>\\[ x^2 - x - 6 = 0 \\]</div>
+                            <div class="text-xs text-red-600 italic">Incorrect factor signs:</div>
+                            <div>\\[ (x + 3)(x - 2) = 0 \\]</div>
+                            <div>\\[ x = -3 \\text{ and } x = 2 \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Factoring Sign Error:</strong> Expanding \\((x + 3)(x - 2)\\) produces \\(x^2 + x - 6\\), which has a <strong>positive</strong> middle term \\(+x\\).</p>
+                            <p>Because the middle term in our quadratic is <strong>\\(-x\\)</strong>, the larger factor must carry the negative sign:
+                            \\[ (x - 3)(x + 2) = 0 \\implies x = 3 \\text{ and } x = -2 \\]</p>
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-3">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-check text-3xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-3 text-left">You equated the two equations and solved the resulting quadratic equation with perfect accuracy:</p>
+                        
+                        <div class="bg-emerald-50 text-emerald-900 p-4 rounded-xl border border-emerald-200 text-left space-y-2 text-sm md:text-base">
+                            <div>1. Equate: \\[ x^2 + x - 3 = 2x + 3 \\]</div>
+                            <div>2. Rearrange to standard form: \\[ x^2 - x - 6 = 0 \\]</div>
+                            <div>3. Factorise correctly: \\[ (x - 3)(x + 2) = 0 \\]</div>
+                            <div>4. Null Factor Law: \\[ x = 3 \\quad \\text{and} \\quad x = -2 \\]</div>
+                        </div>
+                        
+                        <p class="text-sm bg-blue-50 text-blue-800 p-3 rounded-lg border border-blue-200 mt-3 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Explore Options A, B, and D to see how sign errors during transposition and factorisation are classic examination pitfalls.
+                        </p>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-3">You likely made an algebraic rearrangement error by adding terms instead of subtracting them when moving everything to one side and then solved incorrectly.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-gray-500 italic">Incorrectly moving \(2x\) and \(3\) across:</div>
+                            <div>\\[ x^2 + x - 3 = 2x + 3 \\]</div>
+                            <div class="text-xs text-gray-500 italic">Adding terms instead of subtracting:</div>
+                            <div>\\[ x^2 + 3x = 0 \\]</div>
+                            <div class="text-xs text-gray-500 italic">Incorrectly dividing by \(x\) when solving:</div>
+                            <div>\\[ x + 3 = 0 \\implies x = -3 \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Double Error:</strong> First, subtracting \\(2x + 3\\) from both sides gives \\(x^2 - x - 6 = 0\\), not \\(x^2 + 3x = 0\\).</p>
+                            <p>Secondly, even if solving \\(x^2 + 3x = 0 \\) , you should factorise first \\(x(x + 3) = 0\\), and then solve \\(x = 0\\) and  \\(x + 3 = 0\\) yielding \\(x = 0\\) AND \\(x = -3\\).</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case new math was revealed
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
