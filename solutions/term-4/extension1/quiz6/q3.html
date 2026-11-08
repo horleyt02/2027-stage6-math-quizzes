@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Trigonometric Identity</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-wave-square text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-6 text-lg">
+                <p class="mb-4 text-gray-800 font-medium">
+                    Which of the following is equal to the expression?
+                </p>
+                
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 mb-6 text-center shadow-inner overflow-x-auto">
+                    <span class="text-2xl md:text-3xl text-blue-950 font-serif font-bold">
+                        \[ \sin x \cos^3 x - \sin^3 x \cos x \]
+                    </span>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="A">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">A</div>
+                        <div class="flex-grow text-center text-lg font-serif font-bold">
+                            \[ \frac{1}{4} \sin 4x \]
+                        </div>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="B">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">B</div>
+                        <div class="flex-grow text-center text-lg font-serif font-bold">
+                            \[ \frac{1}{2} \sin 4x \]
+                        </div>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="C">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">C</div>
+                        <div class="flex-grow text-center text-lg font-serif font-bold">
+                            \[ 2 \sin 4x \]
+                        </div>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="D">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">D</div>
+                        <div class="flex-grow text-center text-lg font-serif font-bold">
+                            \[ 4 \sin 4x \]
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Factor the Expression</p>
+                        <p class="text-gray-700 mb-2">Look for the highest common factor (HCF) in both terms of \( \sin x \cos^3 x - \sin^3 x \cos x \).</p>
+                        <p class="text-gray-700">Both terms share at least one \( \sin x \) and one \( \cos x \). Factoring out \( \sin x \cos x \) gives:</p>
+                        
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 text-base md:text-lg text-center my-3 text-slate-800 font-bold shadow-sm overflow-x-auto">
+                            \[ \sin x \cos x (\cos^2 x - \sin^2 x) \]
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Reference Sheet & Compound Angles</p>
+                        <p class="text-gray-700 mb-2">Consult the <strong>Compound angles</strong> section on your reference sheet to derive the double-angle formulas:</p>
+                        
+                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 my-3 space-y-3 shadow-sm">
+                            <h4 class="text-sm uppercase font-bold text-amber-900 tracking-wider mb-2 border-b border-amber-200 pb-1">From Reference Sheet:</h4>
+                            <div class="text-sm md:text-base text-amber-950 font-serif">
+                                <div class="mb-2">\[ \sin(A + B) = \sin A \cos B + \cos A \sin B \]</div>
+                                <div>\[ \cos(A + B) = \cos A \cos B - \sin A \sin B \]</div>
+                            </div>
+                            <div class="bg-white bg-opacity-60 p-3 rounded mt-3 text-sm text-amber-900">
+                                <p class="mb-1"><strong>Let A = x and B = x:</strong></p>
+                                <div>\( \sin(2x) = 2 \sin x \cos x \implies \sin x \cos x = \frac{1}{2} \sin 2x \)</div>
+                                <div>\( \cos(2x) = \cos x \cos x - \sin x \sin x \implies \cos^2 x - \sin^2 x = \cos 2x \)</div>
+                            </div>
+                        </div>
+
+                        <p class="text-sm text-gray-700 mt-2">Substitute these back into our factored expression:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center text-base text-blue-900 overflow-x-auto">
+                            \[ \left( \frac{1}{2} \sin 2x \right) ( \cos 2x ) = \frac{1}{2} \sin 2x \cos 2x \]
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Apply the Identity Again</p>
+                        <p class="text-gray-700 mb-2">We have \( \frac{1}{2} \sin 2x \cos 2x \). Notice that \( \sin 2x \cos 2x \) perfectly matches the structure of the sine double-angle identity again, but with an angle of \( 2x \).</p>
+                        
+                        <p class="text-sm text-gray-700 mb-2">Using \( \sin A \cos A = \frac{1}{2}\sin(2A) \), where \( A = 2x \):</p>
+                        
+                        <div class="bg-white p-4 rounded-lg border border-gray-100 my-2 shadow-sm text-center space-y-2 text-base text-blue-900 overflow-x-auto">
+                            <div>\[ \sin 2x \cos 2x = \frac{1}{2} \sin(4x) \]</div>
+                            <hr class="border-gray-200 mx-8">
+                            <div class="mt-2 text-gray-700 text-sm">Substitute this into our full expression:</div>
+                            <div class="font-bold text-lg">\[ \frac{1}{2} \left( \frac{1}{2} \sin 4x \right) = \frac{1}{4} \sin 4x \]</div>
+                        </div>
+
+                        <p class="font-bold text-green-700 text-xl mt-4 bg-green-100 inline-block px-5 py-3 rounded-lg font-serif shadow-sm">
+                            \[ \frac{1}{4} \sin 4x \]
+                        </p>
+                        <p class="mt-4 text-sm font-semibold text-gray-600">
+                            <i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option A is correct.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the options to reveal common missing coefficients when using the double-angle formulas.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-base md:text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const feedbackData = {
+            'A': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-3">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-check text-3xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-3 text-left">You successfully factored the expression and navigated the double-angle formulas <strong>twice</strong>, keeping track of your coefficients.</p>
+                        
+                        <div class="bg-emerald-50 text-emerald-900 p-4 rounded-xl border border-emerald-200 text-left space-y-3 text-sm md:text-base">
+                            <div>1. Factor out GCF: \\[ \\sin x \\cos x (\\cos^2 x - \\sin^2 x) \\]</div>
+                            <div>2. First compound angle substitution: \\[ \\left( \\frac{1}{2} \\sin 2x \\right) (\\cos 2x) = \\frac{1}{2} \\sin 2x \\cos 2x \\]</div>
+                            <div>3. Second compound angle substitution: \\[ \\frac{1}{2} \\left( \\frac{1}{2} \\sin 4x \\right) = \\frac{1}{4} \\sin 4x \\]</div>
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-3">You correctly factored the expression and performed the first identity substitution, but you lost a coefficient of \\( \\frac{1}{2} \\) on the final step.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-gray-500 italic">Correctly arriving at the intermediate step:</div>
+                            <div>\\[ \\frac{1}{2} \\sin 2x \\cos 2x \\]</div>
+                            <div class="text-xs text-orange-700 italic">Forgetting the second half-factor:</div>
+                            <div>\\[ \\text{Assuming } \\sin 2x \\cos 2x = \\sin 4x \\quad \\text{❌} \\]</div>
+                            <div>\\[ \\implies \\frac{1}{2} \\sin 4x \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Identity Check:</strong> The formula is \\( \\sin(2A) = 2 \\sin A \\cos A \\).</p>
+                            <p>To use it in reverse for \\( \\sin 2x \\cos 2x \\), you must isolate the terms by dividing by 2:</p>
+                            <div class="text-center font-bold text-slate-800">\\[ \\sin A \\cos A = \\frac{1}{2} \\sin(2A) \\]</div>
+                            <p>So, \\( \\sin 2x \\cos 2x \\) becomes \\( \\frac{1}{2} \\sin 4x \\). Multiplied by your existing \\( \\frac{1}{2} \\), you get \\( \\frac{1}{4} \\sin 4x \\).</p>
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-3">You likely recognised the correct final angle (\\( 4x \\)) and knew the formula \\( \\sin 4x = 2 \\sin 2x \\cos 2x \\), but you confused how to apply it algebraically.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-gray-500 italic">Recalling the relationship:</div>
+                            <div>\\[ \\sin 4x = 2 \\sin 2x \\cos 2x \\]</div>
+                            <div class="text-xs text-purple-700 italic">Making a faulty substitution mapping:</div>
+                            <div>\\[ \\text{Since } \\sin 4x \\text{ has a 2 in it, the answer must be } 2 \\sin 4x \\quad \\text{❌} \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Algebraic Trap:</strong> You have to substitute algebraically, not just by looking at patterns.</p>
+                            <p>If you have \\( \\sin 2x \\cos 2x \\), you must divide the formula \\( \\sin 4x = 2 \\sin 2x \\cos 2x \\) by 2 on both sides:</p>
+                            <div class="text-center font-bold text-slate-800">\\[ \\frac{1}{2} \\sin 4x = \\sin 2x \\cos 2x \\]</div>
+                            <p>Because your factored expression was \\( \\frac{1}{2} \\sin 2x \\cos 2x \\), you must multiply by <em>another</em> half, yielding \\( \\frac{1}{4} \\sin 4x \\).</p>
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'red',
+                body: `
+                    <p class="mb-3">You factored the expression correctly, but you multiplied your coefficients instead of halving them when applying the double-angle identities.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-gray-500 italic">Incorrectly converting the first step (multiplying by 2 instead of 1/2):</div>
+                            <div>\\[ \\sin x \\cos x \\rightarrow 2 \\sin 2x \\quad \\text{❌} \\]</div>
+                            <div class="text-xs text-red-700 italic">Getting to intermediate step:</div>
+                            <div>\\[ 2 \\sin 2x \\cos 2x \\]</div>
+                            <div class="text-xs text-red-700 italic">Multiplying by 2 again instead of 1/2:</div>
+                            <div>\\[ 2(2 \\sin 4x) = 4 \\sin 4x \\quad \\text{❌} \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Coefficient Error:</strong> The reference sheet says \\( \\sin(A + B) = \\sin A \\cos B + \\cos A \\sin B \\).</p>
+                            <p>If \\( A=x \\) and \\( B=x \\), we get \\( \\sin(2x) = 2 \\sin x \\cos x \\).</p>
+                            <p>To replace \\( \\sin x \\cos x \\), you must <strong>divide</strong> by 2, not multiply! It becomes \\( \\frac{1}{2} \\sin 2x \\). You must do this halving process twice.</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    const badge = b.querySelector('div:first-child');
+                    badge.classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    badge.classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('div:first-child');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case new math was revealed
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
