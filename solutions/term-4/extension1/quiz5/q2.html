@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Polynomial Division</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                macros: {
+                    deg: "\\operatorname{deg}"
+                }
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-divide text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-6 text-lg">
+                <p class="mb-3 text-gray-800">A polynomial \( P(x) \) has degree 4.</p>
+                <p class="mb-5 text-gray-800">When \( P(x) \) is divided by \( D(x) \), the remainder is \( x^2 + 6x + 9 \).</p>
+                <p class="font-semibold mb-4 text-gray-800">Which of the following is true about the degree of \( D(x) \)?</p>
+                
+                <div class="space-y-3" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn w-full p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left flex items-start" data-value="A">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 mr-3 mt-0.5 flex-shrink-0">A</div>
+                        <div class="text-sm md:text-base text-gray-800 font-medium leading-relaxed">
+                            The degree must be 2.
+                        </div>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn w-full p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left flex items-start" data-value="B">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 mr-3 mt-0.5 flex-shrink-0">B</div>
+                        <div class="text-sm md:text-base text-gray-800 font-medium leading-relaxed">
+                            The degree could be 2.
+                        </div>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn w-full p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left flex items-start" data-value="C">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 mr-3 mt-0.5 flex-shrink-0">C</div>
+                        <div class="text-sm md:text-base text-gray-800 font-medium leading-relaxed">
+                            The degree must be 3.
+                        </div>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn w-full p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left flex items-start" data-value="D">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 mr-3 mt-0.5 flex-shrink-0">D</div>
+                        <div class="text-sm md:text-base text-gray-800 font-medium leading-relaxed">
+                            The degree could be 3.
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Identify the Degree of the Remainder</p>
+                        <p class="text-gray-700 mb-2">Look at the remainder given in the problem:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-base md:text-lg text-blue-900">
+                            \[ R(x) = x^2 + 6x + 9 \]
+                        </div>
+                        <p class="text-sm text-gray-700 mt-2">The highest power of \( x \) in this expression is 2, so the <strong>degree of the remainder is 2</strong>.</p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Apply the Division Theorem</p>
+                        <p class="text-gray-700 mb-2">The fundamental rule of polynomial division states that the division process only stops when the degree of the remainder is strictly less than the degree of the divisor:</p>
+                        <div class="bg-amber-50 p-3 rounded-lg border border-amber-200 my-2 shadow-sm text-center font-medium overflow-x-auto text-base text-amber-900">
+                            \[ \deg(R) < \deg(D) \]
+                        </div>
+                        <p class="text-sm text-gray-700 mt-2">Since \( \deg(R) = 2 \), the divisor \( D(x) \) must have a degree of <strong>at least 3</strong>.</p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Determine Possible Degrees for D(x)</p>
+                        <p class="text-gray-700 mb-2">We know \( \deg(D) \ge 3 \). Because the original polynomial \( P(x) \) has degree 4, the divisor can be degree 3 or degree 4 (yielding a quotient of degree 1 or 0 respectively).</p>
+                        
+                        <!-- Visual Inequality Number Line SVG -->
+                        <div class="bg-white border border-gray-100 rounded-lg p-3 my-3 shadow-sm w-full flex flex-col items-center">
+                            <span class="text-xs uppercase font-bold text-slate-500 tracking-wider mb-2">Possible Degrees for Divisor D(x)</span>
+                            <svg viewBox="0 0 400 90" class="w-full max-w-[380px]">
+                                <!-- Number Line -->
+                                <line x1="20" y1="50" x2="380" y2="50" stroke="#94a3b8" stroke-width="2"/>
+                                
+                                <!-- Ticks & Numbers (0 to 5) -->
+                                <g font-family="sans-serif" font-size="12" font-weight="bold" fill="#64748b" text-anchor="middle">
+                                    <line x1="50" y1="45" x2="50" y2="55" stroke="#94a3b8" stroke-width="2"/><text x="50" y="75">0</text>
+                                    <line x1="110" y1="45" x2="110" y2="55" stroke="#94a3b8" stroke-width="2"/><text x="110" y="75">1</text>
+                                    
+                                    <!-- Remainder Degree (2) -->
+                                    <line x1="170" y1="40" x2="170" y2="60" stroke="#ef4444" stroke-width="2.5"/><text x="170" y="75" fill="#ef4444">2</text>
+                                    <text x="170" y="25" font-size="10" fill="#ef4444">deg(R)</text>
+
+                                    <!-- Valid Divisor Degrees (3, 4) -->
+                                    <line x1="230" y1="40" x2="230" y2="60" stroke="#10b981" stroke-width="3"/><text x="230" y="75" fill="#10b981">3</text>
+                                    <line x1="290" y1="40" x2="290" y2="60" stroke="#10b981" stroke-width="3"/><text x="290" y="75" fill="#10b981">4</text>
+                                    
+                                    <!-- P(x) Degree Max (4) -->
+                                    <text x="290" y="25" font-size="10" fill="#10b981">deg(P)</text>
+
+                                    <line x1="350" y1="45" x2="350" y2="55" stroke="#94a3b8" stroke-width="2"/><text x="350" y="75">5</text>
+                                </g>
+
+                                <!-- Inequality highlight (Valid integer degrees 3 and 4) -->
+                                <path d="M 230 40 L 230 60" stroke="#10b981" stroke-width="3"/>
+                                <line x1="230" y1="50" x2="290" y2="50" stroke="#10b981" stroke-width="4"/>
+                                <path d="M 290 40 L 290 60" stroke="#10b981" stroke-width="3"/>
+                            </svg>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-base text-emerald-800 space-y-1">
+                            <div>Because \( \deg(D) \) can be either 3 or 4, it is false to say it <em>must</em> be 3.</div>
+                            <div class="font-bold">However, it <em>could</em> be 3.</div>
+                        </div>
+
+                        <p class="font-bold text-green-700 text-lg mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">
+                            Option D
+                        </p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600">
+                            <i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option D is correct.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the options to see common traps involving polynomial degrees and the division algorithm.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-base md:text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-3">You fell into the '2 + 2 = 4' trap, focusing on the quotient and dividend while ignoring the remainder rule!</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-left space-y-2 mb-3 text-sm md:text-base">
+                            <p>• You remembered that \\( \\deg(P) = \\deg(D) + \\deg(Q) \\).</p>
+                            <p>• Since \\( P(x) \\) is degree 4, you assumed \\( D(x) \\) and \\( Q(x) \\) were both degree 2 (since \\( 2 + 2 = 4 \\)).</p>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Remainder Violation:</strong> You completely ignored the remainder! The division process only finishes when the remainder is a <strong>lower degree</strong> than the divisor.</p>
+                            <p>Since the given remainder \\( x^2 + 6x + 9 \\) is degree 2, the divisor \\( D(x) \\) <strong>cannot</strong> be degree 2. If it were, you would be able to divide one more time!</p>
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-3">You assumed that the divisor and quotient could both be degree 2 to multiply up to a degree 4 polynomial.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-orange-700 italic">Thinking that divisor degree + quotient degree = polynomial degree:</div>
+                            <div>\\[ \\deg(D) + \\deg(Q) = 4 \\]</div>
+                            <div class="text-xs text-red-600 italic">Assuming they could both be 2:</div>
+                            <div>\\[ 2 + 2 = 4 \\implies \\deg(D) \\text{ could be } 2 \\quad \\text{❌} \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Remainder Violation:</strong> In polynomial division, \\( \\deg(R) < \\deg(D) \\).</p>
+                            <p>Because \\( R(x) = x^2 + 6x + 9 \\) is degree 2, the divisor \\( D(x) \\) must be strictly greater than 2. It is mathematically impossible for the divisor to "could be" 2 when the remainder is already degree 2.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-3">You correctly realised that the divisor must be a higher degree than the remainder, but you assumed it <em>had</em> to be exactly one degree higher.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-left space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-green-700"><i class="fas fa-check mr-1"></i> Correctly identified \\( \\deg(R) = 2 \\), so \\( \\deg(D) > 2 \\).</div>
+                            <div class="text-red-700 mt-2"><i class="fas fa-times mr-1"></i> Assumed that if it must be greater than 2, it <em>must</em> be 3.</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Logical Trap:</strong> While the degree of \\( D(x) \\) certainly <em>could</em> be 3, it doesn't <em>have</em> to be 3.</p>
+                            <p>For example, if \\( D(x) \\) were degree 4, and \\( P(x) \\) was degree 4, the quotient \\( Q(x) \\) would be a constant (degree 0). This is a perfectly valid division that still leaves a degree 2 remainder. Therefore, it is false to state the degree <strong>must</strong> be 3.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-3">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-check text-3xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-3 text-left">You successfully applied the division theorem and carefully analysed the logic of the options:</p>
+                        
+                        <div class="bg-emerald-50 text-emerald-900 p-4 rounded-xl border border-emerald-200 text-left space-y-2 text-sm md:text-base">
+                            <div>1. Remainder \\( R(x) = x^2 + 6x + 9 \\) is degree 2.</div>
+                            <div>2. Division rule: \\( \\deg(R) < \\deg(D) \\), meaning \\( \\deg(D) \\ge 3 \\).</div>
+                            <div>3. Because \\( P(x) \\) is degree 4, \\( D(x) \\) can be degree 3 (with a degree 1 quotient) or degree 4 (with a degree 0 quotient).</div>
+                            <div class="font-bold text-emerald-800 pt-1">4. Because it can be 3 or 4, it is true to say it "could be 3".</div>
+                        </div>
+                        
+                        <p class="text-sm bg-blue-50 text-blue-800 p-3 rounded-lg border border-blue-200 mt-3 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Check out Options A and B on the left to see why ignoring the remainder condition traps many students into picking degree 2!
+                        </p>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    const badge = b.querySelector('div:first-child');
+                    badge.classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    badge.classList.add('bg-gray-100', 'text-gray-700');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('div:first-child');
+                badge.classList.remove('bg-gray-100', 'text-gray-700');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case new math was revealed
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

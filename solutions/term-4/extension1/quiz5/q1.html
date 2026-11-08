@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Roots of Polynomials</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-square-root-alt text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-6 text-lg">
+                <p class="mb-2 text-gray-800 font-medium">
+                    The polynomial \( P(x) = 3x^3 - x^2 - 6x - 9 \) has roots \( \alpha \), \( \beta \) and \( \gamma \).
+                </p>
+                <p class="mb-3 text-gray-800 font-medium">What is the value of the following?</p>
+                
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6 text-center">
+                    <span class="text-2xl text-blue-950 font-serif font-bold">
+                        \[ \frac{1}{\gamma} + \frac{1}{\beta} + \frac{1}{\alpha} \]
+                    </span>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="A">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">A</div>
+                        <div class="flex-grow py-2 text-center text-lg font-serif font-bold">
+                            \(-3\)
+                        </div>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="B">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">B</div>
+                        <div class="flex-grow py-2 text-center text-lg font-serif font-bold">
+                            \[ -\frac{2}{3} \]
+                        </div>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="C">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">C</div>
+                        <div class="flex-grow py-2 text-center text-lg font-serif font-bold">
+                            \[ \frac{2}{3} \]
+                        </div>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="D">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">D</div>
+                        <div class="flex-grow py-2 text-center text-lg font-serif font-bold">
+                            \(3\)
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Check the Reference Sheet Formulas</p>
+                        <p class="text-gray-700">From the <strong>Functions</strong> section on the reference sheet, for any cubic equation \( ax^3 + bx^2 + cx + d = 0 \):</p>
+                        
+                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 my-2 text-center space-y-1">
+                            <span class="text-xs uppercase font-bold text-amber-800 tracking-wider block mb-1">From the Reference Sheet:</span>
+                            <div class="text-sm md:text-base text-amber-950 font-serif font-bold space-y-1">
+                                <div>\[ \alpha + \beta + \gamma = -\frac{b}{a} \]</div>
+                                <div>\[ \alpha\beta + \alpha\gamma + \beta\gamma = \frac{c}{a} \]</div>
+                                <div>\[ \alpha\beta\gamma = -\frac{d}{a} \]</div>
+                            </div>
+                        </div>
+
+                        <p class="text-sm text-gray-700 mt-2">Identify the coefficients from \( P(x) = 3x^3 - x^2 - 6x - 9 \):</p>
+                        <div class="bg-white p-2.5 rounded-lg border border-gray-100 text-xs md:text-sm text-center my-1 text-slate-800 font-medium">
+                            \[ a = 3, \quad b = -1, \quad c = -6, \quad d = -9 \]
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Combine the Reciprocal Fractions</p>
+                        <p class="text-gray-700 mb-2">Notice that you cannot simply flip the individual roots. You must express the sum of reciprocals over a common denominator \( \alpha\beta\gamma \):</p>
+                        
+                    <!-- Visual Common Denominator & Mapping SVG -->
+<div class="bg-white border border-gray-100 rounded-lg p-3 my-2 shadow-sm w-full flex justify-center">
+    <svg viewBox="0 0 440 125" class="w-full max-w-[420px]">
+        <!-- Left side: Proper stacked fractions -->
+        <rect x="15" y="35" width="135" height="50" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+        
+        <!-- First Fraction: 1/γ -->
+        <text x="38" y="52" font-family="serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">1</text>
+        <line x1="28" y1="58" x2="48" y2="58" stroke="#334155" stroke-width="1.5"/>
+        <text x="38" y="74" font-family="serif" font-size="15" font-weight="bold" fill="#334155" text-anchor="middle">γ</text>
+
+        <!-- Plus Sign -->
+        <text x="60" y="65" font-family="serif" font-size="15" font-weight="bold" fill="#334155" text-anchor="middle">+</text>
+
+        <!-- Second Fraction: 1/β -->
+        <text x="82" y="52" font-family="serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">1</text>
+        <line x1="72" y1="58" x2="92" y2="58" stroke="#334155" stroke-width="1.5"/>
+        <text x="82" y="74" font-family="serif" font-size="15" font-weight="bold" fill="#334155" text-anchor="middle">β</text>
+
+        <!-- Plus Sign -->
+        <text x="104" y="65" font-family="serif" font-size="15" font-weight="bold" fill="#334155" text-anchor="middle">+</text>
+
+        <!-- Third Fraction: 1/α -->
+        <text x="126" y="52" font-family="serif" font-size="14" font-weight="bold" fill="#334155" text-anchor="middle">1</text>
+        <line x1="116" y1="58" x2="136" y2="58" stroke="#334155" stroke-width="1.5"/>
+        <text x="126" y="74" font-family="serif" font-size="15" font-weight="bold" fill="#334155" text-anchor="middle">α</text>
+
+        <!-- Arrow (Text Removed) -->
+        <line x1="156" y1="60" x2="196" y2="60" stroke="#3b82f6" stroke-width="3"/>
+        <polygon points="200,60 190,55 190,65" fill="#3b82f6"/>
+
+        <!-- Right side compound fraction -->
+        <!-- Numerator: pairwise sum -->
+        <rect x="205" y="15" width="220" height="38" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.8"/>
+        <text x="315" y="39" font-family="serif" font-size="16" font-weight="bold" fill="#1e40af" text-anchor="middle">αβ + αγ + βγ</text>
+
+        <!-- Division bar -->
+        <line x1="205" y1="60" x2="425" y2="60" stroke="#1e293b" stroke-width="2.5"/>
+
+        <!-- Denominator: product -->
+        <rect x="245" y="68" width="140" height="38" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.8"/>
+        <text x="315" y="92" font-family="serif" font-size="17" font-weight="bold" fill="#b45309" text-anchor="middle">αβγ</text>
+    </svg>
+</div>
+
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-base text-blue-900">
+                            \[ \frac{1}{\gamma} + \frac{1}{\beta} + \frac{1}{\alpha} = \frac{\alpha\beta + \alpha\gamma + \beta\gamma}{\alpha\beta\gamma} \]
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Evaluate Numerator and Denominator</p>
+                        <p class="text-gray-700 mb-2">Now compute each part using the coefficients \( a = 3, c = -6, d = -9 \):</p>
+                        
+                        <div class="space-y-2 text-sm text-gray-800 bg-white p-3 rounded-lg border border-gray-100">
+                            <div>
+                                <strong class="text-blue-700">• Numerator (sum of pairwise products):</strong>
+                                <div class="text-center font-medium text-base my-1">
+                                    \[ \alpha\beta + \alpha\gamma + \beta\gamma = \frac{c}{a} = \frac{-6}{3} = \mathbf{-2} \]
+                                </div>
+                            </div>
+                            <hr class="border-gray-200 my-1">
+                            <div>
+                                <strong class="text-amber-700">• Denominator (product of roots):</strong>
+                                <div class="text-center font-medium text-base my-1">
+                                    \[ \alpha\beta\gamma = -\frac{d}{a} = -\left(\frac{-9}{3}\right) = -(-3) = \mathbf{3} \]
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="text-sm text-gray-700 mt-3 mb-1">Substitute these into the compound fraction:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-xl text-emerald-800">
+                            \[ \frac{\alpha\beta + \alpha\gamma + \beta\gamma}{\alpha\beta\gamma} = \frac{-2}{3} = \mathbf{-\frac{2}{3}} \]
+                        </div>
+
+                        <p class="font-bold text-green-700 text-lg mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg font-serif">
+                            \[ -\frac{2}{3} \]
+                        </p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600">
+                            <i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option B is correct.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the options to review algebraic fraction traps and Vieta's formulas.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-base md:text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-3">You calculated the single sum of roots \\( \\alpha + \\beta + \\gamma = \\frac{1}{3} \\), and then simply took its <strong>reciprocal</strong>, combined with a <strong>sign error</strong> on the sum of roots.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-gray-500 italic">Finding the sum of roots with a missing negative sign:</div>
+                            <div>\\[ \\alpha + \\beta + \\gamma = \\frac{b}{a} = \\frac{-1}{3} = -\\frac{1}{3} \\quad \\text{❌ (should be } -\\frac{b}{a} = +\\frac{1}{3}\\text{)} \\]</div>
+                            <div class="text-xs text-red-600 italic">Taking the reciprocal directly:</div>
+                            <div>\\[ \\frac{1}{-\\frac{1}{3}} = \\mathbf{-3} \\quad \\text{❌} \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Reciprocal Fallacy:</strong> In algebra, the sum of reciprocals is <strong>not</strong> equal to the reciprocal of the sum:</p>
+                            <div class="text-center font-bold text-rose-900">\\[ \\frac{1}{\\gamma} + \\frac{1}{\\beta} + \\frac{1}{\\alpha} \\ne \\frac{1}{\\alpha + \\beta + \\gamma} \\]</div>
+                            <p>You must find a common denominator: \\( \\frac{\\alpha\\beta + \\alpha\\gamma + \\beta\\gamma}{\\alpha\\beta\\gamma} = \\frac{-2}{3} \\).</p>
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-3">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-check text-3xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-3 text-left">You placed the expression over a common denominator and applied the formulas from the reference sheet:</p>
+                        
+                        <div class="bg-emerald-50 text-emerald-900 p-4 rounded-xl border border-emerald-200 text-left space-y-2 text-sm md:text-base">
+                            <div>1. Express over common denominator: \\[ \\frac{1}{\\gamma} + \\frac{1}{\\beta} + \\frac{1}{\\alpha} = \\frac{\\alpha\\beta + \\alpha\\gamma + \\beta\\gamma}{\\alpha\\beta\\gamma} \\]</div>
+                            <div>2. Evaluate pairwise sum: \\[ \\alpha\\beta + \\alpha\\gamma + \\beta\\gamma = \\frac{c}{a} = \\frac{-6}{3} = -2 \\]</div>
+                            <div>3. Evaluate product of roots: \\[ \\alpha\\beta\\gamma = -\\frac{d}{a} = -\\left(\\frac{-9}{3}\\right) = 3 \\]</div>
+                            <div class="font-bold text-emerald-800 pt-1">4. Substitute: \\[ \\frac{-2}{3} = -\\frac{2}{3} \\]</div>
+                        </div>
+                        
+                        <p class="text-sm bg-blue-50 text-blue-800 p-3 rounded-lg border border-blue-200 mt-3 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Check out Option D on the left to see why students often mistakenly invert the simple sum of roots instead!
+                        </p>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-3">You correctly combined the fractions into \\( \\frac{\\alpha\\beta + \\alpha\\gamma + \\beta\\gamma}{\\alpha\\beta\\gamma} \\), but you made a <strong>sign error</strong>.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-gray-500 italic">Forgetting the negative in the product formula:</div>
+                            <div>\\[ \\alpha\\beta\\gamma = \\frac{d}{a} = \\frac{-9}{3} = -3 \\quad \\text{❌} \\]</div>
+                            <div class="text-xs text-orange-700 italic">Dividing negative by negative:</div>
+                            <div>\\[ \\frac{-2}{-3} = \\mathbf{+\\frac{2}{3}} \\quad \\text{❌} \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Sign Rule Check:</strong> On the reference sheet, the product formula contains an explicit leading negative sign:</p>
+                            <div class="text-center font-bold text-slate-800">\\[ \\alpha\\beta\\gamma = -\\frac{d}{a} \\]</div>
+                            <p>Because \( d = -9 \), the double negative yields:
+                            \\[ \\alpha\\beta\\gamma = -\\left(\\frac{-9}{3}\\right) = +3 \\]</p>
+                            <p>Thus, the overall fraction must be negative: \\( \\frac{-2}{+3} = -\\frac{2}{3} \\).</p>
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-3">You calculated the single sum of roots \\( \\alpha + \\beta + \\gamma = \\frac{1}{3} \\), and then simply took its <strong>reciprocal</strong>.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-gray-500 italic">Finding the single sum of roots:</div>
+                            <div>\\[ \\alpha + \\beta + \\gamma = -\\frac{b}{a} = -\\left(\\frac{-1}{3}\\right) = \\frac{1}{3} \\]</div>
+                            <div class="text-xs text-purple-700 italic">Assuming you can just flip the sum:</div>
+                            <div>\\[ \\frac{1}{\\gamma} + \\frac{1}{\\beta} + \\frac{1}{\\alpha} \\rightarrow \\frac{1}{\\alpha + \\beta + \\gamma} = \\frac{1}{1/3} = \\mathbf{3} \\quad \\text{❌} \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Algebraic Trap:</strong> Adding reciprocals is completely different from taking the reciprocal of a sum!</p>
+                            <p>For example, if numbers are 1 and 2:
+                            \\[ \\frac{1}{1} + \\frac{1}{2} = 1.5 \\quad \\text{but} \\quad \\frac{1}{1 + 2} = \\frac{1}{3} \\approx 0.33 \\]</p>
+                            <p>To evaluate \\( \\frac{1}{\\gamma} + \\frac{1}{\\beta} + \\frac{1}{\\alpha} \\), you must put them over a common denominator: \\( \\frac{\\alpha\\beta + \\alpha\\gamma + \\beta\\gamma}{\\alpha\\beta\\gamma} = -\\frac{2}{3} \\).</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    const badge = b.querySelector('div:first-child');
+                    badge.classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    badge.classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('div:first-child');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case new math was revealed
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
