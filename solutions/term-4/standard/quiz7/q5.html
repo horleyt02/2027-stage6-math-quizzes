@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Geographic Coordinates</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-globe-americas text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-4 text-gray-800">Consider location \( A \) on the globe below.</p>
+                
+                <!-- SVG Globe Diagram -->
+                <div class="flex justify-center mb-6 border border-gray-100 rounded-xl p-4 bg-gray-50 shadow-sm overflow-hidden">
+                    <svg viewBox="0 0 420 420" width="100%" height="280" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Box -->
+                        <rect x="50" y="10" width="300" height="380" fill="#ffffff" stroke="#333" stroke-width="1"/>
+                        
+                        <!-- Globe outline -->
+                        <circle cx="200" cy="200" r="150" fill="none" stroke="#333" stroke-width="1.5"/>
+                        
+                        <!-- Equator and Prime Meridian -->
+                        <line x1="50" y1="200" x2="350" y2="200" stroke="#333" stroke-width="1.5"/>
+                        <line x1="200" y1="50" x2="200" y2="350" stroke="#333" stroke-width="1.5"/>
+                        
+                        <!-- Latitudes -->
+                        <line x1="58.6" y1="150" x2="341.4" y2="150" stroke="#888" stroke-width="1"/> <!-- 30N -->
+                        <line x1="88.2" y1="100" x2="311.8" y2="100" stroke="#888" stroke-width="1"/> <!-- 60N -->
+                        <line x1="58.6" y1="250" x2="341.4" y2="250" stroke="#888" stroke-width="1"/> <!-- 30S -->
+                        <line x1="88.2" y1="300" x2="311.8" y2="300" stroke="#888" stroke-width="1"/> <!-- 60S -->
+                        
+                        <!-- Longitudes -->
+                        <ellipse cx="200" cy="200" rx="50" ry="150" fill="none" stroke="#888" stroke-width="1"/>
+                        <ellipse cx="200" cy="200" rx="100" ry="150" fill="none" stroke="#888" stroke-width="1"/>
+                        
+                        <!-- Point A -->
+                        <circle cx="82.2" cy="150" r="7" fill="#333"/>
+                        <text x="65" y="115" font-family="serif" font-size="18" font-style="italic" font-weight="bold">A</text>
+                        <line x1="72" y1="120" x2="80" y2="145" stroke="#333" stroke-width="1.5"/>
+                        
+                        <!-- Labels -->
+                        <text x="200" y="28" font-family="serif" font-size="14" text-anchor="middle">North Pole</text>
+                        <text x="200" y="44" font-family="serif" font-size="14" text-anchor="middle">90°N</text>
+                        
+                        <text x="200" y="370" font-family="serif" font-size="14" text-anchor="middle">90°S</text>
+                        <text x="200" y="386" font-family="serif" font-size="14" text-anchor="middle">South Pole</text>
+                        
+                        <text x="315" y="100" font-family="sans-serif" font-size="12">60° N</text>
+                        
+                        <!-- Outer labels with arrows -->
+                        <text x="362" y="154" font-family="sans-serif" font-size="12">30° N</text>
+                        <path d="M 358 150 L 352 150 M 354 148 L 350 150 L 354 152" fill="none" stroke="#888" stroke-width="1"/>
+                        
+                        <text x="362" y="204" font-family="sans-serif" font-size="12">0°</text>
+                        <path d="M 358 200 L 352 200 M 354 198 L 350 200 L 354 202" fill="none" stroke="#888" stroke-width="1"/>
+
+                        <!-- Equator Labels -->
+                        <text x="100" y="193" font-family="sans-serif" font-size="11" text-anchor="middle">60° W</text>
+                        <text x="58" y="193" font-family="sans-serif" font-size="11" text-anchor="middle">90° W</text>
+                        <text x="145" y="193" font-family="sans-serif" font-size="11" text-anchor="middle">30° W</text>
+                        <text x="145" y="215" font-family="sans-serif" font-size="12" text-anchor="middle">equator</text>
+                        
+                        <text x="208" y="193" font-family="sans-serif" font-size="11">0°</text>
+                        <text x="250" y="193" font-family="sans-serif" font-size="11" text-anchor="middle">30° E</text>
+                        
+                        <!-- Tiny tick marks -->
+                        <line x1="50" y1="198" x2="50" y2="202" stroke="#333" stroke-width="1"/>
+                        <line x1="100" y1="198" x2="100" y2="202" stroke="#333" stroke-width="1"/>
+                        <line x1="150" y1="198" x2="150" y2="202" stroke="#333" stroke-width="1"/>
+                        <line x1="250" y1="198" x2="250" y2="202" stroke="#333" stroke-width="1"/>
+                    </svg>
+                </div>
+
+                <p class="font-semibold mb-5 text-gray-800">What are the coordinates for location \( A \)?</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( (30^\circ\text{N}, 60^\circ\text{W}) \)</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( (60^\circ\text{W}, 30^\circ\text{N}) \)</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( (30^\circ\text{N}, 75^\circ\text{W}) \)</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">\( (75^\circ\text{W}, 30^\circ\text{N}) \)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Identify the Latitude</p>
+                        <p>Latitude lines are the horizontal lines (parallels) indicating distance North or South of the equator.</p>
+                        <p class="mt-2 text-sm text-gray-700">Locate the horizontal grid line that passes directly through location \( A \). Following this line to the right edge of the globe, it is explicitly labeled as <strong class="text-blue-600">\( 30^\circ\text{N} \)</strong>.</p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Interpolate the Longitude</p>
+                        <p>Longitude lines are the vertical, curved lines (meridians) indicating distance East or West of the Prime Meridian.</p>
+                        <p class="mt-2 text-sm text-gray-700">Location \( A \) does not sit exactly on a labeled longitude line. Instead, it is situated exactly halfway between the line labeled \( 60^\circ\text{W} \) and the line labeled \( 90^\circ\text{W} \).</p>
+                        
+                        <p class="mt-2 text-sm text-gray-700">To find the exact longitude, calculate the midpoint:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-lg text-pink-600">
+                            \[ \frac{60 + 90}{2} = \mathbf{75^\circ\text{W}} \]
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Combine with Standard Convention</p>
+                        
+                        <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200 my-3 text-sm text-yellow-800 shadow-sm">
+                            <p><strong><i class="fas fa-exclamation-circle mr-1"></i> Important Rule:</strong></p>
+                            <p>Geographic coordinates must always be written in the standard order of <strong>(Latitude, Longitude)</strong>.</p>
+                        </div>
+                        
+                        <p>Combining our findings in the correct order gives:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-xl text-gray-900">
+                            \[ (\color{#2563eb}{30^\circ\text{N}}, \color{#db2777}{75^\circ\text{W}}) \]
+ <p class="font-bold text-green-700 text-xl mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">Option C</p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option C is correct.</p>                        
+</div>
+                    </div>
+
+                    
+                    <div>
+                
+                        
+                        <div>
+                           
+                           
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see common mistakes in reading coordinate grids and conventions.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Note: Using \\( and \\) and \\[ and \\] for MathJax in JavaScript strings.
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4">You correctly identified the latitude and used the right coordinate order, but you failed to interpolate the longitude.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Analysing the error:</p>
+                        <div class="text-sm text-gray-700 space-y-3">
+                            <p>You likely just picked the closest labeled vertical line to the right of point \\( A \\), which is \\( 60^\\circ\\text{W} \\).</p>
+                            <p>However, point \\( A \\) is situated exactly halfway between the \\( 60^\\circ\\text{W} \\) and \\( 90^\\circ\\text{W} \\) grid lines.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4">You made two errors here: you failed to interpolate the longitude, and you swapped the standard geographic coordinate order.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        
+                        <div class="mt-2 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800 space-y-3">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Grid Error:</strong> Point \\( A \\) is not on the \\( 60^\\circ\\text{W} \\) line; it is halfway between \\( 60^\\circ\\text{W} \\) and \\( 90^\\circ\\text{W} \\). It sits at \\( 75^\\circ\\text{W} \\).</p>
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Convention Error:</strong> You wrote the coordinates as (Longitude, Latitude). Geographic coordinates must always be written in the standard order of <strong>(Latitude, Longitude)</strong>.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-6">You successfully found the correct latitude (\\( 30^\\circ\\text{N} \\)) and accurately interpolated the longitude by finding the midpoint between 60 and 90 (\\( 75^\\circ\\text{W} \\)). Finally, you combined them using the standard (Latitude, Longitude) convention!</p>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200">
+                            <i class="fas fa-info-circle mr-1"></i> Check out the Worked Solution below to see the tracking lines visualized on the globe!
+                        </p>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4">You successfully found both the correct latitude and the accurately interpolated longitude, but you fell into the convention trap!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Analysing the error:</p>
+                        <div class="text-sm text-gray-700 space-y-3">
+                            <p>You perfectly identified the vertical distance (\\( 30^\\circ\\text{N} \\)) and horizontal midpoint (\\( 75^\\circ\\text{W} \\)).</p>
+                            <p>However, you swapped the standard coordinate order.</p>
+                            <div class="p-3 bg-purple-50 rounded-lg border border-purple-100 text-purple-800 font-medium">
+                                <i class="fas fa-exclamation-triangle mr-1"></i> Geographic coordinates must <strong>always</strong> be listed as (Latitude, Longitude), not the other way around.
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case new math was revealed
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
