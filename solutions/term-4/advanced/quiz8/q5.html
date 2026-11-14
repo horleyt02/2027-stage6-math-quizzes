@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Function Transformation</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-arrows-alt text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-6 text-lg">
+                <p class="mb-4 text-gray-800 font-medium leading-relaxed">
+                    The function \( f(x) = x^2 - 1 \) has domain \( (-\infty, \infty) \) and range \( [-1, \infty) \).
+                </p>
+                <p class="mb-4 text-gray-800 font-medium leading-relaxed">
+                    The function \( g(x) \) is a transformation of \( f(x) \), such that:
+                </p>
+                
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 mb-6 text-center shadow-inner overflow-x-auto">
+                    <span class="text-xl md:text-2xl text-blue-950 font-serif font-bold">
+                        \[ g(x) = -f(x - 4) + 2 \]
+                    </span>
+                </div>
+
+                <p class="mb-4 text-gray-800 font-medium">What is the range of \( g(x) \)?</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="A">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">A</div>
+                        <div class="flex-grow text-center text-lg font-serif font-bold">
+                            \[ [3, \infty) \]
+                        </div>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="B">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">B</div>
+                        <div class="flex-grow text-center text-lg font-serif font-bold">
+                            \[ (-\infty, 3] \]
+                        </div>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="C">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">C</div>
+                        <div class="flex-grow text-center text-lg font-serif font-bold">
+                            \[ (-\infty, -1] \]
+                        </div>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex items-center" data-value="D">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 mr-4 flex-shrink-0">D</div>
+                        <div class="flex-grow text-center text-lg font-serif font-bold">
+                            \[ [-1, \infty) \]
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 1: Separate Domain vs. Range Transformations</p>
+                        <p class="text-gray-700 mb-2">Transformations inside the function bracket (like \( x-4 \)) are <em>horizontal</em> and only affect the domain.</p>
+                        
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 my-2 text-sm text-blue-900 shadow-sm">
+                            To find the new <strong>range</strong>, we only look at the <em>vertical</em> transformations outside the function:
+                            <ul class="list-disc pl-5 mt-2 space-y-1">
+                                <li>The negative sign: <strong>multiply by \( -1 \)</strong> (vertical reflection)</li>
+                                <li>The \( +2 \): <strong>add \( 2 \)</strong> (vertical shift)</li>
+                            </ul>
+                        </div>
+                        <p class="text-gray-700 text-sm mt-2 italic">*Note: Just like normal algebra, we must apply multiplication (the reflection) before addition (the shift).</p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 2: Apply the Vertical Reflection</p>
+                        <p class="text-gray-700 mb-2">The original range is \( [-1, \infty) \), which means \( y \ge -1 \).</p>
+                        <p class="text-gray-700 mb-2">Multiplying by a negative flips the graph upside down. This changes the minimum value into a maximum, and reverses the inequality.</p>
+                        
+                        <div class="bg-white p-4 rounded-lg border border-gray-100 my-2 shadow-sm text-center space-y-2 text-base text-blue-900">
+                            <div>\( y \ge -1 \)</div>
+                            <div class="text-sm text-gray-500 italic">Multiply by -1 and flip the sign:</div>
+                            <div class="font-bold text-lg">\( y \le 1 \) &nbsp; or &nbsp; \( (-\infty, 1] \)</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-2">Step 3: Apply the Vertical Shift</p>
+                        <p class="text-gray-700 mb-2">Finally, take the reflected range and apply the vertical shift by adding 2 to the y-values.</p>
+                        
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center space-y-2 text-base text-blue-900">
+                            <div>\( y \le 1 \mathbf{+ 2} \)</div>
+                            <div class="font-bold text-lg">\( y \le 3 \)</div>
+                        </div>
+
+                        <p class="font-bold text-green-700 text-xl mt-4 bg-green-100 inline-block px-5 py-3 rounded-lg font-serif shadow-sm">
+                            \[ (-\infty, 3] \]
+                        </p>
+                        <p class="mt-4 text-sm font-semibold text-gray-600">
+                            <i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option B is correct.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the options to review common mistakes with the order of operations and direction changes in transformations.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-base md:text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-3">You correctly evaluated the new numerical boundary (\\( 3 \\)), but you forgot that a vertical reflection flips the direction of the range.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-left space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-gray-500 italic">Calculating the new boundary:</div>
+                            <div>\\[ -(-1) + 2 = 1 + 2 = 3 \\]</div>
+                            <div class="text-xs text-red-600 italic">Applying it to the old range direction (pointing to positive infinity):</div>
+                            <div>\\[ \\mathbf{[3, \\infty)} \\quad \\text{❌} \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Flipping the Direction:</strong> The original range was \\( y \\ge -1 \\). When a function is multiplied by a negative number (reflected across the \\(x\\)-axis), all inequalities must flip.</p>
+                            <p>A graph that opens upwards towards \\( +\\infty \\) is flipped to open downwards towards \\( -\\infty \\). Thus, \\( \\ge \\) becomes \\( \\le \\), resulting in \\( (-\\infty, 3] \\).</p>
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-3">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-check text-3xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-3 text-left">You successfully applied the transformations to the range in the correct order, and remembered to flip the direction for the reflection.</p>
+                        
+                        <div class="bg-emerald-50 text-emerald-900 p-4 rounded-xl border border-emerald-200 text-left space-y-3 text-sm md:text-base">
+                            <div>1. <strong>Original Range:</strong> \\( y \\ge -1 \\)</div>
+                            <div>2. <strong>Multiply by -1 (Reflect):</strong> Flip the sign and inequality to get \\( y \\le 1 \\).</div>
+                            <div>3. <strong>Add 2 (Shift Up):</strong> \\( y \\le 1 + 2 \\implies y \\le 3 \\).</div>
+                            <div class="font-bold border-t border-emerald-200 pt-2 text-center">Interval Notation: \\( (-\\infty, 3] \\)</div>
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-3">You correctly flipped the direction of the range to negative infinity, but you applied the vertical transformations in the <strong>wrong order</strong>.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-left space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-gray-500 italic">Adding 2 FIRST:</div>
+                            <div>\\[ -1 + 2 = 1 \\implies [1, \\infty) \\]</div>
+                            <div class="text-xs text-orange-700 italic">Reflecting SECOND (multiplying by -1 and flipping direction):</div>
+                            <div>\\[ -1 \\times (1) = -1 \\implies \\mathbf{(-\\infty, -1]} \\quad \\text{❌} \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Order of Transformations:</strong> In the expression \\( -f(x) + 2 \\), the multiplication by \\( -1 \\) (reflection) happens <em>before</em> the addition of \\(2\\) (vertical translation). You must reflect the \\(-1\\) to get \\(+1\\), and <em>then</em> add \\(2\\).</p>
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-3">You made two distinct errors: applying the transformations in the wrong order, <em>and</em> forgetting to change the direction of the range during the reflection.</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden my-3">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-left space-y-2 mb-3 text-sm md:text-base">
+                            <div class="text-xs text-gray-500 italic">Adding 2 FIRST:</div>
+                            <div>\\[ -1 + 2 = 1 \\]</div>
+                            <div class="text-xs text-purple-700 italic">Reflecting the value SECOND, but keeping the positive infinity direction:</div>
+                            <div>\\[ -1 \\times (1) = -1 \\implies \\mathbf{[-1, \\infty)} \\quad \\text{❌} \\]</div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Two Key Rules:</strong></p>
+                            <ol class="list-decimal pl-4 space-y-1">
+                                <li><strong>Order of Transformations:</strong> Multiplication (reflection) must happen before addition (translation).</li>
+                                <li><strong>Direction:</strong> A negative sign outside the function reflects the graph vertically, which turns a minimum into a maximum, changing \\( [a, \\infty) \\) into \\( (-\\infty, -a] \\).</li>
+                            </ol>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    const badge = b.querySelector('div:first-child');
+                    badge.classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    badge.classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('div:first-child');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback panel
+                emptyState.classList.add('hidden');
+                
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow for animation
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Color coordinate feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step reveal logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case new math was revealed
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
