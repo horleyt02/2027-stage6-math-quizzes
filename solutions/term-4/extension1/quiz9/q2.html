@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Graph Transformations</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* SVG Styling for the graphs */
+        .math-graph {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-bezier-curve text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-4 text-gray-800">The diagram below shows the graph of \( y = f(x) \).</p>
+                
+                <!-- Main Graph Rendered via JS/SVG -->
+                <div class="w-full flex justify-center mb-6 bg-slate-50 p-4 border border-gray-200 rounded-xl shadow-inner relative">
+                    <svg id="svg-main" viewBox="0 0 300 240" class="math-graph max-w-sm"></svg>
+                </div>
+
+                <p class="font-semibold mb-5 text-gray-800">Which of the following best represents the graph of \( y^2 = f(|x|) \)?</p>
+                
+                <div class="grid grid-cols-2 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center relative overflow-hidden focus:outline-none" data-value="A">
+                        <div class="absolute top-3 left-3 w-8 h-8 flex-shrink-0 z-10">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200 shadow-sm border border-gray-200">A</span>
+                        </div>
+                        <svg id="svg-opt-a" viewBox="0 0 240 240" class="w-full h-48 mt-6"></svg>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center relative overflow-hidden focus:outline-none" data-value="B">
+                        <div class="absolute top-3 left-3 w-8 h-8 flex-shrink-0 z-10">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200 shadow-sm border border-gray-200">B</span>
+                        </div>
+                        <svg id="svg-opt-b" viewBox="0 0 240 240" class="w-full h-48 mt-6"></svg>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center relative overflow-hidden focus:outline-none" data-value="C">
+                        <div class="absolute top-3 left-3 w-8 h-8 flex-shrink-0 z-10">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200 shadow-sm border border-gray-200">C</span>
+                        </div>
+                        <svg id="svg-opt-c" viewBox="0 0 240 240" class="w-full h-48 mt-6"></svg>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center relative overflow-hidden focus:outline-none" data-value="D">
+                        <div class="absolute top-3 left-3 w-8 h-8 flex-shrink-0 z-10">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200 shadow-sm border border-gray-200">D</span>
+                        </div>
+                        <svg id="svg-opt-d" viewBox="0 0 240 240" class="w-full h-48 mt-6"></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 1: Analyse \( f(|x|) \)</p>
+                        <p>The absolute value inside the function, \( f(|x|) \), means that negative \( x \)-values produce the same outputs as their positive counterparts.</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-sm text-gray-700">
+                            <i class="fas fa-arrow-right text-blue-500 mr-1"></i> This reflects the right side of the graph (\( x \ge 0 \)) across the \(y\)-axis, overwriting the original left side. 
+                            The new function \( f(|x|) \) is positive for \( x \le -2 \) and \( x \ge 2 \), negative in between, and approaches a horizontal asymptote of \( y = 4 \) in <em>both</em> directions.
+                        </div>
+                    </div>
+                    
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 2: Analyse the \( y^2 \) transformation</p>
+                        <p>The equation \( y^2 = f(|x|) \) can be rewritten as \( y = \pm\sqrt{f(|x|)} \). This has two major effects:</p>
+                        <ul class="list-disc list-inside mt-2 text-gray-700 ml-2 space-y-2 text-sm bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                            <li><strong>Domain restriction:</strong> We can only take the square root of non-negative numbers. So, the graph only exists where \( f(|x|) \ge 0 \), which is \( x \le -2 \) and \( x \ge 2 \).</li>
+                            <li><strong>Symmetry:</strong> The \( \pm \) creates a mirrored reflection across the \(x\)-axis, mapping every positive root to a corresponding negative root.</li>
+                        </ul>
+                    </div>
+
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 3: Find the new asymptotes</p>
+                        <p>Evaluate the limits of the new function to find its end behavior.</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm">
+                            As \( x \to \pm\infty \), the inner function \( f(|x|) \to 4 \).<br>
+                            Therefore, \( y \to \pm\sqrt{4} = \pm 2 \).
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">The graph must have horizontal asymptotes at \( y = 2 \) and \( y = -2 \). Option A is the only graph that satisfies the domain, the symmetries, and the new asymptotes.</p>
+                        
+                        <p class="font-bold text-green-700 text-xl mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">Option A</p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option A is correct.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see common mistakes and detailed feedback.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Data for Error Analysis Feedback
+        const feedbackData = {
+            'A': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-6">You successfully applied all three transformation components to the original graph.</p>
+                        <ul class="text-left text-sm space-y-2 mb-6 inline-block mx-auto text-gray-700 bg-white p-4 rounded-lg border border-gray-100 shadow-sm w-full max-w-sm">
+                            <li><i class="fas fa-arrow-right text-green-500 mr-2 w-4"></i><strong>\\( |x| \\) :</strong> Mirrored the right half perfectly over the \\(y\\)-axis.</li>
+                            <li><i class="fas fa-arrow-right text-green-500 mr-2 w-4"></i><strong>Domain Restriction:</strong> Handled the square root properly by removing the middle section where \\( f(|x|) < 0 \\).</li>
+                            <li><i class="fas fa-arrow-right text-green-500 mr-2 w-4"></i><strong>\\( y^2 \\) Symmetry:</strong> Included the \\( \\pm \\) principal roots, generating the mirrored bottom half and correcting the asymptotes to \\( \\pm 2 \\).</li>
+                        </ul>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4">You perfectly understood the \\( y^2 \\) transformation, but completely forgot to apply the absolute value transformation to the \\(x\\)-variable.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Misconception check:</p>
+                        <p class="text-gray-700 mb-3">Graph B shows \\( y^2 = f(x) \\). It restricts the domain to where the original right side is positive (\\( x \\ge 2 \\)), and generates the \\( \\pm \\) symmetry correctly.</p>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Transformation Error:</strong> The problem asks for \\( f(|x|) \\). Because absolute value strips the negative sign from any input before passing it to the function, the left side of the graph must become a perfect mirror image of the right side. Graph B is missing this mirrored left half.
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4">You correctly applied the horizontal mirror and found the restricted domain, but you forgot that a squared variable yields <em>two</em> solutions.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Misconception check:</p>
+                        <p class="text-gray-700 mb-3">Graph C represents the equation \\( y = +\\sqrt{f(|x|)} \\).</p>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-3">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Algebraic Error:</strong> When solving \\( y^2 = \\text{Value} \\), you must take the positive <em>and</em> negative root: \\( y = \\pm\\sqrt{\\text{Value}} \\).</p>
+                            <p>For example, if \\( f(|x|) = 4 \\), then \\( y^2 = 4 \\implies y = 2 \\) OR \\( y = -2 \\). Graph C is missing the entire negative \\( -\\sqrt{f(|x|)} \\) branch at the bottom.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4">You correctly identified the overall shape and symmetries, but forgot to apply the square root to the \\(y\\)-values themselves.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Misconception check:</p>
+                        <p class="text-gray-700 mb-3">Graph D represents the graph of \\( y = \\pm f(|x|) \\).</p>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-3">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Transformation Error:</strong> The equation is \\( y^2 = f(|x|) \\), which means \\( y = \\pm\\sqrt{f(|x|)} \\).</p>
+                            <p>You remembered the \\( \\pm \\) symmetry, but forgot to actually take the square root of the function's values. Since the original asymptote is \\( y = 4 \\), the new asymptotes must be at \\( y = \\pm\\sqrt{4} = \\pm 2 \\).</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        // --- MATH RENDER ENGINE FOR SVGs ---
+        
+        // Define mathematical models
+        // We model the right side of the original function as an upward rational function:
+        // f(x) = (4x^2 - 16) / (x^2 + 8). This yields f(0) = -2, f(2) = 0, f(inf) = 4.
+        // We model the left side of the original function as a parabola to simulate the image:
+        // f_left(x) = 0.5x^2 - 2. This crosses at x = -2 and goes to +infinity.
+        
+        const f_orig = (x) => {
+            if (x < 0) return 0.5 * x * x - 2;
+            return (4 * x * x - 16) / (x * x + 8);
+        };
+
+        // f(|x|)
+        const f_abs = (x) => {
+            let ax = Math.abs(x);
+            return (4 * ax * ax - 16) / (ax * ax + 8);
+        };
+
+        // Helper to generate SVG polyline data
+        function generatePolyline(fn, color, weight, domain = [-10, 10], steps = 0.1) {
+            let paths = '';
+            let currentPoints = [];
+            const scale = 20; // 20 pixels per unit
+            
+            for (let t = domain[0]; t <= domain[1] + (steps/2); t += steps) {
+                let y = fn(t);
+                
+                // If function returns null, NaN, or is out of drawing bounds, break the path
+                if (y === null || isNaN(y) || Math.abs(y) > 15) {
+                    if (currentPoints.length > 0) {
+                        paths += `<polyline points="${currentPoints.join(' ')}" fill="none" stroke="${color}" stroke-width="${weight}" stroke-linejoin="round" stroke-linecap="round"/>`;
+                        currentPoints = [];
+                    }
+                } else {
+                    let px = 120 + t * scale; // center X at 120
+                    let py = 120 - y * scale; // center Y at 120, inverted for SVG
+                    currentPoints.push(`${px.toFixed(2)},${py.toFixed(2)}`);
+                }
+            }
+            // Catch remainder
+            if (currentPoints.length > 0) {
+                paths += `<polyline points="${currentPoints.join(' ')}" fill="none" stroke="${color}" stroke-width="${weight}" stroke-linejoin="round" stroke-linecap="round"/>`;
+            }
+            return paths;
+        }
+
+        // Helper to draw axes, asymptotes and labels
+        function drawAxesAndAsymptotes(svgId, asymptotes, labels) {
+            const svg = document.getElementById(svgId);
+            if(!svg) return;
+            
+            let html = `
+                <defs>
+                    <marker id="arrow-${svgId}" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#111827" />
+                    </marker>
+                </defs>
+            `;
+            
+            // X and Y Axes
+            html += `
+                <line x1="10" y1="120" x2="230" y2="120" stroke="#9ca3af" stroke-width="1.5" marker-start="url(#arrow-${svgId})" marker-end="url(#arrow-${svgId})" />
+                <line x1="120" y1="10" x2="120" y2="230" stroke="#9ca3af" stroke-width="1.5" marker-start="url(#arrow-${svgId})" marker-end="url(#arrow-${svgId})" />
+            `;
+            
+            // Axis labels
+            html += `
+                <text x="125" y="15" font-family="'Times New Roman', serif" font-size="12" font-style="italic" fill="#374151">y</text>
+                <text x="230" y="135" font-family="'Times New Roman', serif" font-size="12" font-style="italic" fill="#374151">x</text>
+                <text x="108" y="135" font-family="'Times New Roman', serif" font-size="12" font-style="italic" fill="#374151">O</text>
+            `;
+            
+            // Tick marks
+            // -2, 2 on x
+            html += `
+                <line x1="80" y1="117" x2="80" y2="123" stroke="#111827" stroke-width="1" />
+                <line x1="160" y1="117" x2="160" y2="123" stroke="#111827" stroke-width="1" />
+            `;
+            
+            // Draw Asymptotes and their labels
+          const scale = 20;
+    asymptotes.forEach(asym => {
+        let py = 120 - asym.y * scale;
+        let xStart = asym.xMin !== undefined ? 120 + asym.xMin * scale : 20;
+        html += `<line x1="${xStart}" y1="${py}" x2="295" y2="${py}" stroke="#4b5563" stroke-width="1" stroke-dasharray="4,4" />`;
+
+        // Tick and Label on Y-axis
+        html += `<line x1="117" y1="${py}" x2="123" y2="${py}" stroke="#111827" stroke-width="1" />`;
+        if (asym.label) {
+            html += `<text x="100" y="${py + 4}" font-family="'Times New Roman', serif" font-size="12" fill="#111827">${asym.label}</text>`;
+        }
+    });
+            
+            // Custom Labels (e.g. -2, 2 on X axis)
+            labels.forEach(lbl => {
+                let px = 120 + lbl.x * scale;
+                let py = 120 - lbl.y * scale;
+                html += `<text x="${px - 8}" y="${py + 15}" font-family="'Times New Roman', serif" font-size="12" fill="#111827">${lbl.text}</text>`;
+            });
+
+            svg.innerHTML = html;
+        }
+
+        // Draw a specific graph by injecting paths into the pre-drawn axes
+        function injectGraph(svgId, fns, asymptotes, labels) {
+            drawAxesAndAsymptotes(svgId, asymptotes, labels);
+            const svg = document.getElementById(svgId);
+            
+            let pathsHtml = '';
+            fns.forEach(fnObj => {
+                pathsHtml += generatePolyline(fnObj.fn, fnObj.color, fnObj.weight);
+            });
+            
+            svg.innerHTML += pathsHtml;
+        }
+
+        // Initialize all vector graphics
+        function initGraphs() {
+            // Main Graph: Original f(x)
+            injectGraph('svg-main', [
+                { fn: f_orig, color: '#000000', weight: 1.5 }
+            ], [
+                { y: 4, label: "4", xMin:0 }
+            ], [
+                { x: -2, y: 0, text: "-2" },
+                { x: 2, y: 0, text: "2" }
+            ]);
+            
+            // Text annotation for the original graph
+            document.getElementById('svg-main').innerHTML += `<text x="160" y="30" font-family="'Times New Roman', serif" font-size="12" font-style="italic" fill="#000000">y = f(x)</text>`;
+
+            // Option A: Correct ( y = +/- sqrt(f(|x|)) for |x| >= 2 )
+           injectGraph('svg-opt-a', [
+    { fn: (x) => (Math.abs(x) >= 1.999) ? 1.5 * Math.sqrt(Math.max(0, f_abs(x))) : null, color: '#1f2937', weight: 1.5 },
+    { fn: (x) => (Math.abs(x) >= 1.999) ? -1.5 * Math.sqrt(Math.max(0, f_abs(x))) : null, color: '#1f2937', weight: 1.5 }
+], [
+    { y: 3, label: "2" },
+    { y: -3, label: "-2" }
+], [
+    { x: -2, y: 0, text: "-2" },
+    { x: 2, y: 0, text: "2" }
+]);
+
+            // Option B: Missing |x| ( y = +/- sqrt(f(x)) for x >= 2 )
+            injectGraph('svg-opt-b', [
+    { fn: (x) => (x >= 1.999) ? 1.5 * Math.sqrt(Math.max(0, f_orig(x))) : null, color: '#1f2937', weight: 1.5 },
+    { fn: (x) => (x >= 1.999) ? -1.5 * Math.sqrt(Math.max(0, f_orig(x))) : null, color: '#1f2937', weight: 1.5 }
+], [
+    { y: 3, label: "2" },
+    { y: -3, label: "-2" }
+], [
+   { x: -2, y: 0, text: "-2" }, 
+{ x: 2, y: 0, text: "2" }
+]);
+
+            // Option C: Missing +/- ( y = +sqrt(f(|x|)) for |x| >= 2 )
+           injectGraph('svg-opt-c', [
+    { fn: (x) => (Math.abs(x) >= 1.999) ? 2 * Math.sqrt(Math.max(0, f_abs(x))) : null, color: '#1f2937', weight: 1.5 }
+], [
+    { y: 4, label: "4" }
+], [
+    { x: -2, y: 0, text: "-2" },
+    { x: 2, y: 0, text: "2" }
+]);
+
+            // Option D: Missing sqrt on values ( y = +/- f(|x|) for |x| >= 2 )
+           injectGraph('svg-opt-d', [
+    { fn: (x) => (Math.abs(x) >= 1.999) ? 1.75 * Math.pow(Math.max(0, f_abs(x)), 0.6) : null, color: '#1f2937', weight: 1.5 },
+    { fn: (x) => (Math.abs(x) >= 1.999) ? -1.75 * Math.pow(Math.max(0, f_abs(x)), 0.6) : null, color: '#1f2937', weight: 1.5 }
+], [
+    { y: 4.4 },
+    { y: -4.4 }
+], [
+    { x: -2, y: 0, text: "-2" },
+    { x: 2, y: 0, text: "2" },
+    { x: -0.6, y: 4, text: "4" },
+    { x: -0.8, y: -4, text: "-4" }
+]);
+        }
+
+        // Run graph init immediately on load
+        document.addEventListener('DOMContentLoaded', initGraphs);
+
+        // --- INTERACTION LOGIC ---
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500', 'shadow-none');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600', 'shadow-sm');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600', 'shadow-sm');
+                badge.classList.add('shadow-none');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback
+                emptyState.classList.add('hidden');
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Style feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step solution logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
