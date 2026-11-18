@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Composite Area</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-shapes text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-2 text-gray-800">The composite figure below consists of a rhombus with a semicircle on two of the opposite sides.</p>
+                <p class="mb-4 text-gray-800">The rhombus has a side length of 6 cm and a perpendicular height of 3 cm.</p>
+                
+                <!-- SVG Diagram Programmatically Generated -->
+               <div class="mb-6 flex justify-center bg-gray-50 rounded-xl p-4 border border-gray-100 relative">
+  <span class="absolute top-4 right-4 text-xs font-semibold text-gray-400 uppercase tracking-widest">Not To Scale</span>
+  <svg viewBox="0 0 300 300" class="w-full max-w-[260px] h-auto" xmlns="http://w3.org">
+    <!-- Top Semicircle -->
+    <path d="M 125,100 A 45,45 0 0,1 215,100" fill="none" stroke="#1f2937" stroke-width="2"/>
+    
+    <!-- Bottom Semicircle -->
+    <path d="M 163,190 A 45,45 0 0,1 73,190" fill="none" stroke="#1f2937" stroke-width="2"/>
+    
+    <!-- Dashed Top/Bottom Sides -->
+    <line x1="125" y1="100" x2="215" y2="100" stroke="#1f2937" stroke-width="2" stroke-dasharray="5,5"/>
+    <line x1="73" y1="190" x2="163" y2="190" stroke="#1f2937" stroke-width="2" stroke-dasharray="5,5"/>
+    
+    <!-- Solid Slanted Sides -->
+    <line x1="73" y1="190" x2="125" y2="100" stroke="#1f2937" stroke-width="2"/>
+    <line x1="163" y1="190" x2="215" y2="100" stroke="#1f2937" stroke-width="2"/>
+    
+    <!-- Height Line -->
+    <line x1="140" y1="100" x2="140" y2="190" stroke="#1f2937" stroke-width="1.5" stroke-dasharray="3,3"/>
+    
+    <!-- Right Angle Symbol (Left Side) -->
+    <polyline points="140,180 130,180 130,190" fill="none" stroke="#1f2937" stroke-width="1.5"/>
+    
+    <!-- Label for 3 cm -->
+    <text x="148" y="149" font-family="'Inter', sans-serif" font-size="14" fill="#374151">3 cm</text>
+    
+    <!-- Slanted Label for 6 cm -->
+    <g transform="translate(205, 154) rotate(-60)">
+      <text x="0" y="0" text-anchor="middle" font-family="'Inter', sans-serif" font-size="14" fill="#374151">6 cm</text>
+    </g>
+  </svg>
+                </div>
+                
+                <p class="mb-4 text-gray-800 font-medium">What is the total area of the composite figure? (Round your answer to one decimal place.)</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">32.1 cm²</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">46.3 cm²</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">64.3 cm²</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2">131.1 cm²</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 1: Area of the Rhombus</p>
+                        <p>The area of a rhombus can be found using the formula \( \text{Area} = \text{base} \times \text{height} \).</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium">
+                            <div>\[ \text{Area}_{\text{rhombus}} = 6 \text{ cm} \times 3 \text{ cm} \]</div>
+                            <div class="text-blue-900">\[ \text{Area}_{\text{rhombus}} = 18 \text{ cm}^2 \]</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 2: Area of the Semicircles</p>
+                        <p>There are two identical semicircles attached to the sides of the rhombus, which together form exactly one full circle.</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 mt-2 mb-2 ml-1">
+                            <li>The diameter is the side of the rhombus: \( d = 6 \text{ cm} \).</li>
+                            <li>The radius is half the diameter: \( r = 3 \text{ cm} \).</li>
+                        </ul>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto space-y-2">
+                            <div>\[ \text{Area}_{\text{circle}} = \pi \times r^2 \]</div>
+                            <div>\[ \text{Area}_{\text{circle}} = \pi \times 3^2 = 9\pi \]</div>
+                            <div class="text-blue-900">\[ \text{Area}_{\text{circle}} \approx 28.274 \text{ cm}^2 \]</div>
+                        </div>
+                    </div>
+
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 3: Calculate Total Area</p>
+                        <p>Add the area of the central rhombus and the circular components together, then round to one decimal place.</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm overflow-x-auto text-center space-y-2">
+                            <div>\[ \text{Total Area} = 18 + 28.274 \]</div>
+                            <div>\[ \text{Total Area} = 46.274 \]</div>
+                        </div>
+                        <p class="font-bold text-green-700 text-xl mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">46.3</p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option B is correct.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see common calculation mistakes and detailed feedback.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Note: Used 4 backslashes for MathJax inside JS template strings to properly render in DOM.
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4">You successfully calculated the area of the rhombus, but you only added the area of <em>one</em> semicircle instead of two.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2">
+                            <div class="text-sm text-gray-500 italic">Adding only half a circle:</div>
+                            <div>\\[ \\text{Area} = 18 + \\frac{1}{2}(\\pi \\times 3^2) \\]</div>
+                            <div>\\[ \\text{Area} = 18 + 4.5\\pi \\approx 32.1 \\]</div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Reading Error:</strong> The problem states that the figure has a semicircle on <em>two</em> of the opposite sides. When you have two identical semicircles, they combine to form the area of one full circle (\\( 9\\pi \\)).
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-6 text-left">You successfully found the total area by breaking the composite figure into its correct parts.</p>
+                        <ul class="list-disc list-inside space-y-2 text-gray-600 text-left mb-6 text-sm">
+                            <li>You found the area of the central rhombus using \\( \\text{base} \\times \\text{height} = 6 \\times 3 = 18 \\).</li>
+                            <li>You recognised the two semicircles form one full circle with a diameter of 6 (radius 3), giving an area of \\( \\pi(3)^2 = 9\\pi \\approx 28.27 \\).</li>
+                            <li>You correctly added them to get \\( 18 + 28.27 = 46.27 \\), which rounds to 46.3.</li>
+                        </ul>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Explore the other options on the left to see common pitfalls involving wrong area formulas or incorrect radius values.
+                        </p>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4">You calculated the circles correctly, but you used the wrong formula to find the area of the rhombus.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto text-center space-y-2">
+                            <div class="text-sm text-gray-500 italic">Assuming the rhombus area is side &times; side:</div>
+                            <div>\\[ \\text{Area} = (6 \\times 6) + 9\\pi \\]</div>
+                            <div>\\[ \\text{Area} = 36 + 28.27 \\approx 64.3 \\]</div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Formula Error:</strong> You assumed the formula for the area of a rhombus is simply \\( \\text{side} \\times \\text{side} \\). While this is true for a square (which is a special type of straight rhombus), a general rhombus requires the formula \\( \\text{Area} = \\text{base} \\times \\text{perpendicular height} \\). You should have used \\( 6 \\times 3 = 18 \\).</p>
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4">You calculated the area of the rhombus correctly, but you made a critical error when finding the area of the circular parts.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Your likely process:</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <div class="text-center font-medium bg-purple-50 py-2 rounded border border-purple-100">\\[ \\text{Area} = (6 \\times 3) + \\pi(6)^2 \\]</div>
+                            <div class="text-center font-medium bg-purple-50 py-2 rounded border border-purple-100">\\[ \\text{Area} = 18 + 36\\pi \\approx 131.1 \\]</div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Radius vs Diameter:</strong> You used the full side length of the rhombus (6 cm) as the <em>radius</em> in your circle area calculation. Looking at the diagram, the side length spans the entire width of the semicircle, meaning 6 cm is the <em>diameter</em>. The radius is half of that (3 cm).</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback
+                emptyState.classList.add('hidden');
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Style feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step solution logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
