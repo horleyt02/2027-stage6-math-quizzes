@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Direct Variation</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-project-diagram text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-4 text-gray-800">Two relationships between variables are represented below, one by a graph and the other by an equation.</p>
+                
+                <div class="flex flex-col md:flex-row justify-around items-center bg-gray-50 p-6 rounded-xl border border-gray-100 mb-6 gap-6">
+                    
+                    <!-- Graph Relationship -->
+                    <div class="flex flex-col items-center w-full md:w-1/2">
+                        <p class="text-xs font-semibold text-gray-700 mb-2 text-center">The relationship between \( M \) and \( N \)</p>
+                        <svg viewBox="0 0 240 240" class="w-full max-w-[200px] h-auto" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Axes -->
+                            <g stroke="#1f2937" stroke-width="1.5">
+                                <!-- X-axis -->
+                                <line x1="20" y1="210" x2="220" y2="210" />
+                                <polygon points="215,206 222,210 215,214" fill="#1f2937" stroke="none" />
+                                <!-- Y-axis -->
+                                <line x1="20" y1="210" x2="20" y2="10" />
+                                <polygon points="16,15 20,8 24,15" fill="#1f2937" stroke="none" />
+                            </g>
+                            <!-- Ticks -->
+                            <g stroke="#1f2937" stroke-width="1.5">
+                                <!-- X ticks -->
+                                <line x1="53" y1="207" x2="53" y2="213" />
+                                <line x1="86" y1="207" x2="86" y2="213" />
+                                <line x1="119" y1="207" x2="119" y2="213" />
+                                <line x1="152" y1="207" x2="152" y2="213" />
+                                <line x1="185" y1="207" x2="185" y2="213" />
+                                <!-- Y ticks -->
+                                <line x1="17" y1="182" x2="23" y2="182" />
+                                <line x1="17" y1="154" x2="23" y2="154" />
+                                <line x1="17" y1="126" x2="23" y2="126" />
+                                <line x1="17" y1="98" x2="23" y2="98" />
+                                <line x1="17" y1="70" x2="23" y2="70" />
+                                <line x1="17" y1="42" x2="23" y2="42" />
+                            </g>
+                            <!-- Function Line -->
+                            <line x1="20" y1="210" x2="155" y2="30" stroke="#1f2937" stroke-width="1.5" />
+                            <polygon points="151,33 158,26 156,36" fill="#1f2937" stroke="none" transform="rotate(5 155 30)" />
+                            
+                            <!-- Labels -->
+                            <text x="228" y="213" font-family="'Inter', sans-serif" font-style="italic" font-size="12" fill="#374151">N</text>
+                            <text x="14" y="6" font-family="'Inter', sans-serif" font-style="italic" font-size="12" fill="#374151">M</text>
+                        </svg>
+                    </div>
+
+                    <!-- Equation Relationship -->
+                    <div class="flex flex-col items-center justify-center w-full md:w-1/2 h-full min-h-[150px]">
+                        <p class="text-xs font-semibold text-gray-700 mb-6 text-center">The relationship between \( P \) and \( Q \)</p>
+                        <div class="text-2xl font-medium text-gray-900">
+                            \[ P = 4.5Q \]
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <p class="mb-4 text-gray-800 font-medium">Which relationship is an example of direct variation?</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow py-2">Both relationships</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow py-2">The relationship between \( M \) and \( N \) only</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow py-2">The relationship between \( P \) and \( Q \) only</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow py-2">Neither relationship</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 1: Define Direct Variation</p>
+                        <p>Direct variation occurs when two variables are directly proportional to each other. This means they increase or decrease at a constant rate together.</p>
+                        <ul class="list-disc list-inside mt-2 text-gray-700 bg-white p-3 rounded-lg border border-gray-100 text-sm shadow-sm space-y-2">
+                            <li><strong>Algebraically:</strong> It must take the form \( y = kx \) (where \( k \) is a constant, and there is no \(+c\) or \(y\)-intercept).</li>
+                            <li><strong>Graphically:</strong> It must be a <strong>straight line</strong> that passes exactly through the <strong>origin (0,0)</strong>.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 2: Analyse the Graph (M and N)</p>
+                        <p>Look at the graph representing the relationship between \( M \) and \( N \).</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-gray-700 text-sm font-medium">
+                            <p>It is a straight line, and it starts exactly at the origin \( (0,0) \).</p>
+                            <p class="text-green-700 mt-1"><i class="fas fa-check mr-1"></i> Therefore, the relationship between \( M \) and \( N \) is an example of direct variation.</p>
+                        </div>
+                    </div>
+
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 3: Analyse the Equation (P and Q)</p>
+                        <p>Look at the equation representing the relationship between \( P \) and \( Q \): \( P = 4.5Q \).</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-gray-700 text-sm font-medium">
+                            <p>This perfectly matches the form \( y = kx \). The constant of variation \( k \) is \( 4.5 \), and there is no extra number added or subtracted at the end (the y-intercept is 0).</p>
+                            <p class="text-green-700 mt-1"><i class="fas fa-check mr-1"></i> Therefore, the relationship between \( P \) and \( Q \) is also an example of direct variation.</p>
+                        </div>
+                        <p class="font-bold text-green-700 text-lg mt-3 bg-green-100 inline-block px-4 py-2 rounded-lg">Both relationships</p>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option A is correct.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see common mistakes in identifying direct variation.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Used 4 backslashes for MathJax inside JS template strings to properly render in DOM.
+        const feedbackData = {
+            'A': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-6 text-left">You correctly identified the requirements for direct variation in both formats!</p>
+                        <ul class="list-disc list-inside space-y-2 text-gray-600 text-left mb-6 text-sm">
+                            <li>The graph of \\( M \\) and \\( N \\) is a straight line passing through the origin (0,0), which perfectly satisfies the graphical condition.</li>
+                            <li>The equation \\( P = 4.5Q \\) is in the exact format of \\( y = kx \\) (with \\( k = 4.5 \\) and a y-intercept of 0), satisfying the algebraic condition.</li>
+                        </ul>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Explore the other options on the left to see why a student might incorrectly dismiss one of these valid relationships.
+                        </p>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4">You correctly identified that the graph represents direct variation, but you failed to recognise that the equation does too.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Your likely misconception:</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>You might have thought that direct variation requires a whole number or a fraction for the constant of variation, making you doubt the decimal in \\( P = 4.5Q \\).</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Equation Check:</strong> Direct variation simply means the equation fits the format \\( y = kx \\). The constant \\( k \\) can be <em>any</em> real number (except zero)—including decimals like 4.5! Because there is no \\( + c \\) added to the end, it passes through the origin and is a valid direct variation.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4">You correctly identified that the equation represents direct variation, but you failed to recognise that the graph does too!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Your likely misconception:</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>You might have forgotten the graphical rules for direct variation, perhaps thinking that a direct variation graph doesn't need to pass through the origin, or perhaps doubting this specific graph for some reason.</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Graph Check:</strong> The visual test for direct variation is simple: Is it a straight line? And does it pass through exactly (0,0)? The graph of \\( M \\) and \\( N \\) does exactly this, meaning it is a perfect example of direct variation.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4">You incorrectly dismissed both representations, suggesting a fundamental misunderstanding of what direct variation looks like.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Your likely misconception:</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>You might be confusing <em>direct</em> variation with <em>inverse</em> variation (which takes the form \\( y = \\frac{k}{x} \\) and graphs as a hyperbola curve), or you forgot the rules entirely.</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Rule Reminder:</strong> Direct variation means as one variable goes up, the other goes up at a constant rate. Graphically, this is always a straight line through the origin (0,0). Algebraically, it's always in the form \\( y = kx \\). Both examples in the problem fit these rules perfectly!
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback
+                emptyState.classList.add('hidden');
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Style feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step solution logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
