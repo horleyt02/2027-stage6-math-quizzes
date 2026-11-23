@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Absolute Value Graph</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-chart-line text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-4 text-gray-800">The graph of the function \( f(x) \) is shown.</p>
+                
+                <!-- Main Graph -->
+                <div class="mb-6 flex justify-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm relative">
+                    <div id="graph-main" class="w-full max-w-[300px]"></div>
+                </div>
+                
+                <p class="mb-4 text-gray-800 font-medium text-center">Which of the following best represents the graph of \( y = |f(x)| \)?</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center relative" data-value="A">
+                        <div class="absolute top-3 left-3 w-8 h-8">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <div id="graph-opt-A" class="w-full max-w-[200px] mt-8 mb-1"></div>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center relative" data-value="B">
+                        <div class="absolute top-3 left-3 w-8 h-8">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <div id="graph-opt-B" class="w-full max-w-[200px] mt-8 mb-1"></div>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center relative" data-value="C">
+                        <div class="absolute top-3 left-3 w-8 h-8">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <div id="graph-opt-C" class="w-full max-w-[200px] mt-8 mb-1"></div>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 flex flex-col items-center relative" data-value="D">
+                        <div class="absolute top-3 left-3 w-8 h-8">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <div id="graph-opt-D" class="w-full max-w-[200px] mt-8 mb-1"></div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 1: Define the Transformation</p>
+                        <p>The absolute value function \( |f(x)| \) makes all output values positive.</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-sm text-gray-700 space-y-2">
+                            <p><strong>Geometrically:</strong></p>
+                            <ul class="list-disc list-inside ml-2">
+                                <li>Any part of the original graph that is <em>above</em> the \(x\)-axis stays exactly where it is.</li>
+                                <li>Any part of the original graph that is <em>below</em> the \(x\)-axis is <strong>reflected</strong> upwards across the \(x\)-axis.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 2: Analyse the Original Graph</p>
+                        <p>Identify which parts of the original \( f(x) \) graph are negative.</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-sm text-gray-700 space-y-2">
+                            <p>There are three sections below the x-axis:</p>
+                            <ul class="list-disc list-inside ml-2">
+                                <li>The far-left tail descending downwards.</li>
+                                <li>A small 'dip' (valley) in the middle that crosses the \(y\)-axis.</li>
+                                <li>The far-right tail descending downwards.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 3: Apply the Reflection</p>
+                        <p>Reflect those three negative sections upwards.</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-sm text-gray-700">
+                            <p class="mb-2">The two large positive 'humps' (peaks) will stay exactly the same. The two downward tails will flip to point upwards. The small negative dip in the middle must reflect upwards to become a new, small positive peak.</p>
+                            <p class="text-blue-900 font-medium"><strong>Option D</strong> is the only graph that correctly shows this result, preserving the roots and the original positive peaks while flipping all negative regions.</p>
+                        </div>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option D is correct.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see common graphical transformation mistakes, such as confusing absolute value with square roots or negative reflections.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-base md:text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Utilizing a single backslash for MathJax to prevent over-escaping issues
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose Graph A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-3">You correctly reflected the outer tails upwards, but you failed to properly reflect the middle section of the graph.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Analysing the Transformation:</p>
+                        <p class="text-gray-700 mb-4 text-sm md:text-base">The original graph has a small 'dip' (valley) that goes below the \\(x\\)-axis near the origin. When taking the absolute value, that negative valley must reflect upwards to become a positive 'peak'.</p>
+                        
+                        <div class="mt-2 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Missing Reflection:</strong> Graph A distorts the inner roots rather than correctly reflecting the negative dip upwards into a peak (like Graph D does).</p>
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose Graph B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-3">You reflected the entire graph across the \\(x\\)-axis.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Analysing the Transformation:</p>
+                        <p class="text-gray-700 mb-4 text-sm md:text-base">Graph B shows all the positive peaks turning negative, and all the negative tails turning positive. This is a complete reflection of the original function.</p>
+                        
+                        <div class="mt-2 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Wrong Transformation:</strong> A complete reflection across the \\(x\\)-axis represents the function <strong>\\( y = -f(x) \\)</strong>. The absolute value function, <strong>\\( y = |f(x)| \\)</strong>, only reflects the <em>negative</em> portions, leaving the already-positive portions exactly as they were.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose Graph C...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-3">You identified the positive sections of the graph but completely deleted the negative sections, likely confusing absolute value with a square root.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Analysing the Transformation:</p>
+                        <p class="text-gray-700 mb-4 text-sm md:text-base">Graph C has gaps (undefined domains) wherever the original graph was negative. This happens when you graph a function like <strong>\\( y = \\sqrt{f(x)} \\)</strong>, because you cannot take the square root of a negative number.</p>
+                        
+                        <div class="mt-2 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800 space-y-2">
+                            <p><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Domain Error:</strong> The absolute value function does not restrict the domain or 'delete' negative values. Instead, it <em>reflects</em> those negative values to make them positive. The new graph should be continuous.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-4">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-6 text-left">You successfully applied the graphical rules for absolute value! You recognised that the function \\( y = |f(x)| \\) forces all \\(y\\)-values to be positive or zero.</p>
+                        
+                        <div class="bg-white p-4 rounded-xl border-2 border-green-100 shadow-sm text-left mb-6 text-sm">
+                            <p class="font-bold text-green-800 mb-2">Visual Breakdown:</p>
+                            <p class="mb-1">1. The two large positive peaks stayed exactly where they were.</p>
+                            <p class="mb-1">2. The two outer tails (which were negative) reflected upwards to become positive.</p>
+                            <p>3. The small negative valley in the middle reflected upwards to become a small positive peak.</p>
+                        </div>
+
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Explore the other options on the left to see which of the incorrect choices are a full reflection (\\( -f(x) \\)) or leave gaps (\\( \\sqrt{f(x)} \\)).
+                        </p>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-blue-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback
+                emptyState.classList.add('hidden');
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Style feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step solution logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+
+    <!-- Graph Generation Script -->
+    <script>
+        const scaleX = 22; 
+        const scaleY = 35;  
+        
+        // Mathematical model for the original negative quartic (M-shape)
+        const f_val = (x) => -0.04 * (x + 3.5) * (x + 1.5) * (x - 0.5) * (x - 3.5);
+
+        // Transformation models for the options
+        const optA_val = (x) => 0.0065 * Math.pow(x+2.4, 2) * Math.pow(x+1.2, 2) * Math.pow(x-0.6, 2) * Math.pow(x-3, 2); // W-shape for Option A
+        const optB_val = (x) => -f_val(x); // Complete reflection: -f(x)
+        
+        // Option C: Square root (leaves gaps where f(x) < 0)
+        // Returning NaN breaks the SVG line, creating the domain gaps perfectly
+        const optC_val = (x) => {
+            let y = f_val(x);
+            return y >= 0 ? y : NaN; 
+        };
+        
+        // Option D: Correct Absolute Value: |f(x)|
+        const optD_val = (x) => Math.abs(f_val(x));
+
+        function createGraphSVG(func) {
+            const sizeW = 280;
+            const sizeH = 220;
+            const cx = 130; 
+            const cy = 110; 
+            
+            let svg = '<svg viewBox="0 0 '+sizeW+' '+sizeH+'" class="w-full h-auto bg-white" xmlns="http://www.w3.org/2000/svg">';
+            
+            // X and Y Axes
+            svg += '<g stroke="#1f2937" stroke-width="1.2">';
+            // x-axis
+            svg += '<line x1="15" y1="'+cy+'" x2="'+(sizeW-15)+'" y2="'+cy+'" />';
+            svg += '<polygon points="'+(sizeW-15)+','+(cy-3)+' '+(sizeW-10)+','+cy+' '+(sizeW-15)+','+(cy+3)+'" fill="#1f2937" stroke="none"/>';
+            svg += '<polygon points="15,'+(cy-3)+' 10,'+cy+' 15,'+(cy+3)+'" fill="#1f2937" stroke="none"/>';
+            // y-axis
+            svg += '<line x1="'+cx+'" y1="'+(sizeH-15)+'" x2="'+cx+'" y2="15" />';
+            svg += '<polygon points="'+(cx-3)+',15 '+cx+',10 '+(cx+3)+',15" fill="#1f2937" stroke="none"/>';
+            svg += '<polygon points="'+(cx-3)+','+(sizeH-15)+' '+cx+','+(sizeH-10)+' '+(cx+3)+','+(sizeH-15)+'" fill="#1f2937" stroke="none"/>';
+            svg += '</g>';
+            
+            // Axis Labels
+            svg += '<g font-family="\'Inter\', sans-serif" font-size="10" font-style="italic" fill="#374151">';
+            svg += '<text x="'+(sizeW-15)+'" y="'+(cy+14)+'" text-anchor="middle">x</text>';
+            svg += '<text x="'+(cx-10)+'" y="15" text-anchor="end">y</text>';
+            
+            // Mark Origin 'O'
+            svg += '<text x="'+(cx-5)+'" y="'+(cy+14)+'" text-anchor="end">O</text>';
+            svg += '</g>';
+
+            // Helper for generating path data
+            const getPath = (f, xStart, xEnd, step = 0.05) => {
+                let path = '';
+                let isFirst = true;
+                for(let x = xStart; x <= xEnd; x += step) {
+                    let y = f(x);
+                    
+                    // Handle NaN (Domain Gaps for Option C)
+                    if (isNaN(y)) {
+                        isFirst = true; // Break the path, start a new one next valid point
+                        continue;
+                    }
+
+                    let px = cx + x * scaleX;
+                    let py = cy - y * scaleY;
+                    
+                    // Out of bounds check to prevent wild SVG drawing
+                    if (py < -10 || py > sizeH + 10) {
+                        isFirst = true;
+                        continue;
+                    }
+
+                    if (isFirst) {
+                        path += 'M '+px+' '+py+' ';
+                        isFirst = false;
+                    } else {
+                        path += 'L '+px+' '+py+' ';
+                    }
+                }
+                return path;
+            };
+
+            // Draw the function
+            const pathData = getPath(func, -5, 5);
+            svg += '<path d="' + pathData + '" fill="none" stroke="#111827" stroke-width="1.8" stroke-linejoin="round" />';
+            
+            svg += '</svg>';
+            return svg;
+        }
+
+        // Draw all equations when the DOM is prepared
+        function drawAllGraphs() {
+            document.getElementById('graph-main').innerHTML = createGraphSVG(f_val);
+            document.getElementById('graph-opt-A').innerHTML = createGraphSVG(optA_val);
+            document.getElementById('graph-opt-B').innerHTML = createGraphSVG(optB_val);
+            document.getElementById('graph-opt-C').innerHTML = createGraphSVG(optC_val);
+            document.getElementById('graph-opt-D').innerHTML = createGraphSVG(optD_val);
+        }
+
+        drawAllGraphs();
+    </script>
+</body>
+</html>
