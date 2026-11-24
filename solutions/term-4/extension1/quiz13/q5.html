@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Circular Permutations</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-drafting-compass text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-3 text-gray-800 font-medium">A netball team consisting of \( 10 \) players and \( 3 \) coaches are seated at a circular table for the annual awards night.</p>
+                <p class="mb-6 text-gray-800 font-medium">In how many ways can the team sit at the table if all the coaches must sit together?</p>
+                
+                <div class="grid grid-cols-1 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2 flex justify-center text-xl">\( 10!\,2! \)</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2 flex justify-center text-xl">\( 10!\,3! \)</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2 flex justify-center text-xl">\( 11!\,2! \)</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2 flex justify-center text-xl">\( 11!\,3! \)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Worked Solution Section -->
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 1: Group the Coaches into One Block</p>
+                        <p class="text-gray-700 text-sm mb-3">Since all \( 3 \) coaches must sit together, treat them as a single grouped unit (<strong>1 block</strong>). Together with the \( 10 \) individual players, we have \( 10 + 1 = 11 \) units to seat around the circular table.</p>
+                        
+                        <!-- Inline SVG Diagram of Circular Table -->
+                        <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center">
+                            <div id="table-diagram" class="w-full max-w-[270px]"></div>
+                            <div class="flex flex-wrap justify-center gap-4 mt-2 text-xs text-gray-600">
+                                <span class="flex items-center">
+                                    <span class="w-3 h-3 rounded-full bg-blue-500 inline-block mr-1.5"></span>10 Players (P1–P10)
+                                </span>
+                                <span class="flex items-center">
+                                    <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block mr-1.5"></span>3 Coaches (1 Block)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 2: Arrange the 11 Units Around the Circular Table</p>
+                        <p class="text-gray-700 text-sm">The number of ways to arrange \( n \) distinct items in a circle is \( (n - 1)! \) because rotating the entire table does not create a new seating arrangement.</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm font-medium overflow-x-auto text-center space-y-1">
+                            <div class="text-sm text-gray-600">With \( n = 11 \) units around the circle:</div>
+                            <div class="text-blue-900 font-bold text-lg">\[ (11 - 1)! = 10! \text{ ways} \]</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 3: Arrange the Coaches Internally and Multiply</p>
+                        <p class="text-gray-700 text-sm">Inside the coaches' block, the \( 3 \) coaches can sit in any order along their \( 3 \) seats. Because their positions relative to the players matter, this is a <strong>linear</strong> arrangement of \( 3 \) people:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm overflow-x-auto text-center space-y-2">
+                            <div>\[ \text{Internal arrangements of coaches} = 3! \]</div>
+                            <div class="text-sm text-gray-600 border-t pt-2">By the Fundamental Counting Principle, multiply both counts:</div>
+                            <div class="text-green-700 font-bold text-xl">\[ \text{Total ways} = 10! \times 3! = 10!\,3! \]</div>
+                        </div>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option B is the correct choice.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to see the most common circular permutation misconceptions.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /**
+         * Builds a clean inline SVG diagram showing 10 players and 3 grouped coaches
+         * seated around a circular table (11 total units).
+         */
+        function createCircularTableSVG() {
+            const w = 280;
+            const h = 255;
+            const cx = 140;
+            const cy = 138;
+            const tableR = 62;
+            const seatR = 88;
+            const totalSeats = 13;
+            const stepDeg = 360 / totalSeats;
+
+            // Helper to convert polar angle (degrees, -90 is top) to SVG x,y
+            const polar = (r, deg) => {
+                const rad = (deg * Math.PI) / 180;
+                return {
+                    x: cx + r * Math.cos(rad),
+                    y: cy + r * Math.sin(rad)
+                };
+            };
+
+            // Coaches sit at top: indices -1, 0, 1 around -90 degrees
+            const coachAngles = [-90 - stepDeg, -90, -90 + stepDeg];
+            const arcStart = polar(seatR, coachAngles[0] - 8);
+            const arcEnd = polar(seatR, coachAngles[2] + 8);
+
+            // Build player seats (10 seats: indices 2 through 11)
+            let playersSVG = '';
+            for (let i = 0; i < 10; i++) {
+                const angle = -90 + (i + 2) * stepDeg;
+                const pt = polar(seatR, angle);
+                playersSVG += `
+                    <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="11" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.8"/>
+                    <text x="${pt.x.toFixed(1)}" y="${(pt.y + 3.2).toFixed(1)}" font-size="8.5" font-weight="700" text-anchor="middle" fill="#1d4ed8">P${i + 1}</text>
+                `;
+            }
+
+            // Build coach seats (3 seats grouped at the top)
+            let coachesSVG = '';
+            coachAngles.forEach((angle, idx) => {
+                const pt = polar(seatR, angle);
+                coachesSVG += `
+                    <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="11.5" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+                    <text x="${pt.x.toFixed(1)}" y="${(pt.y + 3.2).toFixed(1)}" font-size="8.5" font-weight="700" text-anchor="middle" fill="#065f46">C${idx + 1}</text>
+                `;
+            });
+
+            return `
+                <svg viewBox="0 0 ${w} ${h}" class="w-full h-auto block" role="img" aria-label="Circular table with 10 players and 3 coaches grouped into 1 block">
+                    <!-- Soft highlighted arc grouping the 3 coaches into 1 block -->
+                    <path d="M ${arcStart.x.toFixed(1)} ${arcStart.y.toFixed(1)} A ${seatR} ${seatR} 0 0 1 ${arcEnd.x.toFixed(1)} ${arcEnd.y.toFixed(1)}"
+                          fill="none" stroke="#a7f3d0" stroke-width="32" stroke-linecap="round" opacity="0.7"/>
+                    <path d="M ${arcStart.x.toFixed(1)} ${arcStart.y.toFixed(1)} A ${seatR} ${seatR} 0 0 1 ${arcEnd.x.toFixed(1)} ${arcEnd.y.toFixed(1)}"
+                          fill="none" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3" stroke-linecap="round"/>
+
+                    <!-- Top badge label for the Coaches Block -->
+                    <rect x="64" y="5" width="152" height="22" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.2"/>
+                    <text x="140" y="19.5" font-size="9.5" font-weight="700" text-anchor="middle" fill="#065f46">1 Coaches Block (3! ways)</text>
+
+                    <!-- Circular Table -->
+                    <circle cx="${cx}" cy="${cy}" r="${tableR}" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+                    <circle cx="${cx}" cy="${cy}" r="${tableR - 6}" fill="none" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,3"/>
+                    
+                    <!-- Centre Table Text -->
+                    <text x="${cx}" y="${cy - 10}" font-size="10.5" font-weight="700" text-anchor="middle" fill="#334155">Circular Table</text>
+                    <text x="${cx}" y="${cy + 5}" font-size="9.5" font-weight="600" text-anchor="middle" fill="#475569">10 Players + 1 Block</text>
+                    <text x="${cx}" y="${cy + 20}" font-size="10" font-weight="700" text-anchor="middle" fill="#1d4ed8">= 11 Units → 10!</text>
+
+                    <!-- Seats -->
+                    ${playersSVG}
+                    ${coachesSVG}
+                </svg>
+            `;
+        }
+
+        // Inject the circular table diagram into Step 1
+        document.getElementById('table-diagram').innerHTML = createCircularTableSVG();
+
+        // Note: Backslashes are doubled inside JS template literals so MathJax receives valid LaTeX in the DOM.
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4 text-base">You correctly found \\( 10! \\) ways to arrange the \\( 11 \\) units around the table, but you applied the circular \\( (n - 1)! \\) rule a <strong>second time</strong> inside the coaches' block.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Misconception: Applying \\( (n - 1)! \\) Twice</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Once the coaches' block is placed at the table, the \\( 3 \\) coaches are seated in a <strong>row of 3 specific seats</strong> (left, middle, right relative to the players beside them).</p>
+                            <div class="text-center font-medium bg-red-50 py-2 px-3 rounded border border-red-100">
+                                \\[ \\text{Swapping } (C_1, C_2, C_3) \\to (C_2, C_3, C_1)\\] </p> \\[\\text{ changes who sits next to each player!} \\]
+                            </div>
+                            <p>Because rotating the coaches inside their block creates genuinely different seating arrangements, we use a linear permutation \\( 3! \\), not \\( (3 - 1)! = 2! \\).</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Rule of Thumb:</strong> Only subtract 1 <em>once</em> for the overall circular table: \\( (11 - 1)! \\times 3! = 10!\\,3! \\).
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-4 text-left text-base">You correctly grouped the \\( 3 \\) coaches into \\( 1 \\) block to form \\( 11 \\) units around the circular table, and remembered to use a circular permutation for the table and a linear permutation inside the block:</p>
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6 font-medium text-lg space-y-2">
+                            <div>\\[ \\text{11 units in a circle: } (11 - 1)! = 10! \\]</div>
+                            <div>\\[ \\text{3 coaches in their block: } 3! \\]</div>
+                            <div class="text-green-700 font-bold border-t pt-2">\\[ \\text{Total} = 10!\,3! \\]</div>
+                        </div>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Explore Options A, C, and D on the left to see the three classic circular permutation mistakes.
+                        </p>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4 text-base">You have the circular and linear permutation rules <strong>swapped</strong> between the table and the coaches' block.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Misconception: Mixing Up Both Rules</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <ul class="list-disc list-inside space-y-1.5">
+                                <li><strong>Around the table (\\( 11 \\) units):</strong> This is a circle, so rotations are identical. It should be \\( (11 - 1)! = 10! \\), not \\( 11! \\).</li>
+                                <li><strong>Inside the block (\\( 3 \\) coaches):</strong> This is a straight row of \\( 3 \\) adjacent seats, so it should be \\( 3! \\), not \\( 2! \\).</li>
+                            </ul>
+                            <div class="text-center font-medium bg-orange-50 py-2 px-3 rounded border border-orange-100">
+                                \\[ \\underbrace{(11 - 1)!}_{\\text{circular table}} \\times \\underbrace{3!}_{\\text{linear block}} = 10!\,3! \\]
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Check Which Part Rotates:</strong> The whole table can rotate (subtract 1 from the \\( 11 \\) units), whereas the \\( 3 \\) coaches inside their block cannot.
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4 text-base">You correctly grouped the \\( 3 \\) coaches into \\( 1 \\) block (giving \\( 11 \\) units) and accounted for their \\( 3! \\) internal arrangements, but you treated the seating like a <strong>straight line</strong>.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Misconception: Treating a Circle Like a Straight Line</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>If the team were standing in a straight row for a photo, the answer would indeed be \\( 11!\\,3! \\). However, at a <strong>circular table</strong>, there is no 'first' or 'last' seat.</p>
+                            <div class="text-center font-medium bg-purple-50 py-2 px-3 rounded border border-purple-100">
+                                \\[ \\frac{11!}{11} = (11 - 1)! = 10! \\]
+                            </div>
+                            <p>Dividing by \\( 11 \\) removes the \\( 11 \\) identical rotational copies of every seating plan, giving \\( 10!\\,3! \\).</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Keyword Alert:</strong> Whenever a problem says <em>'circular table'</em> or <em>'in a circle'</em>, remember to fix one unit in place using \\( (n - 1)! \\).
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-green-300', 'ring-red-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback
+                emptyState.classList.add('hidden');
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Style feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step solution logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
