@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Trigonometric Equations</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .graph-svg text {
+            user-select: none;
+        }
+        .axis-label {
+            font-family: 'Times New Roman', Times, serif;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-drafting-compass text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-3 text-gray-800 font-medium">For the domain \( 0 \le x \le 2\pi \), how many solutions does the following equation have?</p>
+                
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6 text-center text-xl">
+                    \[ \sin(2x) - \cos x = 0 \]
+                </div>
+                
+                <div class="grid grid-cols-1 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2 flex justify-center text-xl">\( 2 \)</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2 flex justify-center text-xl">\( 3 \)</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2 flex justify-center text-xl">\( 4 \)</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-2 flex justify-center text-xl">\( 5 \)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Worked Solution Section -->
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1: Double-Angle Identity & Factorisation -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 1: Apply the Compound Angle Identity from the reference sheet and Factorise</p>
+                        <p class="text-gray-700 text-sm">Substitute \( \sin(2x) = 2\sin x \cos x \) into the equation and factor out the common term \( \cos x \) (do <strong>not</strong> divide by \( \cos x \)):</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto space-y-2">
+                            <div>\[ 2\sin x \cos x - \cos x = 0 \]</div>
+                            <div class="text-blue-900 font-bold border-t pt-2">\[ \cos x(2\sin x - 1) = 0 \]</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Solve Both Equations on [0, 2pi] -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 2: Solve Each Factor for \( 0 \le x \le 2\pi \)</p>
+                        <p class="text-gray-700 text-sm">Set each factor equal to zero and find all solutions in the domain \( 0 \le x \le 2\pi \):</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm font-medium overflow-x-auto space-y-3 text-sm">
+                            <div>
+                                <div class="text-gray-600 mb-1"><strong>Case 1:</strong> \( \cos x = 0 \)</div>
+                                <div class="text-center text-blue-900">\[ x = \frac{\pi}{2}, \; \frac{3\pi}{2} \quad (\text{2 solutions}) \]</div>
+                            </div>
+                            <div class="border-t pt-2">
+                                <div class="text-gray-600 mb-1"><strong>Case 2:</strong> \( 2\sin x - 1 = 0 \implies \sin x = \dfrac{1}{2} \) (Quadrants 1 &amp; 2)</div>
+                                <div class="text-center text-blue-900">\[ x = \frac{\pi}{6}, \; \frac{5\pi}{6} \quad (\text{2 solutions}) \]</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Visual Confirmation via Graphs & Intersections -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 3: Verify Graphically via Intersection Points</p>
+                        <p class="text-gray-700 text-sm mb-3">Rewriting the equation as \( \sin(2x) = \cos x \), the solutions are the intersection points of \( y = \sin(2x) \) and \( y = \cos x \) on \( [0, 2\pi] \):</p>
+                        
+                        <!-- Inline SVG Graph of y = sin(2x) and y = cos(x) -->
+                        <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center">
+                            <div id="trig-graph-diagram" class="w-full max-w-[350px]"></div>
+                            <div class="flex flex-wrap justify-center gap-4 mt-2 text-xs text-gray-600">
+                                <span class="flex items-center"><span class="w-3.5 h-0.5 bg-blue-600 inline-block mr-1.5"></span>\( y = \sin(2x) \)</span>
+                                <span class="flex items-center"><span class="w-3.5 h-0.5 bg-orange-500 inline-block mr-1.5"></span>\( y = \cos x \)</span>
+                                <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block mr-1.5"></span>4 Intersections</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-3 shadow-sm text-center font-medium overflow-x-auto">
+                            <div class="text-green-700 font-bold text-lg">\[ x = \frac{\pi}{6}, \; \frac{\pi}{2}, \; \frac{5\pi}{6}, \; \frac{3\pi}{2} \implies 4 \text{ solutions} \]</div>
+                        </div>
+                        <p class="mt-2 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option C is the correct choice.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to uncover the most common trigonometric equation pitfalls.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /**
+         * Builds a crisp inline SVG graph of y = sin(2x) and y = cos(x)
+         * over the domain 0 <= x <= 2*pi, highlighting all 4 intersection points.
+         */
+        function createTrigGraphSVG() {
+            const w = 360;
+            const h = 215;
+            const xLeft = 36;
+            const xRight = 336;
+            const plotW = xRight - xLeft; // 300px for 0 to 2*pi
+            const axisY = 106;
+            const scaleY = 64; // 1 unit = 64px
+
+            const toX = (x) => xLeft + (x / (2 * Math.PI)) * plotW;
+            const toY = (y) => axisY - y * scaleY;
+
+            // Helper to sample a smooth trig curve on [0, 2*pi]
+            function buildCurve(fn) {
+                const steps = 160;
+                const pts = [];
+                for (let i = 0; i <= steps; i++) {
+                    const x = (2 * Math.PI) * (i / steps);
+                    pts.push(`${toX(x).toFixed(2)},${toY(fn(x)).toFixed(2)}`);
+                }
+                return `M ${pts.join(' L ')}`;
+            }
+
+            const sin2xPath = buildCurve(x => Math.sin(2 * x));
+            const cosxPath = buildCurve(x => Math.cos(x));
+
+            // Key x-axis markers: pi/2, pi, 3pi/2, 2pi
+            const xTicks = [
+                { val: Math.PI / 2, label: 'π/2' },
+                { val: Math.PI, label: 'π' },
+                { val: 3 * Math.PI / 2, label: '3π/2' },
+                { val: 2 * Math.PI, label: '2π' }
+            ];
+
+            let gridSVG = '';
+            xTicks.forEach(t => {
+                const px = toX(t.val).toFixed(1);
+                gridSVG += `
+                    <line x1="${px}" y1="26" x2="${px}" y2="186" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
+                    <line x1="${px}" y1="${axisY - 3}" x2="${px}" y2="${axisY + 3}" stroke="#475569" stroke-width="1.2"/>
+                    <text x="${px}" y="${axisY + 17}" font-size="10" font-weight="600" text-anchor="middle" fill="#475569">${t.label}</text>
+                `;
+            });
+
+            // Horizontal reference lines at y = 1 and y = -1
+            const yTop = toY(1).toFixed(1);
+            const yBot = toY(-1).toFixed(1);
+            gridSVG += `
+                <line x1="${xLeft}" y1="${yTop}" x2="${xRight}" y2="${yTop}" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
+                <line x1="${xLeft}" y1="${yBot}" x2="${xRight}" y2="${yBot}" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3,3"/>
+                <text x="${xLeft - 8}" y="${(parseFloat(yTop) + 3.5).toFixed(1)}" font-size="10" font-weight="600" text-anchor="end" fill="#475569">1</text>
+                <text x="${xLeft - 8}" y="${(parseFloat(yBot) + 3.5).toFixed(1)}" font-size="10" font-weight="600" text-anchor="end" fill="#475569">-1</text>
+                <text x="${xLeft - 8}" y="${axisY + 14}" font-size="10" font-weight="600" text-anchor="end" fill="#475569">0</text>
+            `;
+
+            // The 4 exact intersection points
+            const intersections = [
+                { x: Math.PI / 6, y: Math.sqrt(3) / 2, label: 'π/6', dx: 14, dy: -11 },
+                { x: Math.PI / 2, y: 0, label: 'π/2', dx: 13, dy: -10 },
+                { x: 5 * Math.PI / 6, y: -Math.sqrt(3) / 2, label: '5π/6', dx: 16, dy: 16 },
+                { x: 3 * Math.PI / 2, y: 0, label: '3π/2', dx: 15, dy: -10 }
+            ];
+
+            let dotsSVG = '';
+            intersections.forEach(pt => {
+                const px = toX(pt.x);
+                const py = toY(pt.y);
+                dotsSVG += `
+                    <circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="5" fill="#10b981" stroke="#ffffff" stroke-width="1.8"/>
+                    <rect x="${(px + pt.dx - 16).toFixed(1)}" y="${(py + pt.dy - 10).toFixed(1)}" width="32" height="15" rx="4" fill="#ecfdf5" stroke="#10b981" stroke-width="0.9"/>
+                    <text x="${(px + pt.dx).toFixed(1)}" y="${(py + pt.dy + 1).toFixed(1)}" font-size="9.5" font-weight="700" text-anchor="middle" fill="#065f46">${pt.label}</text>
+                `;
+            });
+
+            return `
+                <svg viewBox="0 0 ${w} ${h}" class="graph-svg w-full h-auto block" role="img" aria-label="Graphs of y = sin(2x) and y = cos(x) intersecting 4 times on 0 to 2pi">
+                    <rect x="0" y="0" width="${w}" height="${h}" fill="#ffffff" rx="8"/>
+
+                    ${gridSVG}
+
+                    <!-- X-axis -->
+                    <line x1="${xLeft}" y1="${axisY}" x2="${xRight + 10}" y2="${axisY}" stroke="#334155" stroke-width="1.3"/>
+                    <polygon points="${xRight + 15},${axisY} ${xRight + 8},${axisY - 3.5} ${xRight + 8},${axisY + 3.5}" fill="#334155"/>
+                    <text x="${xRight + 12}" y="${axisY + 15}" font-size="12" class="axis-label" text-anchor="middle" fill="#334155">x</text>
+
+                    <!-- Y-axis -->
+                    <line x1="${xLeft}" y1="22" x2="${xLeft}" y2="192" stroke="#334155" stroke-width="1.3"/>
+                    <polygon points="${xLeft},16 ${xLeft - 3.5},23 ${xLeft + 3.5},23" fill="#334155"/>
+                    <text x="${xLeft}" y="12" font-size="12" class="axis-label" text-anchor="middle" fill="#334155">y</text>
+
+                    <!-- Trig Curves -->
+                    <path d="${sin2xPath}" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round"/>
+                    <path d="${cosxPath}" fill="none" stroke="#f97316" stroke-width="2.2" stroke-linecap="round"/>
+
+                    <!-- 4 Intersection Points -->
+                    ${dotsSVG}
+                </svg>
+            `;
+        }
+
+        // Inject the trig graph SVG into Step 3
+        document.getElementById('trig-graph-diagram').innerHTML = createTrigGraphSVG();
+
+        // Note: Backslashes are doubled inside JS template literals so MathJax receives valid LaTeX in the DOM.
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4 text-base">It looks like you rewrote \\( \\sin(2x) = 2\\sin x \\cos x \\) and then <strong>divided both sides by \\( \\cos x \\)</strong> to get \\( 2\\sin x = 1 \\).</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Misconception: Dividing by a Variable Expression (\\( \\cos x \\))</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Dividing both sides of \\( 2\\sin x \\cos x = \\cos x \\) by \\( \\cos x \\) only leaves \\( \\sin x = \\frac{1}{2} \\) (\\( x = \\frac{\\pi}{6}, \\frac{5\\pi}{6} \\)) — it <strong>deletes</strong> all solutions where \\( \\cos x = 0 \\).</p>
+                            <div class="text-center font-medium bg-red-50 py-2 px-3 rounded border border-red-100">
+                                \\[ \\text{Correct method (factorise): } \\cos x(2\\sin x - 1) = 0 \\]
+                            </div>
+                            <p>Factoring preserves both branches:</p>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>\\( \\sin x = \\frac{1}{2} \\implies x = \\frac{\\pi}{6}, \\frac{5\\pi}{6} \\) (2 solutions)</li>
+                                <li>\\( \\cos x = 0 \\implies x = \\frac{\\pi}{2}, \\frac{3\\pi}{2} \\) (2 solutions)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Golden Rule:</strong> Never divide both sides of a trigonometric equation by a trig function like \\( \\cos x \\) or \\( \\sin x \\) — always move all terms to one side and <strong>factorise</strong>.
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4 text-base">Getting <strong>3 solutions</strong> usually happens in one of two ways: missing the second solution to \\( \\cos x = 0 \\), or guessing from the coefficients of \\( x \\).</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Common Misconceptions Behind Choosing 3</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Thinking \\( \\cos x = 0 \\) has only 1 solution:</strong> On \\( 0 \\le x \\le 2\\pi \\), the cosine curve crosses the \\( x \\)-axis <em>twice</em> — at both \\( x = \\frac{\\pi}{2} \\) and \\( x = \\frac{3\\pi}{2} \\). Missing \\( \\frac{3\\pi}{2} \\) leaves only \\( 2 + 1 = 3 \\) solutions.</li>
+                                <li><strong>Adding the angles' multipliers (\\( 2x \\) and \\( x \\)):</strong> Seeing \\( \\sin(2x) \\) and \\( \\cos(x) \\) and intuitively thinking \\( 2 + 1 = 3 \\) solutions doesn't account for both factors in \\( \\cos x(2\\sin x - 1) = 0 \\) each yielding 2 solutions.</li>
+                            </ul>
+                            <div class="text-center font-medium bg-orange-50 py-2 px-3 rounded border border-orange-100">
+                                \\[ \\underbrace{\\frac{\\pi}{6}, \\; \\frac{5\\pi}{6}}_{\\sin x = 1/2} \\quad \\text{and} \\quad \\underbrace{\\frac{\\pi}{2}, \\; \\frac{3\\pi}{2}}_{\\cos x = 0} \\implies 4 \\text{ solutions} \\]
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Visual Tip:</strong> Sketching \\( y = \\sin(2x) \\) and \\( y = \\cos x \\) on \\( [0, 2\\pi] \\) quickly confirms there are 4 distinct intersection points!
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-4">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-check text-3xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-4 text-left text-base">You correctly factored the equation instead of dividing by \\( \\cos x \\) and found all <strong>4 solutions</strong> in \\( 0 \\le x \\le 2\\pi \\):</p>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-5 font-medium text-base space-y-2">
+                            <div>\\[ \\cos x(2\\sin x - 1) = 0 \\]</div>
+                            <div class="text-sm text-gray-700">\\( \\cos x = 0 \\implies x = \\frac{\\pi}{2}, \\; \\frac{3\\pi}{2} \\) &nbsp;|&nbsp; \\( \\sin x = \\frac{1}{2} \\implies x = \\frac{\\pi}{6}, \\; \\frac{5\\pi}{6} \\)</div>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-xl border border-green-200 shadow-sm mb-4 flex flex-col items-center">
+                            <p class="text-xs font-bold tracking-wider text-green-700 mb-1">4 Intersection Points of \\( y = \\sin(2x) \\) &amp; \\( y = \\cos x \\)</p>
+                            <div class="w-full max-w-[320px]">${createTrigGraphSVG()}</div>
+                        </div>
+
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Explore Options A, B, and D on the left to see the most common algebraic and counting traps.
+                        </p>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4 text-base">You remembered to factorise into \\( \\cos x(2\\sin x - 1) = 0 \\), but you counted <strong>3 solutions</strong> for \\( \\cos x = 0 \\) instead of 2.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Misconception: Confusing the Zeros of \\( \\cos x \\) with \\( \\sin x \\)</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>On the closed domain \\( 0 \\le x \\le 2\\pi \\):</p>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>\\( \\sin x = 0 \\) has <strong>3 solutions</strong> (\\( 0, \\pi, 2\\pi \\)) because both endpoints are zeros.</li>
+                                <li>\\( \\cos x = 0 \\) has only <strong>2 solutions</strong> (\\( \\frac{\\pi}{2}, \\frac{3\\pi}{2} \\)), since \\( \\cos(0) = 1 \\) and \\( \\cos(2\\pi) = 1 \\).</li>
+                            </ul>
+                            <div class="text-center font-medium bg-purple-50 py-2 px-3 rounded border border-purple-100">
+                                \\[ \\text{Actual count: } \\underbrace{2}_{\\cos x = 0} + \\underbrace{2}_{\\sin x = 1/2} = 4 \\text{ solutions (not } 3 + 2 = 5\\text{)} \\]
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Endpoint Check:</strong> Always test \\( x = 0 \\) and \\( x = 2\\pi \\) in the original equation. Here, \\( \\sin(0) - \\cos(0) = 0 - 1 = -1 \\neq 0 \\), so the endpoints are not solutions.
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-green-300', 'ring-red-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback
+                emptyState.classList.add('hidden');
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Style feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step solution logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

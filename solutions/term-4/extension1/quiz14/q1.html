@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Sketching Polynomials</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .graph-svg text {
+            user-select: none;
+        }
+        .axis-label {
+            font-family: 'Times New Roman', Times, serif;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-drafting-compass text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-5 text-gray-800 font-medium">
+                    Which of the following represents the graph of \( y = x(x - 3)^3(x + 1)^2(4 - x) \)?
+                </p>
+                
+                <!-- 2x2 Grid of Inline SVG Graph Options -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium flex flex-col items-center relative" data-value="A">
+                        <div class="w-full flex items-center justify-start mb-1">
+                            <div class="relative w-8 h-8 flex-shrink-0">
+                                <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200 text-base">A</span>
+                            </div>
+                        </div>
+                        <div id="graph-option-A" class="w-full max-w-[215px] pointer-events-none"></div>
+                    </button>
+
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium flex flex-col items-center relative" data-value="B">
+                        <div class="w-full flex items-center justify-start mb-1">
+                            <div class="relative w-8 h-8 flex-shrink-0">
+                                <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200 text-base">B</span>
+                            </div>
+                        </div>
+                        <div id="graph-option-B" class="w-full max-w-[215px] pointer-events-none"></div>
+                    </button>
+
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium flex flex-col items-center relative" data-value="C">
+                        <div class="w-full flex items-center justify-start mb-1">
+                            <div class="relative w-8 h-8 flex-shrink-0">
+                                <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200 text-base">C</span>
+                            </div>
+                        </div>
+                        <div id="graph-option-C" class="w-full max-w-[215px] pointer-events-none"></div>
+                    </button>
+
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium flex flex-col items-center relative" data-value="D">
+                        <div class="w-full flex items-center justify-start mb-1">
+                            <div class="relative w-8 h-8 flex-shrink-0">
+                                <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200 text-base">D</span>
+                            </div>
+                        </div>
+                        <div id="graph-option-D" class="w-full max-w-[215px] pointer-events-none"></div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Worked Solution Section -->
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1: Degree & End Behaviour -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 1: Determine the Leading Term &amp; End Behaviour</p>
+                        <p class="text-gray-700 text-sm mb-2">Multiply the highest-power term from each factor to find the leading term of the polynomial:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto space-y-2">
+                            <div>\[ \text{Leading term} = x \cdot (x)^3 \cdot (x)^2 \cdot (-x) = -x^7 \]</div>
+                        </div>
+                        <div class="text-sm text-gray-700 space-y-1 mt-2">
+                            <div><i class="fas fa-arrow-right text-blue-500 mr-1.5"></i><strong>Degree \( 7 \) (odd):</strong> The two ends point in <strong>opposite</strong> directions (eliminating Options A and B).</div>
+                            <div><i class="fas fa-arrow-right text-blue-500 mr-1.5"></i><strong>Negative leading coefficient (\( -1 \)):</strong> As \( x \to -\infty, \; y \to +\infty \) (starts high on the left) and as \( x \to +\infty, \; y \to -\infty \) (finishes low on the right).</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Roots & Multiplicities -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 2: Analyse the Roots (\( x \)-intercepts) &amp; Multiplicities</p>
+                        <p class="text-gray-700 text-sm mb-2">Set each factor equal to zero and inspect its exponent (multiplicity):</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-sm text-gray-700 space-y-2">
+                            <div class="flex items-start">
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 mt-1.5 mr-2 flex-shrink-0"></span>
+                                <span><strong>\( x = -1 \)</strong> from \( (x + 1)^2 \): <strong>Double root</strong> (even) — the curve touches and <em>bounces</em> off the \( x \)-axis.</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="w-2.5 h-2.5 rounded-full bg-blue-600 mt-1.5 mr-2 flex-shrink-0"></span>
+                                <span><strong>\( x = 0 \)</strong> from \( x \): <strong>Single root</strong> — the curve cuts straight through the <em>origin</em> \( (0, 0) \).</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="w-2.5 h-2.5 rounded-full bg-purple-600 mt-1.5 mr-2 flex-shrink-0"></span>
+                                <span><strong>\( x = 3 \)</strong> from \( (x - 3)^3 \): <strong>Triple root</strong> — the curve crosses with a <em>horizontal point of inflection</em>.</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 mt-1.5 mr-2 flex-shrink-0"></span>
+                                <span><strong>\( x = 4 \)</strong> from \( (4 - x) \): <strong>Single root</strong> — the curve cuts straight through \( (4, 0) \).</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Annotated SVG & Final Match -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 3: Combine All Features to Identify the Graph</p>
+                        <p class="text-gray-700 text-sm mb-3">Starting from \( +\infty \) on the left, the graph bounces at \( -1 \), crosses downward through \( 0 \), inflects upward through \( 3 \), and crosses downward through \( 4 \) toward \( -\infty \):</p>
+                        
+                        <!-- Annotated Correct Graph -->
+                        <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center">
+                            <div id="graph-annotated" class="w-full max-w-[300px]"></div>
+                            <div class="flex flex-wrap justify-center gap-x-3 gap-y-1.5 mt-2 text-xs text-gray-600">
+                                <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block mr-1"></span>Bounce (\(-1\))</span>
+                                <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block mr-1"></span>Origin (\(0\))</span>
+                                <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block mr-1"></span>Inflection (\(3\))</span>
+                                <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block mr-1"></span>Cross (\(4\))</span>
+                            </div>
+                        </div>
+
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option C is the correct choice.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different graph options to see the most common polynomial sketching errors.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /**
+         * Generates crisp inline SVGs for the four polynomial options (A–D)
+         * and the annotated solution graph ('annotated').
+         * Uses smooth asinh vertical compression so root multiplicities
+         * (bounce at -1, crossing at 0 and 4, horizontal inflection at 3)
+         * remain mathematically faithful while fitting cleanly in the frame.
+         */
+        function createPolynomialSVG(mode) {
+            const isAnnotated = (mode === 'annotated');
+            const w = isAnnotated ? 300 : 230;
+            const h = isAnnotated ? 235 : 195;
+            const cx = w / 2;
+            const cy = h / 2;
+            const scaleX = isAnnotated ? 22 : 17.5;
+            const scaleY = isAnnotated ? 24 : 21.5;
+            const yClip = 3.55; // Compressed vertical clip bound
+
+            const toX = (x) => cx + x * scaleX;
+            const toY = (yComp) => cy - yComp * scaleY;
+
+            // Evaluate the exact polynomial for each mode
+            function evalPoly(x) {
+                const base = Math.pow(x - 3, 3) * Math.pow(x + 1, 2);
+                if (mode === 'A') return base * (4 - x);            // Degree 6, negative leading term (missing x)
+                if (mode === 'B') return base * (x - 4);            // Degree 6, positive leading term (missing x & flipped sign)
+                if (mode === 'C' || mode === 'annotated') return x * base * (4 - x); // Degree 7, negative leading term (CORRECT)
+                if (mode === 'D') return x * base * (x - 4);        // Degree 7, positive leading term (flipped sign)
+                return 0;
+            }
+
+            // Smooth monotonic compression preserving zero derivatives at roots
+            function compressY(y) {
+                return Math.asinh(y / 12);
+            }
+
+            // Sample curve points finely within the vertical clip window
+            const pts = [];
+            const xMin = -2.2;
+            const xMax = 5.0;
+            const steps = 600;
+
+            for (let i = 0; i <= steps; i++) {
+                const x = xMin + (xMax - xMin) * (i / steps);
+                const yc = compressY(evalPoly(x));
+                if (Math.abs(yc) <= yClip) {
+                    pts.push({ x: toX(x), y: toY(yc) });
+                }
+            }
+
+            const pathD = pts.length
+                ? 'M ' + pts.map(p => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' L ')
+                : '';
+
+            // Helper to draw a small directional arrowhead at the ends of the polynomial curve
+            function curveArrow(pTip, pPrev, color) {
+                const dx = pTip.x - pPrev.x;
+                const dy = pTip.y - pPrev.y;
+                const len = Math.hypot(dx, dy) || 1;
+                const ux = dx / len;
+                const uy = dy / len;
+                const size = isAnnotated ? 7 : 5.5;
+                const wing = isAnnotated ? 3.2 : 2.6;
+                const bx = pTip.x - ux * size;
+                const by = pTip.y - uy * size;
+                const px = -uy * wing;
+                const py = ux * wing;
+                return `<polygon points="${pTip.x.toFixed(1)},${pTip.y.toFixed(1)} ${(bx + px).toFixed(1)},${(by + py).toFixed(1)} ${(bx - px).toFixed(1)},${(by - py).toFixed(1)}" fill="${color}"/>`;
+            }
+
+            const curveColor = isAnnotated ? '#1e3a8a' : '#111827';
+            let endArrowsSVG = '';
+            if (pts.length > 5) {
+                endArrowsSVG += curveArrow(pts[0], pts[4], curveColor);
+                endArrowsSVG += curveArrow(pts[pts.length - 1], pts[pts.length - 5], curveColor);
+            }
+
+            // Build unit tick marks on x-axis from -5 to 5
+            let ticksSVG = '';
+            for (let i = -5; i <= 5; i++) {
+                if (i === 0) continue;
+                const tx = toX(i);
+                ticksSVG += `<line x1="${tx.toFixed(1)}" y1="${(cy - 3).toFixed(1)}" x2="${tx.toFixed(1)}" y2="${(cy + 3).toFixed(1)}" stroke="#1f2937" stroke-width="1"/>`;
+            }
+
+            // Axes with arrowheads
+            const xAxisLeft = toX(-5.4);
+            const xAxisRight = toX(5.4);
+            const yAxisTop = 18;
+            const yAxisBot = h - 14;
+
+            const axesSVG = `
+                <!-- X-axis -->
+                <line x1="${xAxisLeft.toFixed(1)}" y1="${cy}" x2="${xAxisRight.toFixed(1)}" y2="${cy}" stroke="#1f2937" stroke-width="1.1"/>
+                <polygon points="${(xAxisRight + 6).toFixed(1)},${cy} ${(xAxisRight - 1).toFixed(1)},${cy - 3.5} ${(xAxisRight - 1).toFixed(1)},${cy + 3.5}" fill="#1f2937"/>
+                <polygon points="${(xAxisLeft - 6).toFixed(1)},${cy} ${(xAxisLeft + 1).toFixed(1)},${cy - 3.5} ${(xAxisLeft + 1).toFixed(1)},${cy + 3.5}" fill="#1f2937"/>
+                <text x="${(xAxisRight + 12).toFixed(1)}" y="${cy + 3.5}" font-size="${isAnnotated ? 13 : 11.5}" class="axis-label" text-anchor="middle" fill="#1f2937">x</text>
+
+                <!-- Y-axis -->
+                <line x1="${cx}" y1="${yAxisTop}" x2="${cx}" y2="${yAxisBot}" stroke="#1f2937" stroke-width="1.1"/>
+                <polygon points="${cx},${yAxisTop - 6} ${cx - 3.5},${yAxisTop + 1} ${cx + 3.5},${yAxisTop + 1}" fill="#1f2937"/>
+                <polygon points="${cx},${yAxisBot + 6} ${cx - 3.5},${yAxisBot - 1} ${cx + 3.5},${yAxisBot - 1}" fill="#1f2937"/>
+                <text x="${cx}" y="${yAxisTop - 9}" font-size="${isAnnotated ? 13 : 11.5}" class="axis-label" text-anchor="middle" fill="#1f2937">y</text>
+            `;
+
+            // Extra callouts for the annotated worked-solution graph
+            let annotationsSVG = '';
+            if (isAnnotated) {
+                const xNeg1 = toX(-1);
+                const xZero = toX(0);
+                const xThree = toX(3);
+                const xFour = toX(4);
+
+                annotationsSVG = `
+                    <!-- Root Dots -->
+                    <circle cx="${xNeg1.toFixed(1)}" cy="${cy}" r="4.2" fill="#f59e0b" stroke="#ffffff" stroke-width="1.2"/>
+                    <circle cx="${xZero.toFixed(1)}" cy="${cy}" r="4.2" fill="#2563eb" stroke="#ffffff" stroke-width="1.2"/>
+                    <circle cx="${xThree.toFixed(1)}" cy="${cy}" r="4.2" fill="#9333ea" stroke="#ffffff" stroke-width="1.2"/>
+                    <circle cx="${xFour.toFixed(1)}" cy="${cy}" r="4.2" fill="#10b981" stroke="#ffffff" stroke-width="1.2"/>
+
+                    <!-- Root Numeric Labels -->
+                    <text x="${(xNeg1 - 5).toFixed(1)}" y="${cy + 16}" font-size="10.5" font-weight="700" text-anchor="middle" fill="#b45309">-1</text>
+                    <text x="${(xZero - 9).toFixed(1)}" y="${cy + 16}" font-size="10.5" font-weight="700" text-anchor="middle" fill="#1d4ed8">0</text>
+                    <text x="${(xThree - 2).toFixed(1)}" y="${cy + 16}" font-size="10.5" font-weight="700" text-anchor="middle" fill="#7e22ce">3</text>
+                    <text x="${(xFour + 7).toFixed(1)}" y="${cy + 16}" font-size="10.5" font-weight="700" text-anchor="middle" fill="#047857">4</text>
+
+                    <!-- End Behaviour Badges -->
+                    <rect x="22" y="18" width="68" height="19" rx="9" fill="#eff6ff" stroke="#93c5fd" stroke-width="1"/>
+                    <text x="56" y="30.5" font-size="9" font-weight="700" text-anchor="middle" fill="#1e40af">y → +∞</text>
+
+                    <rect x="216" y="198" width="68" height="19" rx="9" fill="#eff6ff" stroke="#93c5fd" stroke-width="1"/>
+                    <text x="250" y="210.5" font-size="9" font-weight="700" text-anchor="middle" fill="#1e40af">y → −∞</text>
+
+                    <!-- Inflection Label -->
+                    <text x="${(xThree + 2).toFixed(1)}" y="${cy - 22}" font-size="8.8" font-weight="700" text-anchor="middle" fill="#7e22ce">Inflection</text>
+                    <line x1="${xThree.toFixed(1)}" y1="${cy - 18}" x2="${xThree.toFixed(1)}" y2="${cy - 6}" stroke="#9333ea" stroke-width="1" stroke-dasharray="2,2"/>
+                `;
+            }
+
+            return `
+                <svg viewBox="0 0 ${w} ${h}" class="graph-svg w-full h-auto block" role="img" aria-label="Polynomial graph">
+                    <rect x="0" y="0" width="${w}" height="${h}" fill="#ffffff" rx="8"/>
+                    ${axesSVG}
+                    ${ticksSVG}
+                    <path d="${pathD}" fill="none" stroke="${curveColor}" stroke-width="${isAnnotated ? 2.2 : 1.5}" stroke-linecap="round" stroke-linejoin="round"/>
+                    ${endArrowsSVG}
+                    ${annotationsSVG}
+                </svg>
+            `;
+        }
+
+        // Render the four option graphs and the annotated solution graph
+        document.getElementById('graph-option-A').innerHTML = createPolynomialSVG('A');
+        document.getElementById('graph-option-B').innerHTML = createPolynomialSVG('B');
+        document.getElementById('graph-option-C').innerHTML = createPolynomialSVG('C');
+        document.getElementById('graph-option-D').innerHTML = createPolynomialSVG('D');
+        document.getElementById('graph-annotated').innerHTML = createPolynomialSVG('annotated');
+
+        // Note: Backslashes are doubled inside JS template literals so MathJax receives valid LaTeX in the DOM.
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4 text-base">Look closely at the origin \\( (0, 0) \\) and the left-hand end of the graph in Option A: the curve does <strong>not</strong> pass through the origin, and both ends point downward.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Misconception: Forgetting the Leading \\( x \\) Factor</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Option A is actually the graph of the <strong>degree 6</strong> polynomial:</p>
+                            <div class="text-center font-medium bg-red-50 py-2 px-3 rounded border border-red-100">
+                                \\[ y = (x - 3)^3(x + 1)^2(4 - x) \\quad \\text{(leading term } -x^6 \\text{)} \\]
+                            </div>
+                            <p>Because the standalone \\( x \\) factor at the front was overlooked:</p>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>The root at \\( x = 0 \\) is missing (the \\( y \\)-intercept is negative instead of \\( 0 \\)).</li>
+                                <li>The degree became even (\\( 6 \\)) instead of odd (\\( 7 \\)), making both ends go to \\( -\\infty \\).</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Quick Check:</strong> Substitute \\( x = 0 \\) into \\( y = x(x - 3)^3(x + 1)^2(4 - x) \\). Since \\( y(0) = 0 \\), the correct graph <em>must</em> pass through the origin!
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4 text-base">Option B misses the \\( x \\)-intercept at the origin <em>and</em> has both ends pointing upward to \\( +\\infty \\).</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Misconception: Missing \\( x \\) AND Ignoring the Negative in \\( (4 - x) \\)</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Option B represents the <strong>degree 6</strong> polynomial with a positive leading term:</p>
+                            <div class="text-center font-medium bg-orange-50 py-2 px-3 rounded border border-orange-100">
+                                \\[ y = (x - 3)^3(x + 1)^2(x - 4) \\quad \\text{(leading term } +x^6 \\text{)} \\]
+                            </div>
+                            <p>Two separate errors produce this graph:</p>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Overlooking the leading factor \\( x \\), which removes the root at \\( (0, 0) \\) and changes the degree from \\( 7 \\) to \\( 6 \\).</li>
+                                <li>Treating \\( (4 - x) \\) as \\( (x - 4) \\), which reverses the leading sign from negative to positive.</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Leading Term Check:</strong> \\( x \\cdot x^3 \\cdot x^2 \\cdot (-x) = -x^7 \\). An odd-degree polynomial must have opposite end behaviours.
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-4">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-check text-3xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-4 text-left text-base">You accurately matched both the <strong>end behaviour</strong> and every <strong>root multiplicity</strong> of \\( y = x(x - 3)^3(x + 1)^2(4 - x) \\):</p>
+                        
+                        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-5 text-left text-sm space-y-2">
+                            <div><strong>Leading term \\( -x^7 \\):</strong> Starts at \\( +\\infty \\) on the left and finishes at \\( -\\infty \\) on the right.</div>
+                            <div><strong>\\( x = -1 \\) (even, power 2):</strong> Touches and bounces off the \\( x \\)-axis.</div>
+                            <div><strong>\\( x = 0 \\) &amp; \\( x = 4 \\) (power 1):</strong> Cuts straight through the \\( x \\)-axis.</div>
+                            <div><strong>\\( x = 3 \\) (odd, power 3):</strong> Crosses with a horizontal point of inflection.</div>
+                        </div>
+
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Explore Options A, B, and D on the left to see the exact algebraic traps each distractor represents.
+                        </p>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4 text-base">You got all four \\( x \\)-intercepts (\\( -1, 0, 3, 4 \\)) and their multiplicities right, but the entire graph is <strong>upside down</strong>.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Misconception: Overlooking the Negative in \\( (4 - x) \\)</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Option D is the graph of \\( y = x(x - 3)^3(x + 1)^2(x - 4) \\), which has a <strong>positive</strong> leading term \\( +x^7 \\). However, our equation has \\( (4 - x) \\), not \\( (x - 4) \\):</p>
+                            <div class="text-center font-medium bg-purple-50 py-2 px-3 rounded border border-purple-100">
+                                \\[ y = x(x - 3)^3(x + 1)^2\\underbrace{(4 - x)}_{-(x - 4)} \\implies \\text{Leading term} = -x^7 \\]
+                            </div>
+                            <p>Test a large positive value like \\( x = 5 \\):</p>
+                            <div class="text-center font-medium bg-purple-50 py-2 px-3 rounded border border-purple-100">
+                                \\[ y(5) = (5)(2)^3(6)^2(-1) < 0 \\]
+                            </div>
+                            <p>Since \\( y \\) is <strong>negative</strong> for \\( x > 4 \\), the right-hand tail must go downward to \\( -\\infty \\), not upward.</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Watch Out:</strong> Always check the sign of \\( x \\) inside every factor — reversed factors like \\( (4 - x) \\) introduce a negative sign that reflects the entire curve vertically.
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-green-300', 'ring-red-300');
+                    b.classList.add('border-gray-200');
+                    const badge = b.querySelector('span.absolute');
+                    badge.classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    badge.classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback
+                emptyState.classList.add('hidden');
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Style feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step solution logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
