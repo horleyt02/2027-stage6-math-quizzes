@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Box Plots &amp; Outliers</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .diagram-svg text {
+            user-select: none;
+        }
+        .math-serif {
+            font-family: 'Times New Roman', Times, serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-drafting-compass text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-4 text-gray-800 font-medium">
+                    The box plot below shows the pulse rates (beats/min) of \( 60 \) people after exercise at a local fitness centre.
+                </p>
+
+                <!-- Problem Box Plot Container -->
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-5 flex justify-center">
+                    <div id="boxplot-problem" class="w-full max-w-[430px]"></div>
+                </div>
+
+                <p class="mb-5 text-gray-800 font-medium">
+                    Which of these pulse rates could be considered an outlier for the recorded data?
+                </p>
+                
+                <div class="grid grid-cols-1 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( 64 \)</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( 65 \)</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( 128 \)</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( 129 \)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Worked Solution Section -->
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1: Read Quartiles & Calculate IQR -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 1: Read \( Q_1 \) and \( Q_3 \) from the Box Plot and Find the IQR</p>
+                        <p class="text-gray-700 text-sm">The left and right edges of the box give the lower quartile (\( Q_1 \)) and upper quartile (\( Q_3 \)):</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto space-y-2">
+                            <div class="text-sm text-gray-600">\( Q_1 = 89 \) &nbsp; and &nbsp; \( Q_3 = 105 \)</div>
+                            <div class="text-blue-900 font-bold text-lg border-t pt-2">\[ \text{IQR} = Q_3 - Q_1 = 105 - 89 = 16 \]</div>
+                            <div class="text-sm text-gray-700 border-t pt-2">\[ 1.5 \times \text{IQR} = 1.5 \times 16 = 24 \]</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Calculate the Lower and Upper Outlier Boundaries -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 2: Calculate the Lower and Upper Outlier Boundaries</p>
+                        <p class="text-gray-700 text-sm">A score is considered an outlier if it is <strong>strictly less than</strong> \( Q_1 - 1.5 \times \text{IQR} \) or <strong>strictly greater than</strong> \( Q_3 + 1.5 \times \text{IQR} \):</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm font-medium overflow-x-auto text-center space-y-2">
+                            <div>\[ \text{Lower boundary} = Q_1 - 1.5 \times \text{IQR} = 89 - 24 = 65 \]</div>
+                            <div class="border-t pt-2">\[ \text{Upper boundary} = Q_3 + 1.5 \times \text{IQR} = 105 + 24 = 129 \]</div>
+                            <div class="text-blue-900 font-bold text-sm border-t pt-2">
+                                Outliers must satisfy \( x < 65 \) or \( x > 129 \) &nbsp;(strict inequalities!)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Annotated Outlier-Fence Diagram & Test All Four Options -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 3: Plot All Four Options Against the Outlier Fences</p>
+                        <p class="text-gray-700 text-sm mb-3">Comparing each option against the non-outlier interval \( [65, 129] \) shows that <strong>\( 64 \)</strong> is the only value strictly inside an outlier zone (and within the recorded range \( [60, 135] \)):</p>
+                        
+                        <!-- Inline SVG Outlier-Fence Diagram -->
+                        <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center mb-3">
+                            <div id="outlier-fence-diagram" class="w-full max-w-[380px]"></div>
+                            <div class="flex flex-wrap justify-center gap-4 mt-2 text-xs text-gray-600">
+                                <span class="flex items-center">
+                                    <span class="w-3 h-3 rounded-sm bg-red-100 border border-red-400 inline-block mr-1.5"></span>Outlier Zones (\( < 65 \) or \( > 129 \))
+                                </span>
+                                <span class="flex items-center">
+                                    <span class="w-3 h-3 rounded-sm bg-emerald-100 border border-emerald-500 inline-block mr-1.5"></span>Non-Outlier Zone (\( [65, 129] \))
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm overflow-x-auto text-center">
+                            <div class="text-green-700 font-bold text-xl">\[ 64 < 65 \implies 64 \text{ is an outlier!} \]</div>
+                        </div>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option A is the correct choice.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to uncover the classic strict-inequality boundary traps in outlier questions.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /**
+         * Builds a crisp inline SVG faithfully recreating the given exam box plot
+         * with Min = 60, Q1 = 89, Median = 98, Q3 = 105, Max = 135, dashed vertical
+         * drop lines to the horizontal axis, and "DIAGRAM NOT TO SCALE".
+         */
+        function createProblemBoxPlotSVG() {
+            const w = 430;
+            const h = 152;
+            const axisY = 108;
+            const boxTop = 32;
+            const boxBot = 74;
+            const boxMid = (boxTop + boxBot) / 2; // 53
+
+            // Visual positions matching the exam diagram (not to scale)
+            const xMin = 56;
+            const xQ1 = 140;
+            const xMed = 175;
+            const xQ3 = 198;
+            const xMax = 286;
+
+            const markers = [
+                { x: xMin, label: '60',  yStart: boxMid + 7 },
+                { x: xQ1,  label: '89',  yStart: boxBot },
+                { x: xMed, label: '98',  yStart: boxBot },
+                { x: xQ3,  label: '105', yStart: boxBot },
+                { x: xMax, label: '135', yStart: boxMid + 7 }
+            ];
+
+            let dropsSVG = '';
+            markers.forEach(m => {
+                dropsSVG += `
+                    <line x1="${m.x}" y1="${m.yStart}" x2="${m.x}" y2="${axisY}" stroke="#1f2937" stroke-width="1.2" stroke-dasharray="3.5,3"/>
+                    <text x="${m.x}" y="${axisY + 24}" font-size="14" class="math-serif" text-anchor="middle" fill="#111827">${m.label}</text>
+                `;
+            });
+
+            return `
+                <svg viewBox="0 0 ${w} ${h}" class="diagram-svg w-full h-auto block" role="img" aria-label="Box plot with minimum 60, lower quartile 89, median 98, upper quartile 105, and maximum 135">
+                    <rect x="0" y="0" width="${w}" height="${h}" fill="#ffffff" rx="8"/>
+
+                    <!-- Horizontal Number Line -->
+                    <line x1="16" y1="${axisY}" x2="368" y2="${axisY}" stroke="#111827" stroke-width="1.2"/>
+
+                    <!-- Dashed Vertical Drop Lines & Numeric Labels -->
+                    ${dropsSVG}
+
+                    <!-- Left Whisker (60 to 89) -->
+                    <line x1="${xMin}" y1="${boxMid}" x2="${xQ1}" y2="${boxMid}" stroke="#111827" stroke-width="1.5"/>
+                    <line x1="${xMin}" y1="${boxMid - 7}" x2="${xMin}" y2="${boxMid + 7}" stroke="#111827" stroke-width="2"/>
+
+                    <!-- Right Whisker (105 to 135) -->
+                    <line x1="${xQ3}" y1="${boxMid}" x2="${xMax}" y2="${boxMid}" stroke="#111827" stroke-width="1.5"/>
+                    <line x1="${xMax}" y1="${boxMid - 7}" x2="${xMax}" y2="${boxMid + 7}" stroke="#111827" stroke-width="2"/>
+
+                    <!-- Box (Q1 to Q3) -->
+                    <rect x="${xQ1}" y="${boxTop}" width="${xQ3 - xQ1}" height="${boxBot - boxTop}" fill="#ffffff" stroke="#111827" stroke-width="2"/>
+
+                    <!-- Median Line (98) -->
+                    <line x1="${xMed}" y1="${boxTop}" x2="${xMed}" y2="${boxBot}" stroke="#111827" stroke-width="2"/>
+
+                    <!-- DIAGRAM NOT TO SCALE note -->
+                    <text x="328" y="50" font-size="12.5" class="math-serif" fill="#111827">DIAGRAM NOT</text>
+                    <text x="328" y="67" font-size="12.5" class="math-serif" fill="#111827">TO SCALE</text>
+                </svg>
+            `;
+        }
+
+        /**
+         * Builds a crisp inline SVG outlier-fence diagram with a clean axis break (//)
+         * in the middle of the non-outlier interval [65, 129], so the 1-unit gaps
+         * around both boundaries (64 vs 65 and 128 vs 129) are clearly visible.
+         */
+        function createOutlierFenceSVG() {
+            const w = 380;
+            const h = 200;
+            const axisY = 120;
+
+            // Left zoomed segment: values 60..69 -> x in [24, 150] (14px per unit)
+            const toXLeft = (v) => 24 + (v - 60) * 14;
+            // Right zoomed segment: values 125..135 -> x in [226, 356] (13px per unit)
+            const toXRight = (v) => 226 + (v - 125) * 13;
+
+            const x60 = toXLeft(60);   // 24
+            const x64 = toXLeft(64);   // 80
+            const x65 = toXLeft(65);   // 94  (Lower Fence)
+
+            const x128 = toXRight(128); // 265
+            const x129 = toXRight(129); // 278 (Upper Fence)
+            const x135 = toXRight(135); // 356
+
+            return `
+                <svg viewBox="0 0 ${w} ${h}" class="diagram-svg w-full h-auto block" role="img" aria-label="Outlier fence diagram showing non-outlier zone from 65 to 129, red outlier zones below 65 and above 129, and options 64, 65, 128, and 129 plotted">
+                    <rect x="0" y="0" width="${w}" height="${h}" fill="#ffffff" rx="8"/>
+
+                    <!-- Shaded Zone Backgrounds -->
+                    <!-- Left Red Outlier Zone (< 65) -->
+                    <rect x="14" y="54" width="${x65 - 14}" height="76" rx="4" fill="#fee2e2" fill-opacity="0.65"/>
+                    <!-- Middle Emerald Non-Outlier Zone [65, 129] -->
+                    <rect x="${x65}" y="54" width="${x129 - x65}" height="76" fill="#d1fae5" fill-opacity="0.55"/>
+                    <!-- Right Red Outlier Zone (> 129) -->
+                    <rect x="${x129}" y="54" width="${w - 14 - x129}" height="76" rx="4" fill="#fee2e2" fill-opacity="0.65"/>
+
+                    <!-- Zone Header Labels -->
+                    <text x="${(14 + x65) / 2}" y="46" font-size="8.6" font-weight="800" text-anchor="middle" fill="#b91c1c">OUTLIER (&lt; 65)</text>
+                    <text x="${(x65 + x129) / 2}" y="46" font-size="9" font-weight="800" text-anchor="middle" fill="#065f46">NON-OUTLIER ZONE [65, 129]</text>
+                    <text x="${(x129 + w - 14) / 2}" y="46" font-size="8.6" font-weight="800" text-anchor="middle" fill="#b91c1c">OUTLIER (&gt; 129)</text>
+
+                    <!-- Vertical Dashed Boundary Fences at 65 and 129 -->
+                    <line x1="${x65}" y1="52" x2="${x65}" y2="146" stroke="#059669" stroke-width="1.8" stroke-dasharray="4,3"/>
+                    <line x1="${x129}" y1="52" x2="${x129}" y2="146" stroke="#059669" stroke-width="1.8" stroke-dasharray="4,3"/>
+
+                    <!-- Main Axis Line (left segment + break + right segment) -->
+                    <line x1="16" y1="${axisY}" x2="176" y2="${axisY}" stroke="#334155" stroke-width="1.5"/>
+                    <line x1="204" y1="${axisY}" x2="${w - 16}" y2="${axisY}" stroke="#334155" stroke-width="1.5"/>
+
+                    <!-- Axis Break Slashes (//) in middle -->
+                    <line x1="181" y1="${axisY + 6}" x2="188" y2="${axisY - 6}" stroke="#64748b" stroke-width="1.5"/>
+                    <line x1="191" y1="${axisY + 6}" x2="198" y2="${axisY - 6}" stroke="#64748b" stroke-width="1.5"/>
+
+                    <!-- Recorded Min (60) and Max (135) tick cues -->
+                    <line x1="${x60}" y1="${axisY - 4}" x2="${x60}" y2="${axisY + 4}" stroke="#64748b" stroke-width="1.3"/>
+                    <text x="${x60}" y="${axisY + 17}" font-size="9" font-weight="600" text-anchor="middle" fill="#64748b">Min</text>
+                    <text x="${x60}" y="${axisY + 28}" font-size="9" font-weight="700" text-anchor="middle" fill="#475569">60</text>
+
+                    <line x1="${x135}" y1="${axisY - 4}" x2="${x135}" y2="${axisY + 4}" stroke="#64748b" stroke-width="1.3"/>
+                    <text x="${x135}" y="${axisY + 17}" font-size="9" font-weight="600" text-anchor="middle" fill="#64748b">Max</text>
+                    <text x="${x135}" y="${axisY + 28}" font-size="9" font-weight="700" text-anchor="middle" fill="#475569">135</text>
+
+                    <!-- Fence Labels below axis -->
+                    <text x="${x65}" y="159" font-size="9" font-weight="800" text-anchor="middle" fill="#065f46">Fence = 65</text>
+                    <text x="${x65}" y="171" font-size="8" font-weight="600" text-anchor="middle" fill="#047857">(Q₁ − 24)</text>
+
+                    <text x="${x129}" y="159" font-size="9" font-weight="800" text-anchor="middle" fill="#065f46">Fence = 129</text>
+                    <text x="${x129}" y="171" font-size="8" font-weight="600" text-anchor="middle" fill="#047857">(Q₃ + 24)</text>
+
+                    <!-- OPTION A: 64 (OUTLIER — Highlighted!) -->
+                    <line x1="${x64}" y1="84" x2="${x64}" y2="${axisY - 6}" stroke="#dc2626" stroke-width="1.5"/>
+                    <circle cx="${x64}" cy="${axisY}" r="5.5" fill="#dc2626" stroke="#ffffff" stroke-width="1.8"/>
+                    <rect x="${x64 - 36}" y="62" width="58" height="22" rx="11" fill="#dc2626"/>
+                    <text x="${x64 - 7}" y="76.5" font-size="9.5" font-weight="800" text-anchor="middle" fill="#ffffff">A: 64 ✓</text>
+
+                    <!-- OPTION B: 65 (On lower boundary — Not an outlier) -->
+                    <line x1="${x65}" y1="95" x2="${x65}" y2="${axisY - 5}" stroke="#059669" stroke-width="1.3"/>
+                    <circle cx="${x65}" cy="${axisY}" r="4.5" fill="#059669" stroke="#ffffff" stroke-width="1.5"/>
+                    <rect x="${x65 + 4}" y="82" width="44" height="19" rx="9" fill="#ffffff" stroke="#10b981" stroke-width="1.1"/>
+                    <text x="${x65 + 26}" y="94.5" font-size="9" font-weight="700" text-anchor="middle" fill="#065f46">B: 65</text>
+
+                    <!-- OPTION C: 128 (Inside non-outlier zone) -->
+                    <line x1="${x128}" y1="95" x2="${x128}" y2="${axisY - 5}" stroke="#059669" stroke-width="1.3"/>
+                    <circle cx="${x128}" cy="${axisY}" r="4.5" fill="#059669" stroke="#ffffff" stroke-width="1.5"/>
+                    <rect x="${x128 - 49}" y="82" width="47" height="19" rx="9" fill="#ffffff" stroke="#10b981" stroke-width="1.1"/>
+                    <text x="${x128 - 25.5}" y="94.5" font-size="9" font-weight="700" text-anchor="middle" fill="#065f46">C: 128</text>
+
+                    <!-- OPTION D: 129 (On upper boundary — Not an outlier) -->
+                    <line x1="${x129}" y1="74" x2="${x129}" y2="${axisY - 5}" stroke="#059669" stroke-width="1.3"/>
+                    <circle cx="${x129}" cy="${axisY}" r="4.5" fill="#059669" stroke="#ffffff" stroke-width="1.5"/>
+                    <rect x="${x129 + 5}" y="62" width="48" height="19" rx="9" fill="#ffffff" stroke="#10b981" stroke-width="1.1"/>
+                    <text x="${x129 + 29}" y="74.5" font-size="9" font-weight="700" text-anchor="middle" fill="#065f46">D: 129</text>
+
+                    <!-- Bottom caption -->
+                    <text x="${w / 2}" y="191" font-size="8.8" font-weight="600" text-anchor="middle" fill="#475569">Only A (64) lies strictly outside [65, 129] — values ON 65 or 129 are not outliers</text>
+                </svg>
+            `;
+        }
+
+        // Inject both inline SVGs
+        document.getElementById('boxplot-problem').innerHTML = createProblemBoxPlotSVG();
+        document.getElementById('outlier-fence-diagram').innerHTML = createOutlierFenceSVG();
+
+        // Note: Backslashes are doubled inside JS template literals so MathJax receives valid LaTeX in the DOM.
+        const feedbackData = {
+            'A': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-4 text-left text-base">You found \\( \\text{IQR} = 105 - 89 = 16 \\), calculated both outlier fences accurately, and remembered that outliers require a <strong>strict</strong> inequality:</p>
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6 font-medium text-base space-y-2">
+                            <div>\\[ \\text{Lower fence} = 89 - 1.5(16) = 65 \\] \\[\\quad \\text{Upper fence} = 105 + 1.5(16) = 129 \\]</div>
+                            <div class="text-green-700 font-bold text-xl border-t pt-2">\\[ 64 < 65 \\implies 64 \\text{ is an outlier!} \\]</div>
+                        </div>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Explore Options B, C, and D on the left to see why values sitting <em>on</em> the boundaries (\\( 65 \\) and \\( 129 \\)) are not outliers, or walk through the solution steps to view the outlier-fence diagram.
+                        </p>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4 text-base">Your calculation of the lower outlier boundary was 100% accurate (\\( Q_1 - 1.5 \\times \\text{IQR} = 89 - 24 = 65 \\)), but \\( 65 \\) sits <strong>exactly on</strong> the boundary — it is <em>not</em> strictly below it!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Misconception: Using \\( \\le \\) Instead of Strict \\( < \\) at the Lower Boundary</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>The formal outlier rule uses a <strong>strict</strong> inequality:</p>
+                            <div class="text-center font-medium bg-red-50 py-2 px-3 rounded border border-red-100">
+                                \\[ \\text{Lower outlier} \\iff x < Q_1 - 1.5 \\times \\text{IQR} \\quad (x < 65) \\]
+                            </div>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>\\( 65 \\) is the <em>smallest</em> non-outlier value (\\( 65 \\not< 65 \\)).</li>
+                                <li>\\( 64 \\) is strictly less than \\( 65 \\) (\\( 64 < 65 \\)), making Option A the only outlier.</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Boundary Rule:</strong> Think of the fence as the edge of the safe zone — standing <em>on</em> the fence (\\( 65 \\) or \\( 129 \\)) is still inside; you must cross <em>beyond</em> it to be an outlier!
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4 text-base">\\( 128 \\) lies strictly <strong>inside</strong> the upper outlier boundary (\\( 128 < 129 \\)), so it is a normal data value, not an outlier.</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Misconception: Miscalculating the IQR or Upper Fence</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Double-check the interquartile range and upper boundary calculation:</p>
+                            <div class="text-center font-medium bg-orange-50 py-2 px-3 rounded border border-orange-100">
+                                \\[ \\text{IQR} = 105 - 89 = 16 \\implies 1.5 \\times \\text{IQR} = 24 \\]
+                                \\[ \\text{Upper boundary} = Q_3 + 24 = 105 + 24 = 129 \\]
+                            </div>
+                            <p>An upper outlier must be strictly greater than \\( 129 \\) (e.g., \\( 130 \\) or \\( 135 \\)). Since \\( 128 < 129 \\), \\( 128 \\) sits comfortably inside the non-outlier interval \\( [65, 129] \\).</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Check Both Ends:</strong> Always calculate <em>both</em> fences (\\( 65 \\) and \\( 129 \\)) — here, none of the options exceed \\( 129 \\), while \\( 64 \\) drops below \\( 65 \\)!
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4 text-base">You calculated the upper outlier boundary accurately (\\( Q_3 + 1.5 \\times \\text{IQR} = 105 + 24 = 129 \\)), but \\( 129 \\) sits <strong>exactly on</strong> the boundary — it is <em>not</em> strictly greater than \\( 129 \\)!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Misconception: Using \\( \\ge \\) Instead of Strict \\( > \\) at the Upper Boundary</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>The upper outlier rule requires a value to be <strong>strictly greater than</strong> the upper fence:</p>
+                            <div class="text-center font-medium bg-purple-50 py-2 px-3 rounded border border-purple-100">
+                                \\[ \\text{Upper outlier} \\iff x > Q_3 + 1.5 \\times \\text{IQR} \\quad (x > 129) \\]
+                            </div>
+                            <p>Since \\( 129 \\) is equal to the boundary (\\( 129 \\not> 129 \\)), it is the largest <em>non-outlier</em> value. Meanwhile, at the lower end, \\( 64 < 65 \\) satisfies the strict inequality and <em>is</em> an outlier.</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Exam Clue:</strong> Notice that both \\( 65 \\) (Option B) and \\( 129 \\) (Option D) appear in the choices! Because both sit on the exact fences, neither can be the single unique answer — pointing directly to \\( 64 \\) (Option A)!
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-green-300', 'ring-red-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback
+                emptyState.classList.add('hidden');
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Style feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step solution logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

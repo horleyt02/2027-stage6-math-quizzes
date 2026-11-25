@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Sketching Linear Graphs</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .graph-svg text {
+            user-select: none;
+        }
+        .math-serif {
+            font-family: 'Times New Roman', Times, serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-drafting-compass text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-5 text-gray-800 font-medium">
+                    Which of the following could represent the graph of \( y = 4x + 3 \)?
+                </p>
+                
+                <!-- 2x2 Grid of Inline SVG Linear Graph Options -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium flex flex-col items-center relative" data-value="A">
+                        <div class="w-full flex items-center justify-start mb-1">
+                            <div class="relative w-8 h-8 flex-shrink-0">
+                                <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200 text-base">A</span>
+                            </div>
+                        </div>
+                        <div id="graph-option-A" class="w-full max-w-[205px] pointer-events-none"></div>
+                    </button>
+
+                    <!-- Option B -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium flex flex-col items-center relative" data-value="B">
+                        <div class="w-full flex items-center justify-start mb-1">
+                            <div class="relative w-8 h-8 flex-shrink-0">
+                                <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200 text-base">B</span>
+                            </div>
+                        </div>
+                        <div id="graph-option-B" class="w-full max-w-[205px] pointer-events-none"></div>
+                    </button>
+
+                    <!-- Option C -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium flex flex-col items-center relative" data-value="C">
+                        <div class="w-full flex items-center justify-start mb-1">
+                            <div class="relative w-8 h-8 flex-shrink-0">
+                                <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200 text-base">C</span>
+                            </div>
+                        </div>
+                        <div id="graph-option-C" class="w-full max-w-[205px] pointer-events-none"></div>
+                    </button>
+
+                    <!-- Option D -->
+                    <button class="choice-btn p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium flex flex-col items-center relative" data-value="D">
+                        <div class="w-full flex items-center justify-start mb-1">
+                            <div class="relative w-8 h-8 flex-shrink-0">
+                                <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200 text-base">D</span>
+                            </div>
+                        </div>
+                        <div id="graph-option-D" class="w-full max-w-[205px] pointer-events-none"></div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Worked Solution Section -->
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1: Identify Gradient m and y-intercept c -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 1: Compare with Gradient–Intercept Form \( y = mx + c \)</p>
+                        <p class="text-gray-700 text-sm mb-2">Match \( y = 4x + 3 \) directly with the standard linear equation \( y = mx + c \):</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto space-y-2">
+                            <div class="text-lg">\[ y = \underbrace{4}_{m}x + \underbrace{3}_{c} \]</div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm border-t pt-2.5">
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-2 text-blue-900">
+                                    <strong>Gradient:</strong> \( m = 4 \) (<strong>positive</strong>)
+                                </div>
+                                <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-emerald-900">
+                                    <strong>\( y \)-intercept:</strong> \( c = 3 \) (<strong>positive</strong>)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Interpret the Two Signs Visually -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 2: Interpret What Each Feature Looks Like on a Graph</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-1 shadow-sm text-sm text-gray-700 space-y-2">
+                            <div class="flex items-start">
+                                <i class="fas fa-arrow-trend-up text-blue-600 mt-1 mr-2.5 flex-shrink-0"></i>
+                                <span><strong>Positive gradient (\( m = 4 > 0 \)):</strong> The line slopes <strong>upward</strong> as you read from left to right (this eliminates Options C and D).</span>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-location-dot text-emerald-600 mt-1 mr-2.5 flex-shrink-0"></i>
+                                <span><strong>Positive \( y \)-intercept (\( c = 3 > 0 \)):</strong> The line crosses the vertical \( y \)-axis <strong>above</strong> the origin at \( (0, 3) \) (this eliminates Option A).</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Annotated Matching Graph & Conclusion -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 3: Match Both Features to the Correct Graph</p>
+                        <p class="text-gray-700 text-sm mb-3">Option B is the only graph that both rises from left to right and crosses the \( y \)-axis above the origin:</p>
+                        
+                        <!-- Annotated Graph of Option B -->
+                        <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center">
+                            <div id="graph-annotated" class="w-full max-w-[275px]"></div>
+                            <div class="flex flex-wrap justify-center gap-4 mt-2 text-xs text-gray-600">
+                                <span class="flex items-center">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block mr-1.5"></span>\( y \)-intercept \( (0, 3) > 0 \)
+                                </span>
+                                <span class="flex items-center">
+                                    <span class="w-3.5 h-0.5 bg-blue-600 inline-block mr-1.5"></span>Positive gradient (\( m = 4 > 0 \))
+                                </span>
+                            </div>
+                        </div>
+
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option B is the correct choice.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the four linear graphs to check how the gradient \( m \) and \( y \)-intercept \( c \) control the line's direction and position.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /**
+         * Builds crisp inline SVGs for the four linear graph options (A–D)
+         * and the annotated solution diagram ('annotated').
+         * Option A: positive gradient, negative y-intercept
+         * Option B: positive gradient, positive y-intercept (CORRECT)
+         * Option C: negative gradient, positive y-intercept
+         * Option D: negative gradient, negative y-intercept
+         */
+        function createLinearGraphSVG(mode) {
+            const isAnnotated = (mode === 'annotated');
+            const w = isAnnotated ? 275 : 210;
+            const h = isAnnotated ? 220 : 185;
+            const cx = isAnnotated ? 132 : 105;
+            const cy = isAnnotated ? 118 : 96;
+
+            // Define line endpoints (x1, y1) -> (x2, y2) matching the exam visual proportions
+            let p1, p2;
+            const spanX = isAnnotated ? 70 : 56;
+            const spanY = isAnnotated ? 78 : 62;
+            const shiftY = isAnnotated ? 30 : 24; // Vertical offset for positive/negative y-intercept
+
+            if (mode === 'A') {
+                // Positive gradient, negative y-intercept
+                p1 = { x: cx - spanX + 10, y: cy + spanY + shiftY - 12 };
+                p2 = { x: cx + spanX + 12, y: cy - spanY + shiftY - 12 };
+            } else if (mode === 'B' || mode === 'annotated') {
+                // Positive gradient, positive y-intercept
+                p1 = { x: cx - spanX - 10, y: cy + spanY - shiftY + 8 };
+                p2 = { x: cx + spanX - 12, y: cy - spanY - shiftY + 8 };
+            } else if (mode === 'C') {
+                // Negative gradient, positive y-intercept
+                p1 = { x: cx - spanX + 12, y: cy - spanY - shiftY + 12 };
+                p2 = { x: cx + spanX + 10, y: cy + spanY - shiftY + 12 };
+            } else {
+                // Option D: Negative gradient, negative y-intercept
+                p1 = { x: cx - spanX - 10, y: cy - spanY + shiftY - 8 };
+                p2 = { x: cx + spanX - 12, y: cy + spanY + shiftY - 8 };
+            }
+
+            // Helper to draw clean open-V arrowheads at both ends of a line segment
+            function openArrow(tip, from, color, strokeW) {
+                const dx = tip.x - from.x;
+                const dy = tip.y - from.y;
+                const len = Math.hypot(dx, dy) || 1;
+                const ux = dx / len;
+                const uy = dy / len;
+                const lenA = isAnnotated ? 7.5 : 6;
+                const wing = isAnnotated ? 4 : 3.3;
+                const bx = tip.x - ux * lenA;
+                const by = tip.y - uy * lenA;
+                const px = -uy * wing;
+                const py = ux * wing;
+                return `<path d="M ${(bx + px).toFixed(1)},${(by + py).toFixed(1)} L ${tip.x.toFixed(1)},${tip.y.toFixed(1)} L ${(bx - px).toFixed(1)},${(by - py).toFixed(1)}" fill="none" stroke="${color}" stroke-width="${strokeW}" stroke-linecap="round" stroke-linejoin="round"/>`;
+            }
+
+            const xAxisLeft = 18;
+            const xAxisRight = w - 20;
+            const yAxisTop = 20;
+            const yAxisBot = h - 14;
+
+            const axesSVG = `
+                <!-- X-axis -->
+                <line x1="${xAxisLeft}" y1="${cy}" x2="${xAxisRight}" y2="${cy}" stroke="#1f2937" stroke-width="1.15"/>
+                <polygon points="${xAxisRight + 7},${cy} ${xAxisRight - 1},${cy - 3.5} ${xAxisRight - 1},${cy + 3.5}" fill="#1f2937"/>
+                <text x="${xAxisRight + 4}" y="${cy + 15}" font-size="${isAnnotated ? 13 : 12}" font-style="italic" class="math-serif" text-anchor="middle" fill="#1f2937">x</text>
+
+                <!-- Y-axis -->
+                <line x1="${cx}" y1="${yAxisBot}" x2="${cx}" y2="${yAxisTop}" stroke="#1f2937" stroke-width="1.15"/>
+                <polygon points="${cx},${yAxisTop - 7} ${cx - 3.5},${yAxisTop + 1} ${cx + 3.5},${yAxisTop + 1}" fill="#1f2937"/>
+                <text x="${cx - 11}" y="${yAxisTop + 4}" font-size="${isAnnotated ? 13 : 12}" font-style="italic" class="math-serif" text-anchor="middle" fill="#1f2937">y</text>
+            `;
+
+            const lineColor = isAnnotated ? '#1e3a8a' : '#111827';
+            const lineWidth = isAnnotated ? 2.2 : 1.35;
+
+            if (!isAnnotated) {
+                return `
+                    <svg viewBox="0 0 ${w} ${h}" class="graph-svg w-full h-auto block" role="img" aria-label="Linear graph option ${mode}">
+                        <rect x="0" y="0" width="${w}" height="${h}" fill="#ffffff" rx="8"/>
+                        ${axesSVG}
+                        <line x1="${p1.x.toFixed(1)}" y1="${p1.y.toFixed(1)}" x2="${p2.x.toFixed(1)}" y2="${p2.y.toFixed(1)}" stroke="${lineColor}" stroke-width="${lineWidth}" stroke-linecap="round"/>
+                        ${openArrow(p1, p2, lineColor, lineWidth)}
+                        ${openArrow(p2, p1, lineColor, lineWidth)}
+                    </svg>
+                `;
+            }
+
+            // Compute exact y-intercept point on the line where x = cx
+            const tYInt = (cx - p1.x) / (p2.x - p1.x);
+            const yIntY = p1.y + tYInt * (p2.y - p1.y);
+
+            // Compute a small rise/run gradient triangle in Quadrant I along the line
+            const tA = tYInt + 0.08;
+            const tB = tYInt + 0.30;
+            const gA = { x: p1.x + tA * (p2.x - p1.x), y: p1.y + tA * (p2.y - p1.y) };
+            const gB = { x: p1.x + tB * (p2.x - p1.x), y: p1.y + tB * (p2.y - p1.y) };
+
+            return `
+                <svg viewBox="0 0 ${w} ${h}" class="graph-svg w-full h-auto block" role="img" aria-label="Annotated graph of y = 4x + 3 showing positive y-intercept at (0, 3) and positive gradient m = 4">
+                    <rect x="0" y="0" width="${w}" height="${h}" fill="#ffffff" rx="8"/>
+                    ${axesSVG}
+
+                    <!-- Rise/Run Gradient Indicator -->
+                    <line x1="${gA.x.toFixed(1)}" y1="${gA.y.toFixed(1)}" x2="${gB.x.toFixed(1)}" y2="${gA.y.toFixed(1)}" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
+                    <line x1="${gB.x.toFixed(1)}" y1="${gA.y.toFixed(1)}" x2="${gB.x.toFixed(1)}" y2="${gB.y.toFixed(1)}" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,2"/>
+
+                    <!-- Main Line -->
+                    <line x1="${p1.x.toFixed(1)}" y1="${p1.y.toFixed(1)}" x2="${p2.x.toFixed(1)}" y2="${p2.y.toFixed(1)}" stroke="${lineColor}" stroke-width="${lineWidth}" stroke-linecap="round"/>
+                    ${openArrow(p1, p2, lineColor, lineWidth)}
+                    ${openArrow(p2, p1, lineColor, lineWidth)}
+
+                    <!-- Highlighted Positive y-intercept (0, 3) -->
+                    <circle cx="${cx}" cy="${yIntY.toFixed(1)}" r="5" fill="#10b981" stroke="#ffffff" stroke-width="1.8"/>
+                    <rect x="14" y="${(yIntY - 12).toFixed(1)}" width="102" height="21" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="1.1"/>
+                    <text x="65" y="${(yIntY + 2).toFixed(1)}" font-size="9.5" font-weight="800" text-anchor="middle" fill="#065f46">y-int: (0, 3) &gt; 0</text>
+                    <line x1="116" y1="${yIntY.toFixed(1)}" x2="${cx - 6}" y2="${yIntY.toFixed(1)}" stroke="#10b981" stroke-width="1.2" stroke-dasharray="2.5,2"/>
+
+                    <!-- Positive Gradient Badge -->
+                    <rect x="${(gB.x + 6).toFixed(1)}" y="${((gA.y + gB.y) / 2 - 14).toFixed(1)}" width="84" height="28" rx="7" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.1"/>
+                    <text x="${(gB.x + 48).toFixed(1)}" y="${((gA.y + gB.y) / 2 - 2).toFixed(1)}" font-size="9.5" font-weight="800" text-anchor="middle" fill="#1d4ed8">m = 4 &gt; 0</text>
+                    <text x="${(gB.x + 48).toFixed(1)}" y="${((gA.y + gB.y) / 2 + 10).toFixed(1)}" font-size="8.2" font-weight="700" text-anchor="middle" fill="#2563eb">Rises left → right</text>
+                </svg>
+            `;
+        }
+
+        // Render all four option SVGs and the annotated solution SVG
+        document.getElementById('graph-option-A').innerHTML = createLinearGraphSVG('A');
+        document.getElementById('graph-option-B').innerHTML = createLinearGraphSVG('B');
+        document.getElementById('graph-option-C').innerHTML = createLinearGraphSVG('C');
+        document.getElementById('graph-option-D').innerHTML = createLinearGraphSVG('D');
+        document.getElementById('graph-annotated').innerHTML = createLinearGraphSVG('annotated');
+
+        // Note: Backslashes are doubled inside JS template literals so MathJax receives valid LaTeX in the DOM.
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4 text-base">You nailed the <strong>positive gradient</strong> (the line rises upward from left to right), but look closely at where it crosses the vertical \\( y \\)-axis!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Feature Mismatch: Negative \\( y \\)-Intercept (\\( c < 0 \\))</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Option A crosses the \\( y \\)-axis <strong>below</strong> the origin, which represents a line with a negative \\( y \\)-intercept such as:</p>
+                            <div class="text-center font-medium bg-red-50 py-2 px-3 rounded border border-red-100">
+                                \\[ y = 4x - 3 \\quad (m = +4, \\; c = -3) \\]
+                            </div>
+                            <p>In our equation \\( y = 4x + 3 \\), the constant term is <strong>\\( +3 \\)</strong>, so the line must cross the \\( y \\)-axis <em>above</em> the origin at \\( (0, 3) \\).</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Quick Check:</strong> Substitute \\( x = 0 \\) into \\( y = 4x + 3 \\): \\( y = 3 > 0 \\), so the \\( y \\)-intercept sits above the \\( x \\)-axis!
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-4 text-left text-base">You matched both key features of \\( y = 4x + 3 \\) cleanly:</p>
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6 font-medium text-base text-left space-y-2">
+                            <div><strong>1. Positive gradient (\\( m = 4 > 0 \\)):</strong> The line slopes upward from left to right.</div>
+                            <div><strong>2. Positive \\( y \\)-intercept (\\( c = 3 > 0 \\)):</strong> The line crosses the \\( y \\)-axis above the origin at \\( (0, 3) \\).</div>
+                        </div>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Explore Options A, C, and D on the left to see which linear equation each graph actually represents, or walk through the solution steps to view the annotated diagram.
+                        </p>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4 text-base">You matched the <strong>positive \\( y \\)-intercept</strong> (crossing above the origin), but check the <strong>direction</strong> the line is sloping!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Feature Mismatch: Negative Gradient (\\( m < 0 \\))</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Reading from left to right, Option C slopes <strong>downward</strong>, which represents a line with a negative gradient such as:</p>
+                            <div class="text-center font-medium bg-orange-50 py-2 px-3 rounded border border-orange-100">
+                                \\[ y = -4x + 3 \\quad (m = -4, \\; c = +3) \\]
+                            </div>
+                            <p>Because \\( y = 4x + 3 \\) has a <strong>positive</strong> gradient (\\( m = +4 > 0 \\)), \\( y \\) increases as \\( x \\) increases — meaning the line must rise upward from left to right.</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Direction Tip:</strong> Always read graphs from <strong>left to right</strong> (just like reading a sentence): uphill = positive gradient, downhill = negative gradient!
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4 text-base">Both features in Option D are reversed compared to \\( y = 4x + 3 \\) — the line slopes <strong>downward</strong> and crosses the \\( y \\)-axis <strong>below</strong> the origin!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Feature Mismatch: Negative Gradient &amp; Negative \\( y \\)-Intercept</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Option D represents a line where both \\( m \\) and \\( c \\) are negative, such as:</p>
+                            <div class="text-center font-medium bg-purple-50 py-2 px-3 rounded border border-purple-100">
+                                \\[ y = -4x - 3 \\quad (m = -4, \\; c = -3) \\]
+                            </div>
+                            <p>For \\( y = 4x + 3 \\), both \\( m = +4 \\) and \\( c = +3 \\) are <strong>positive</strong>, so we need a line that rises left to right <em>and</em> crosses the \\( y \\)-axis above the origin.</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Two-Point Check:</strong> Compare \\( y = mx + c \\): check the sign of \\( m \\) (slope direction) first, then the sign of \\( c \\) (above or below the origin on the \\( y \\)-axis)!
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-green-300', 'ring-red-300');
+                    b.classList.add('border-gray-200');
+                    const badge = b.querySelector('span.absolute');
+                    badge.classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    badge.classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback
+                emptyState.classList.add('hidden');
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Style feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step solution logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
