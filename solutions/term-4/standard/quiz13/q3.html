@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Volume of a Triangular Prism</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .diagram-svg text {
+            user-select: none;
+        }
+        .math-serif {
+            font-family: 'Times New Roman', Times, serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-drafting-compass text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-4 text-gray-800 font-medium">Consider the triangular prism below.</p>
+
+                <!-- Problem Diagram Container -->
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-5 flex justify-center">
+                    <div id="prism-problem" class="w-full max-w-[360px]"></div>
+                </div>
+
+                <p class="mb-5 text-gray-800 font-medium">What is the volume of the triangular prism?</p>
+                
+                <div class="grid grid-cols-1 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( 360\text{ m}^3 \)</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( 408\text{ m}^3 \)</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( 720\text{ m}^3 \)</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( 816\text{ m}^3 \)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Worked Solution Section -->
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1: Identify the Triangular Cross-Section & Ignore the Hypotenuse -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 1: Identify the Cross-Section and Ignore the Distractor</p>
+                        <p class="text-gray-700 text-sm mb-3">The uniform cross-section of this prism is a <strong>right-angled triangle</strong> with perpendicular base \( b = 15\text{ m} \) and height \( h = 8\text{ m} \). The slanted edge of \( 17\text{ m} \) is the hypotenuse and is <strong>not</strong> used to find the area:</p>
+                        
+                        <!-- Annotated 3D Prism SVG -->
+                        <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center">
+                            <div id="prism-annotated" class="w-full max-w-[350px]"></div>
+                            <div class="flex flex-wrap justify-center gap-4 mt-2 text-xs text-gray-600">
+                                <span class="flex items-center">
+                                    <span class="w-3 h-3 rounded-sm bg-emerald-200 border border-emerald-600 inline-block mr-1.5"></span>Cross-section (\( A = 60\text{ m}^2 \))
+                                </span>
+                                <span class="flex items-center">
+                                    <span class="w-3 h-0.5 bg-blue-600 inline-block mr-1.5"></span>Depth (\( l = 6\text{ m} \))
+                                </span>
+                                <span class="flex items-center">
+                                    <span class="w-3 h-0.5 bg-red-500 inline-block mr-1.5"></span>Distractor (\( 17\text{ m} \))
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Calculate the Cross-Sectional Area -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 2: Calculate the Area of the Triangular Cross-Section</p>
+                        <p class="text-gray-700 text-sm">Use the perpendicular sides \( b = 15\text{ m} \) and \( h = 8\text{ m} \) in the area of a triangle formula \( A = \frac{1}{2}bh \):</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm font-medium overflow-x-auto text-center space-y-2">
+                            <div>\[ A = \frac{1}{2} \times b \times h = \frac{1}{2} \times 15 \times 8 \]</div>
+                            <div class="text-blue-900 font-bold text-lg border-t pt-2">\[ A = 60\text{ m}^2 \]</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Multiply by the Prism Depth to Find Volume -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 3: Multiply by the Prism Length (Depth) to Find Volume</p>
+                        <p class="text-gray-700 text-sm">The volume of any prism is given by \( V = A \times l \), where \( l = 6\text{ m} \) is the length/depth of the prism:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm overflow-x-auto text-center space-y-2">
+                            <div>\[ V = A \times l = 60 \times 6 \]</div>
+                            <div class="text-green-700 font-bold text-xl border-t pt-2">\[ V = 360\text{ m}^3 \]</div>
+                        </div>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option A is the correct choice.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to uncover the most common triangular prism volume traps.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /**
+         * Builds crisp inline SVGs of the 3D right-angled triangular prism.
+         * Modes:
+         *  - 'problem': faithful recreation of the exam diagram with dashed hidden edges,
+         *               right-angle markers, labels (17 m, 6 m, 15 m, 8 m), and "Not to scale".
+         *  - 'annotated': shades the front triangular cross-section (A = 60 m²), highlights
+         *                 the perpendicular sides (15 m, 8 m) and depth (6 m), and crosses out
+         *                 the 17 m hypotenuse distractor.
+         */
+        function createPrismSVG(mode) {
+            const isAnnotated = (mode === 'annotated');
+            const w = 350;
+            const h = 205;
+
+            // Front right-angled triangle vertices
+            const FL = { x: 82, y: 168 };  // Front-Left
+            const FR = { x: 222, y: 168 }; // Front-Right (90° corner)
+            const FT = { x: 222, y: 82 };  // Front-Top
+
+            // Back right-angled triangle vertices (shifted up-left)
+            const dx = -38;
+            const dy = -42;
+            const BL = { x: FL.x + dx, y: FL.y + dy }; // (44, 126)
+            const BR = { x: FR.x + dx, y: FR.y + dy }; // (184, 126)
+            const BT = { x: FT.x + dx, y: FT.y + dy }; // (184, 40)
+
+            // Right-angle square markers (size 9px) at FR and BR
+            const raSize = 9;
+            const raFront = `M ${FR.x - raSize},${FR.y} L ${FR.x - raSize},${FR.y - raSize} L ${FR.x},${FR.y - raSize}`;
+            const raBack  = `M ${BR.x - raSize},${BR.y} L ${BR.x - raSize},${BR.y - raSize} L ${BR.x},${BR.y - raSize}`;
+
+            if (!isAnnotated) {
+                return `
+                    <svg viewBox="0 0 ${w} ${h}" class="diagram-svg w-full h-auto block" role="img" aria-label="Triangular prism with right-angled triangle base 15 m, height 8 m, hypotenuse 17 m, and depth 6 m">
+                        <rect x="0" y="0" width="${w}" height="${h}" fill="#ffffff" rx="8"/>
+
+                        <!-- Hidden (dashed) edges -->
+                        <line x1="${BL.x}" y1="${BL.y}" x2="${BR.x}" y2="${BR.y}" stroke="#1f2937" stroke-width="1.3" stroke-dasharray="3.5,2.5"/>
+                        <line x1="${BR.x}" y1="${BR.y}" x2="${BT.x}" y2="${BT.y}" stroke="#1f2937" stroke-width="1.3" stroke-dasharray="3.5,2.5"/>
+                        <line x1="${FR.x}" y1="${FR.y}" x2="${BR.x}" y2="${BR.y}" stroke="#1f2937" stroke-width="1.3" stroke-dasharray="3.5,2.5"/>
+
+                        <!-- Right-angle markers -->
+                        <path d="${raBack}" fill="none" stroke="#1f2937" stroke-width="1.1"/>
+                        <path d="${raFront}" fill="none" stroke="#1f2937" stroke-width="1.1"/>
+
+                        <!-- Visible (solid) edges -->
+                        <polygon points="${FL.x},${FL.y} ${FR.x},${FR.y} ${FT.x},${FT.y}" fill="none" stroke="#111827" stroke-width="1.5" stroke-linejoin="round"/>
+                        <line x1="${FL.x}" y1="${FL.y}" x2="${BL.x}" y2="${BL.y}" stroke="#111827" stroke-width="1.5"/>
+                        <line x1="${FT.x}" y1="${FT.y}" x2="${BT.x}" y2="${BT.y}" stroke="#111827" stroke-width="1.5"/>
+                        <line x1="${BL.x}" y1="${BL.y}" x2="${BT.x}" y2="${BT.y}" stroke="#111827" stroke-width="1.5"/>
+
+                        <!-- Dimension Labels -->
+                        <text x="102" y="72" font-size="14" class="math-serif" text-anchor="middle" fill="#111827">17 m</text>
+                        <text x="42" y="160" font-size="14" class="math-serif" text-anchor="middle" fill="#111827">6 m</text>
+                        <text x="152" y="188" font-size="14" class="math-serif" text-anchor="middle" fill="#111827">15 m</text>
+                        <text x="242" y="130" font-size="14" class="math-serif" text-anchor="middle" fill="#111827">8 m</text>
+
+                        <!-- Not to scale label -->
+                        <text x="302" y="114" font-size="13.5" class="math-serif" text-anchor="middle" fill="#1f2937">Not to scale</text>
+                    </svg>
+                `;
+            }
+
+            // Annotated version for Step 1 of Worked Solution
+            return `
+                <svg viewBox="0 0 ${w} ${h}" class="diagram-svg w-full h-auto block" role="img" aria-label="Annotated triangular prism highlighting the shaded right-angled cross-section of area 60 square metres and crossing out the 17 m hypotenuse">
+                    <rect x="0" y="0" width="${w}" height="${h}" fill="#ffffff" rx="8"/>
+
+                    <!-- Hidden (dashed) edges -->
+                    <line x1="${BL.x}" y1="${BL.y}" x2="${BR.x}" y2="${BR.y}" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="3.5,2.5"/>
+                    <line x1="${BR.x}" y1="${BR.y}" x2="${BT.x}" y2="${BT.y}" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="3.5,2.5"/>
+                    <line x1="${FR.x}" y1="${FR.y}" x2="${BR.x}" y2="${BR.y}" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="3.5,2.5"/>
+
+                    <!-- Shaded Front Triangular Cross-Section -->
+                    <polygon points="${FL.x},${FL.y} ${FR.x},${FR.y} ${FT.x},${FT.y}" fill="#a7f3d0" fill-opacity="0.62" stroke="#059669" stroke-width="2.2" stroke-linejoin="round"/>
+
+                    <!-- Right-angle marker highlighted in emerald -->
+                    <path d="${raFront}" fill="none" stroke="#047857" stroke-width="1.5"/>
+
+                    <!-- Highlighted Depth Edge (6 m) in Blue -->
+                    <line x1="${FL.x}" y1="${FL.y}" x2="${BL.x}" y2="${BL.y}" stroke="#2563eb" stroke-width="2.6" stroke-linecap="round"/>
+                    <line x1="${FT.x}" y1="${FT.y}" x2="${BT.x}" y2="${BT.y}" stroke="#475569" stroke-width="1.5"/>
+
+                    <!-- Distractor Hypotenuse Edge (17 m) in dashed red -->
+                    <line x1="${BL.x}" y1="${BL.y}" x2="${BT.x}" y2="${BT.y}" stroke="#ef4444" stroke-width="1.8" stroke-dasharray="5,3"/>
+
+                    <!-- Cross-section Area label inside triangle -->
+                    <rect x="136" y="136" width="76" height="20" rx="5" fill="#ffffff" fill-opacity="0.9" stroke="#10b981" stroke-width="1"/>
+                    <text x="174" y="149.5" font-size="10.2" font-weight="800" text-anchor="middle" fill="#065f46">A = 60 m²</text>
+
+                    <!-- Crossed-out 17 m Distractor Badge -->
+                    <rect x="64" y="42" width="74" height="30" rx="6" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+                    <text x="101" y="55" font-size="10.5" font-weight="700" text-anchor="middle" fill="#b91c1c" text-decoration="line-through">17 m</text>
+                    <text x="101" y="67" font-size="8.2" font-weight="700" text-anchor="middle" fill="#dc2626">Slanted (skip!)</text>
+
+                    <!-- Highlighted Depth Pill (6 m) -->
+                    <rect x="14" y="147" width="46" height="20" rx="5" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.1"/>
+                    <text x="37" y="160.5" font-size="10.5" font-weight="800" text-anchor="middle" fill="#1d4ed8">l = 6 m</text>
+
+                    <!-- Highlighted Base Pill (15 m) -->
+                    <rect x="122" y="176" width="60" height="20" rx="5" fill="#ecfdf5" stroke="#10b981" stroke-width="1.1"/>
+                    <text x="152" y="189.5" font-size="10.5" font-weight="800" text-anchor="middle" fill="#065f46">b = 15 m</text>
+
+                    <!-- Highlighted Height Pill (8 m) -->
+                    <rect x="232" y="114" width="56" height="20" rx="5" fill="#ecfdf5" stroke="#10b981" stroke-width="1.1"/>
+                    <text x="260" y="127.5" font-size="10.5" font-weight="800" text-anchor="middle" fill="#065f46">h = 8 m</text>
+                </svg>
+            `;
+        }
+
+        // Inject both inline SVGs
+        document.getElementById('prism-problem').innerHTML = createPrismSVG('problem');
+        document.getElementById('prism-annotated').innerHTML = createPrismSVG('annotated');
+
+        // Note: Backslashes are doubled inside JS template literals so MathJax receives valid LaTeX in the DOM.
+        const feedbackData = {
+            'A': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-4 text-left text-base">You ignored the slanted \\( 17\\text{ m} \\) hypotenuse, used the two perpendicular sides (\\( 15\\text{ m} \\) and \\( 8\\text{ m} \\)) to find the triangular cross-section, and multiplied by the prism depth \\( 6\\text{ m} \\):</p>
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6 font-medium text-base space-y-2">
+                            <div>\\[ A = \\frac{1}{2} \\times 15 \\times 8 = 60\\text{ m}^2 \\]</div>
+                            <div class="text-green-700 font-bold text-xl border-t pt-2">\\[ V = 60 \\times 6 = 360\\text{ m}^3 \\]</div>
+                        </div>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Explore Options B, C, and D on the left to see the exact distractor traps built into this question, or walk through the solution steps to view the annotated cross-section diagram.
+                        </p>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4 text-base">You remembered the \\( \\frac{1}{2} \\) for the triangle's area and multiplied by the depth \\( 6\\text{ m} \\), but you used the <strong>slanted hypotenuse (\\( 17\\text{ m} \\))</strong> instead of the <strong>perpendicular base (\\( 15\\text{ m} \\))</strong>!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Misconception: Using the Slanted Hypotenuse Instead of the Perpendicular Base</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Look at how \\( 408\\text{ m}^3 \\) is produced:</p>
+                            <div class="text-center font-medium bg-red-50 py-2 px-3 rounded border border-red-100">
+                                \\[ \\text{Incorrect: } \\frac{1}{2} \\times 17 \\times 8 \\times 6 = 408\\text{ m}^3 \\]
+                            </div>
+                            <p>The area formula \\( A = \\frac{1}{2}bh \\) requires two sides that meet at a <strong>\\( 90^\\circ \\) right angle</strong>. Look at the right-angle square on the diagram — it sits between \\( 15\\text{ m} \\) and \\( 8\\text{ m} \\):</p>
+                            <div class="text-center font-bold text-red-800 bg-red-50 py-2 px-3 rounded border border-red-100">
+                                \\[ \\text{Correct: } \\frac{1}{2} \\times 15 \\times 8 \\times 6 = 360\\text{ m}^3 \\]
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Right-Angle Tip:</strong> Always find the little right-angle square first — the two edges touching that square are your \\( b \\) and \\( h \\)!
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4 text-base">You picked the exact right three dimensions (\\( 15\\text{ m} \\), \\( 8\\text{ m} \\), and \\( 6\\text{ m} \\)) and ignored the \\( 17\\text{ m} \\) distractor, but you forgot the <strong>\\( \\frac{1}{2} \\)</strong> in the area of a triangle!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Misconception: Using the Rectangular Prism Formula (\\( V = lwh \\))</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Multiplying \\( 15 \\times 8 \\times 6 = 720\\text{ m}^3 \\) gives the volume of a full <strong>rectangular prism</strong> — which is exactly <em>double</em> the volume of our triangular wedge:</p>
+                            <div class="text-center font-medium bg-orange-50 py-2 px-3 rounded border border-orange-100">
+                                \\[ \\text{Rectangular prism: } 15 \\times 8 \\times 6 = 720\\text{ m}^3 \\]
+                            </div>
+                            <p>Because the cross-section is a triangle (\\( A = \\frac{1}{2}bh \\)), we must halve that result:</p>
+                            <div class="text-center font-bold text-orange-800 bg-orange-50 py-2 px-3 rounded border border-orange-100">
+                                \\[ \\text{Triangular prism: } \\frac{1}{2} \\times 15 \\times 8 \\times 6 = 360\\text{ m}^3 \\]
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Visual Check:</strong> A right-angled triangular prism is literally a rectangular prism sliced diagonally in half!
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4 text-base">This option combines <strong>both</strong> classic triangular prism traps: forgetting the \\( \\frac{1}{2} \\) in the triangle's area <em>and</em> using the slanted \\( 17\\text{ m} \\) hypotenuse instead of \\( 15\\text{ m} \\)!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Misconception: Missing \\( \\frac{1}{2} \\) &amp; Using the Slanted Hypotenuse (\\( 17\\text{ m} \\))</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Look at how \\( 816\\text{ m}^3 \\) arises:</p>
+                            <div class="text-center font-medium bg-purple-50 py-2 px-3 rounded border border-purple-100">
+                                \\[ \\text{Incorrect: } 17 \\times 8 \\times 6 = 816\\text{ m}^3 \\]
+                            </div>
+                            <p>To fix both errors, use the two <strong>perpendicular</strong> sides at the right-angle corner (\\( 15\\text{ m} \\) and \\( 8\\text{ m} \\)) and include the \\( \\frac{1}{2} \\) for the triangle's area:</p>
+                            <div class="text-center font-bold text-purple-800 bg-purple-50 py-2 px-3 rounded border border-purple-100">
+                                \\[ \\text{Correct: } V = \\left(\\frac{1}{2} \\times 15 \\times 8\\right) \\times 6 = 60 \\times 6 = 360\\text{ m}^3 \\]
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Two-Step Habit:</strong> (1) Ignore the slanted hypotenuse when finding volume, and (2) never forget the \\( \\frac{1}{2} \\) in \\( A = \\frac{1}{2}bh \\)!
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-green-300', 'ring-red-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback
+                emptyState.classList.add('hidden');
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Style feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step solution logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
