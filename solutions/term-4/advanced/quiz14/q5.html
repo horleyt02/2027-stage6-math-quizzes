@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Kinematics &amp; Velocity</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .graph-svg text {
+            user-select: none;
+        }
+        .axis-label {
+            font-family: 'Times New Roman', Times, serif;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-drafting-compass text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-3 text-gray-800 font-medium">A particle is moving in a straight line.</p>
+                <p class="mb-3 text-gray-800 font-medium">
+                    At time \( t \) seconds it has displacement \( x \) metres from a fixed point \( O \) on the line and velocity \( v\text{ ms}^{-1} \). The displacement is given by:
+                </p>
+                
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-5 text-center text-xl">
+                    \[ x = \frac{16t}{2t + 1} \]
+                </div>
+
+                <p class="mb-5 text-gray-800 font-medium">
+                    What is the time (in seconds) taken for the speed of the particle to equal \( 1\text{ ms}^{-1} \)?
+                </p>
+                
+                <div class="grid grid-cols-1 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( \dfrac{1}{2} \)</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( \dfrac{3}{2} \)</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( 2 \)</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( \dfrac{5}{2} \)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Worked Solution Section -->
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1: Differentiate Using the Quotient Rule -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 1: Find the Velocity \( v = \dfrac{dx}{dt} \) Using the Quotient Rule</p>
+                        <p class="text-gray-700 text-sm">Velocity is the derivative of displacement with respect to time. Apply the Quotient Rule \( \dfrac{d}{dt}\!\left(\dfrac{u}{w}\right) = \dfrac{wu' - uw'}{w^2} \) with \( u = 16t \) and \( w = 2t + 1 \):</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto space-y-2">
+                            <div class="text-sm text-gray-600">\( u' = 16 \) &nbsp; and &nbsp; \( w' = 2 \)</div>
+                            <div>\[ v = \frac{dx}{dt} = \frac{(2t + 1)(16) - (16t)(2)}{(2t + 1)^2} \]</div>
+                            <div>\[ v = \frac{32t + 16 - 32t}{(2t + 1)^2} \]</div>
+                            <div class="text-blue-900 font-bold text-lg border-t pt-2">\[ v = \frac{16}{(2t + 1)^2} \]</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Set Speed Equal to 1 and Solve for t -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 2: Set Speed Equal to \( 1\text{ ms}^{-1} \) and Solve for \( t \)</p>
+                        <p class="text-gray-700 text-sm">Since \( v = \dfrac{16}{(2t + 1)^2} > 0 \) for all \( t \ge 0 \), the speed \( |v| \) is simply equal to \( v \). Set \( v = 1 \):</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm font-medium overflow-x-auto text-center space-y-2">
+                            <div>\[ \frac{16}{(2t + 1)^2} = 1 \implies (2t + 1)^2 = 16 \]</div>
+                            <div>\[ 2t + 1 = \pm 4 \]</div>
+                            <div class="text-sm text-gray-700 border-t pt-2 space-y-1">
+                                <div>\( 2t + 1 = 4 \implies 2t = 3 \implies t = \dfrac{3}{2} \) &nbsp;<span class="text-emerald-700 font-semibold">(valid, \( t \ge 0 \))</span></div>
+                                <div class="text-gray-400 line-through">\( 2t + 1 = -4 \implies 2t = -5 \implies t = -\dfrac{5}{2} \)</div>
+                                <div class="text-xs text-red-600">(rejected since time \( t \ge 0 \))</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Velocity-Time Graph & Conclusion -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 3: Visualise the Velocity-Time Graph</p>
+                        <p class="text-gray-700 text-sm mb-3">Starting from an initial velocity of \( v(0) = 16\text{ ms}^{-1} \), the particle decelerates smoothly along \( v = \frac{16}{(2t + 1)^2} \), crossing the horizontal line \( v = 1\text{ ms}^{-1} \) at exactly \( t = \frac{3}{2}\text{ s} \):</p>
+                        
+                        <!-- Inline SVG Velocity-Time Graph -->
+                        <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center">
+                            <div id="velocity-graph-diagram" class="w-full max-w-[345px]"></div>
+                            <div class="flex flex-wrap justify-center gap-4 mt-2 text-xs text-gray-600">
+                                <span class="flex items-center"><span class="w-3.5 h-0.5 bg-blue-600 inline-block mr-1.5"></span>\( v = \frac{16}{(2t + 1)^2} \)</span>
+                                <span class="flex items-center"><span class="w-3.5 h-0.5 border-t-2 border-dashed border-orange-500 inline-block mr-1.5"></span>\( v = 1\text{ ms}^{-1} \)</span>
+                                <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block mr-1.5"></span>\( \left(\frac{3}{2}, 1\right) \)</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-3 shadow-sm overflow-x-auto text-center">
+                            <div class="text-green-700 font-bold text-xl">\[ t = \frac{3}{2}\text{ seconds} \]</div>
+                        </div>
+                        <p class="mt-2 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option B is the correct choice.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to uncover common Quotient Rule and equation-solving traps in kinematics.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /**
+         * Builds a crisp inline SVG velocity-time graph of v = 16 / (2t + 1)^2
+         * over t in [0, 3.2] and v in [0, 5], highlighting the intersection with
+         * the horizontal line v = 1 at t = 3/2 (1.5 s).
+         */
+        function createVelocityGraphSVG() {
+            const w = 345;
+            const h = 210;
+            const padL = 44;
+            const padR = 24;
+            const padT = 24;
+            const padB = 38;
+
+            const plotW = w - padL - padR; // 277
+            const plotH = h - padT - padB; // 148
+
+            const tMax = 3.2;
+            const vMax = 5.0;
+
+            const toX = (t) => padL + (t / tMax) * plotW;
+            const toY = (v) => padT + plotH - (v / vMax) * plotH;
+
+            // Sample v = 16 / (2t + 1)^2 from where v = 5 (t ≈ 0.394) to t = 3.1
+            const tStart = (Math.sqrt(16 / vMax) - 1) / 2;
+            const tEnd = 3.1;
+            const steps = 100;
+            const pts = [];
+            for (let i = 0; i <= steps; i++) {
+                const t = tStart + (tEnd - tStart) * (i / steps);
+                const v = 16 / Math.pow(2 * t + 1, 2);
+                pts.push(`${toX(t).toFixed(2)},${toY(v).toFixed(2)}`);
+            }
+            const curvePath = `M ${pts.join(' L ')}`;
+
+            // Gridlines & axis ticks
+            let gridSVG = '';
+            for (let v = 1; v <= 5; v++) {
+                const py = toY(v).toFixed(1);
+                gridSVG += `
+                    <line x1="${padL}" y1="${py}" x2="${w - padR}" y2="${py}" stroke="#f1f5f9" stroke-width="1"/>
+                    <line x1="${padL - 3.5}" y1="${py}" x2="${padL}" y2="${py}" stroke="#475569" stroke-width="1.1"/>
+                    <text x="${padL - 8}" y="${(parseFloat(py) + 3.5).toFixed(1)}" font-size="9.5" font-weight="600" text-anchor="end" fill="#64748b">${v}</text>
+                `;
+            }
+
+            const tTicks = [
+                { val: 0.5, label: '½' },
+                { val: 1.0, label: '1' },
+                { val: 1.5, label: '3/2' },
+                { val: 2.0, label: '2' },
+                { val: 2.5, label: '5/2' },
+                { val: 3.0, label: '3' }
+            ];
+            tTicks.forEach(tk => {
+                const px = toX(tk.val).toFixed(1);
+                const isAnswer = (tk.val === 1.5);
+                gridSVG += `
+                    <line x1="${px}" y1="${padT}" x2="${px}" y2="${toY(0).toFixed(1)}" stroke="#f1f5f9" stroke-width="1"/>
+                    <line x1="${px}" y1="${toY(0).toFixed(1)}" x2="${px}" y2="${(toY(0) + 3.5).toFixed(1)}" stroke="${isAnswer ? '#059669' : '#475569'}" stroke-width="${isAnswer ? '1.6' : '1.1'}"/>
+                    <text x="${px}" y="${(toY(0) + 16).toFixed(1)}" font-size="${isAnswer ? '10.5' : '9.2'}" font-weight="${isAnswer ? '800' : '600'}" text-anchor="middle" fill="${isAnswer ? '#065f46' : '#64748b'}">${tk.label}</text>
+                `;
+            });
+
+            const xAns = toX(1.5);
+            const yAns = toY(1);
+            const y0 = toY(0);
+
+            return `
+                <svg viewBox="0 0 ${w} ${h}" class="graph-svg w-full h-auto block" role="img" aria-label="Velocity-time graph of v = 16 / (2t + 1)^2 intersecting v = 1 at t = 3/2">
+                    <defs>
+                        <marker id="drop-arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto">
+                            <path d="M 0 1 L 10 5 L 0 9 z" fill="#059669"/>
+                        </marker>
+                    </defs>
+
+                    <rect x="0" y="0" width="${w}" height="${h}" fill="#ffffff" rx="8"/>
+
+                    ${gridSVG}
+
+                    <!-- Origin label -->
+                    <text x="${padL - 8}" y="${(y0 + 13).toFixed(1)}" font-size="9.5" font-weight="600" text-anchor="end" fill="#64748b">0</text>
+
+                    <!-- Axes -->
+                    <line x1="${padL}" y1="${y0.toFixed(1)}" x2="${w - padR + 8}" y2="${y0.toFixed(1)}" stroke="#334155" stroke-width="1.3"/>
+                    <polygon points="${w - padR + 14},${y0.toFixed(1)} ${w - padR + 7},${(y0 - 3.3).toFixed(1)} ${w - padR + 7},${(y0 + 3.3).toFixed(1)}" fill="#334155"/>
+                    <text x="${w - padR + 10}" y="${(y0 + 15).toFixed(1)}" font-size="11.5" class="axis-label" text-anchor="middle" fill="#334155">t</text>
+
+                    <line x1="${padL}" y1="${y0.toFixed(1)}" x2="${padL}" y2="${padT - 8}" stroke="#334155" stroke-width="1.3"/>
+                    <polygon points="${padL},${padT - 14} ${padL - 3.3},${padT - 7} ${padL + 3.3},${padT - 7}" fill="#334155"/>
+                    <text x="${padL - 12}" y="${padT - 5}" font-size="11.5" class="axis-label" text-anchor="middle" fill="#334155">v</text>
+
+                    <!-- Horizontal line v = 1 -->
+                    <line x1="${padL}" y1="${yAns.toFixed(1)}" x2="${w - padR}" y2="${yAns.toFixed(1)}" stroke="#f97316" stroke-width="1.8" stroke-dasharray="5,3.5"/>
+                    <text x="${(toX(2.85)).toFixed(1)}" y="${(yAns - 6).toFixed(1)}" font-size="9.5" font-weight="700" text-anchor="middle" fill="#ea580c">v = 1 ms⁻¹</text>
+
+                    <!-- Velocity curve v = 16 / (2t + 1)^2 -->
+                    <path d="${curvePath}" fill="none" stroke="#2563eb" stroke-width="2.4" stroke-linecap="round"/>
+
+                    <!-- Note near top of curve indicating v(0) = 16 -->
+                    <text x="${(toX(tStart) + 6).toFixed(1)}" y="${padT + 10}" font-size="8.8" font-weight="600" fill="#2563eb">↑ from (0, 16)</text>
+
+                    <!-- Vertical dashed drop arrow from (3/2, 1) to t = 3/2 -->
+                    <line x1="${xAns.toFixed(1)}" y1="${(yAns + 5).toFixed(1)}" x2="${xAns.toFixed(1)}" y2="${(y0 - 4).toFixed(1)}" stroke="#059669" stroke-width="1.9" stroke-dasharray="3.5,2.5" marker-end="url(#drop-arrow)"/>
+
+                    <!-- Intersection Point (3/2, 1) -->
+                    <circle cx="${xAns.toFixed(1)}" cy="${yAns.toFixed(1)}" r="5" fill="#10b981" stroke="#ffffff" stroke-width="1.8"/>
+
+                    <!-- Callout Pill -->
+                    <rect x="${(xAns + 8).toFixed(1)}" y="${(yAns - 29).toFixed(1)}" width="74" height="19" rx="9" fill="#ecfdf5" stroke="#10b981" stroke-width="1.1"/>
+                    <text x="${(xAns + 45).toFixed(1)}" y="${(yAns - 16.5).toFixed(1)}" font-size="9.5" font-weight="700" text-anchor="middle" fill="#065f46">t = 3/2, v = 1</text>
+
+                    <!-- Axis caption -->
+                    <text x="${(padL + (w - padR)) / 2}" y="${h - 4}" font-size="9.5" font-weight="600" text-anchor="middle" fill="#475569">Time t (seconds)</text>
+                </svg>
+            `;
+        }
+
+        // Inject the velocity-time graph SVG into Step 3
+        document.getElementById('velocity-graph-diagram').innerHTML = createVelocityGraphSVG();
+
+        // Note: Backslashes are doubled inside JS template literals so MathJax receives valid LaTeX in the DOM.
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4 text-base">Getting \\( t = \\frac{1}{2} \\) usually comes from dropping a factor of \\( 4 \\) during differentiation (solving \\( (2t + 1)^2 = 4 \\)) or accidentally setting the denominator \\( 2t + 1 = 0 \\) and ignoring the minus sign!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Misconception: Quotient Rule Slip or Denominator Trap</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Check the Quotient Rule numerator carefully — the \\( 32t \\) terms cancel, leaving \\( 16 \\), not \\( 4 \\):</p>
+                            <div class="text-center font-medium bg-red-50 py-2 px-3 rounded border border-red-100">
+                                \\[ v = \\frac{(2t + 1)(16) - (16t)(2)}{(2t + 1)^2} = \\frac{32t + 16 - 32t}{(2t + 1)^2} = \\frac{16}{(2t + 1)^2} \\]
+                            </div>
+                            <p>Now test \\( t = \\frac{1}{2} \\) in the true velocity formula:</p>
+                            <div class="text-center font-medium bg-red-50 py-2 px-3 rounded border border-red-100">
+                                \\[ v\\!\\left(\\frac{1}{2}\\right) = \\frac{16}{(2(\\frac{1}{2}) + 1)^2} = \\frac{16}{2^2} = 4\\text{ ms}^{-1} \\neq 1\\text{ ms}^{-1} \\]
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Check the Square Root:</strong> Since \\( (2t + 1)^2 = 16 \\), taking the positive square root gives \\( 2t + 1 = 4 \\implies t = \\frac{3}{2} \\).
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-4 text-left text-base">You applied the Quotient Rule cleanly, set \\( v = 1 \\), and solved for the valid positive time \\( t \\ge 0 \\):</p>
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6 font-medium text-base space-y-2">
+                            <div>\\[ v = \\frac{dx}{dt} = \\frac{16}{(2t + 1)^2} = 1 \\]</div>
+                            <div>\\[ (2t + 1)^2 = 16 \\implies 2t + 1 = 4 \\quad (\\text{since } t \\ge 0) \\]</div>
+                            <div class="text-green-700 font-bold text-xl border-t pt-2">\\[ t = \\frac{3}{2}\\text{ s} \\]</div>
+                        </div>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Explore Options A, C, and D on the left to see the most common Quotient Rule and algebraic traps, or walk through the solution steps to view the velocity-time graph.
+                        </p>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4 text-base">You got all the way to \\( 2t + 1 = 4 \\) (or \\( \\sqrt{16} = 4 \\)), but it looks like the <strong>\\( +1 \\)</strong> was dropped when solving for \\( t \\)!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Misconception: Dropping the \\( +1 \\) in \\( 2t + 1 = 4 \\)</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Solving \\( 2t = 4 \\) gives \\( t = 2 \\), but the denominator is \\( 2t + 1 \\), not \\( 2t \\). Subtract \\( 1 \\) from both sides before dividing by \\( 2 \\):</p>
+                            <div class="text-center font-bold text-orange-800 bg-orange-50 py-2 px-3 rounded border border-orange-100">
+                                \\[ 2t + 1 = 4 \\implies 2t = 3 \\implies t = \\frac{3}{2} \\]
+                            </div>
+                            <p>Substituting \\( t = 2 \\) back into the velocity formula confirms it is too slow:</p>
+                            <div class="text-center font-medium bg-orange-50 py-2 px-3 rounded border border-orange-100">
+                                \\[ v(2) = \\frac{16}{(2(2) + 1)^2} = \\frac{16}{25} = 0.64\\text{ ms}^{-1} \\neq 1\\text{ ms}^{-1} \\]
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Quick Check:</strong> Always substitute your value of \\( t \\) back into \\( (2t + 1)^2 \\) to verify it equals \\( 16 \\)!
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4 text-base">You found the exact right equation \\( (2t + 1)^2 = 16 \\), but a <strong>sign error</strong> turned \\( t = \\frac{3}{2} \\) into \\( \\frac{5}{2} \\)!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Misconception: Adding \\( 1 \\) Instead of Subtracting \\( 1 \\) (or Taking \\( |-\\frac{5}{2}| \\))</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>This happens in one of two ways:</p>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Adding \\( 1 \\) instead of subtracting \\( 1 \\) when solving \\( 2t + 1 = 4 \\) (writing \\( 2t = 5 \\implies t = \\frac{5}{2} \\)).</li>
+                                <li>Solving the negative square root \\( 2t + 1 = -4 \\implies t = -\\frac{5}{2} \\) and simply dropping the negative sign.</li>
+                            </ul>
+                            <div class="text-center font-bold text-purple-800 bg-purple-50 py-2 px-3 rounded border border-purple-100">
+                                \\[ 2t + 1 = 4 \\implies 2t = 4 - 1 = 3 \\implies t = \\frac{3}{2} \\]
+                            </div>
+                            <p>Notice that at \\( t = \\frac{5}{2} \\), the velocity is only \\( v = \\frac{16}{(5 + 1)^2} = \\frac{16}{36} = \\frac{4}{9}\\text{ ms}^{-1} \\neq 1 \\).</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Sign Tip:</strong> We reject \\( t = -\\frac{5}{2} \\) completely (we don't reverse its sign to make it positive) — the physical solution comes from the \\( +4 \\) branch!
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-green-300', 'ring-red-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback
+                emptyState.classList.add('hidden');
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Style feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step solution logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

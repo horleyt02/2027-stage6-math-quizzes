@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Cumulative Frequency &amp; Median</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .graph-svg text {
+            user-select: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-drafting-compass text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-4 text-gray-800 font-medium">
+                    Below are the cumulative frequency histogram and polygon (ogive) showing the scores of \( 100 \) students.
+                </p>
+
+                <!-- Problem Graph Container -->
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-5 flex justify-center">
+                    <div id="graph-problem" class="w-full max-w-[440px]"></div>
+                </div>
+
+                <p class="mb-5 text-gray-800 font-medium">
+                    Based on this graph, what is the median test score?
+                </p>
+                
+                <div class="grid grid-cols-1 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( 40 \)</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( 50 \)</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( 55 \)</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( 60 \)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Worked Solution Section -->
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1: Find the Median Position on the Cumulative Frequency Axis -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 1: Find the Median Position on the Vertical Axis</p>
+                        <p class="text-gray-700 text-sm">The median is the \( 50\text{th} \) percentile — the test score at which half of the total number of students sit below and half sit above. Since there are \( N = 100 \) students in total:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto space-y-1">
+                            <div>\[ \text{Median position} = 50\% \text{ of } 100 = \frac{100}{2} = 50 \]</div>
+                            <div class="text-blue-900 text-sm font-semibold">Start at Cumulative Frequency \( = 50 \) on the vertical (\( y \)) axis.</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Trace Across to the Ogive and Down to the Horizontal Axis -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 2: Trace Across to the Ogive and Down to the Test Score</p>
+                        <p class="text-gray-700 text-sm mb-3">Draw a horizontal line from \( \text{CF} = 50 \) across until it meets the red ogive curve, which hits the exact plotted point \( (60, 50) \). Then drop vertically down to the horizontal axis:</p>
+                        
+                        <!-- Annotated Ogive SVG -->
+                        <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center">
+                            <div id="graph-annotated" class="w-full max-w-[420px]"></div>
+                            <div class="flex flex-wrap justify-center gap-4 mt-2 text-xs text-gray-600">
+                                <span class="flex items-center">
+                                    <span class="w-3.5 h-0.5 border-t-2 border-dashed border-emerald-600 inline-block mr-1.5"></span>Median trace (\( \text{CF} = 50 \to \text{Score} = 60 \))
+                                </span>
+                                <span class="flex items-center">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block mr-1.5"></span>Intersection \( (60, 50) \)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Read Off the Median Test Score -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 3: State the Median Test Score</p>
+                        <p class="text-gray-700 text-sm">The vertical drop line lands directly on \( 60 \) on the Test Score axis, meaning \( 50 \) students scored \( 60 \) or below and \( 50 \) students scored above \( 60 \):</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm overflow-x-auto text-center">
+                            <div class="text-green-700 font-bold text-xl">\[ \text{Median Test Score} = 60 \]</div>
+                        </div>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option D is the correct choice.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to uncover the most common mistakes when reading the median from an ogive.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /**
+         * Builds a crisp inline SVG of the Cumulative Frequency Histogram and Ogive.
+         * Modes:
+         *  - 'problem': faithful recreation of the exam chart with legend and labelled coordinates.
+         *  - 'annotated': overlays the emerald dashed trace from CF = 50 -> (60, 50) -> Score = 60.
+         */
+        function createOgiveSVG(mode) {
+            const isAnnotated = (mode === 'annotated');
+            const w = 440;
+            const h = 315;
+            const padL = 56;
+            const padR = 26;
+            const padT = 36;
+            const padB = 46;
+
+            const plotW = w - padL - padR; // 358
+            const plotH = h - padT - padB; // 233
+
+            // X range: 25 to 85 (so bars from 30 to 80 have clean side margins)
+            const xMin = 25;
+            const xMax = 85;
+            // Y range: 0 to 110 (so 100 sits cleanly below the top)
+            const yMin = 0;
+            const yMax = 110;
+
+            const toX = (val) => padL + ((val - xMin) / (xMax - xMin)) * plotW;
+            const toY = (val) => padT + plotH - ((val - yMin) / (yMax - yMin)) * plotH;
+
+            // Histogram bars: [xStart, xEnd, height]
+            const bars = [
+                [30, 40, 10],
+                [40, 50, 30],
+                [50, 60, 50],
+                [60, 70, 85],
+                [70, 80, 100]
+            ];
+
+            // Ogive points: [score, cf]
+            const ogivePts = [
+                [30, 0],
+                [40, 10],
+                [50, 30],
+                [60, 50],
+                [70, 85],
+                [80, 100]
+            ];
+
+            // Gridlines & axis ticks
+            let gridSVG = '';
+            for (let y = 0; y <= 100; y += 10) {
+                const py = toY(y).toFixed(1);
+                if (y > 0) {
+                    gridSVG += `<line x1="${padL}" y1="${py}" x2="${w - padR}" y2="${py}" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,3"/>`;
+                }
+                gridSVG += `<line x1="${padL - 4}" y1="${py}" x2="${padL}" y2="${py}" stroke="#334155" stroke-width="1.1"/>`;
+                gridSVG += `<text x="${padL - 8}" y="${(parseFloat(py) + 3.5).toFixed(1)}" font-size="10" text-anchor="end" fill="#334155">${y}</text>`;
+            }
+
+            for (let x = 30; x <= 80; x += 10) {
+                const px = toX(x).toFixed(1);
+                gridSVG += `<line x1="${px}" y1="${padT}" x2="${px}" y2="${toY(0).toFixed(1)}" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,3"/>`;
+                gridSVG += `<line x1="${px}" y1="${toY(0).toFixed(1)}" x2="${px}" y2="${(toY(0) + 4).toFixed(1)}" stroke="#334155" stroke-width="1.1"/>`;
+                gridSVG += `<text x="${px}" y="${(toY(0) + 17).toFixed(1)}" font-size="10" text-anchor="middle" fill="#334155">${x}</text>`;
+            }
+
+            // Histogram bars SVG
+            let barsSVG = '';
+            bars.forEach(([x1, x2, height]) => {
+                const bx = toX(x1);
+                const bw = toX(x2) - bx;
+                const by = toY(height);
+                const bh = toY(0) - by;
+                barsSVG += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" fill="#a3d2e8" fill-opacity="${isAnnotated ? '0.62' : '0.88'}" stroke="#1e4e68" stroke-width="1.2"/>`;
+            });
+
+            // Ogive polyline path
+            const ogivePath = 'M ' + ogivePts.map(([x, y]) => `${toX(x).toFixed(1)},${toY(y).toFixed(1)}`).join(' L ');
+
+            // Ogive points and coordinate labels
+            let pointsSVG = '';
+            ogivePts.forEach(([x, y], idx) => {
+                const px = toX(x);
+                const py = toY(y);
+                pointsSVG += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3.6" fill="#dc2626"/>`;
+                if (idx > 0) {
+                    // Place coordinate label slightly up-left of each point, matching the image
+                    const lx = (x === 80) ? px - 18 : px - 16;
+                    const ly = py - 9;
+                    pointsSVG += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="9" font-weight="600" text-anchor="middle" fill="#1e3a5f">(${x}, ${y})</text>`;
+                }
+            });
+
+            // Legend box in top-left (for problem mode)
+            const legendSVG = !isAnnotated ? `
+                <rect x="${padL + 8}" y="${padT + 6}" width="166" height="36" rx="4" fill="#ffffff" fill-opacity="0.94" stroke="#cbd5e1" stroke-width="1"/>
+                <line x1="${padL + 15}" y1="${padT + 18}" x2="${padL + 33}" y2="${padT + 18}" stroke="#dc2626" stroke-width="2.2"/>
+                <circle cx="${padL + 24}" cy="${padT + 18}" r="3" fill="#dc2626"/>
+                <text x="${padL + 39}" y="${padT + 21}" font-size="8.6" fill="#1f2937">Ogive (Cumulative Frequency Curve)</text>
+                <rect x="${padL + 16}" y="${padT + 28}" width="16" height="8" fill="#a3d2e8" stroke="#1e4e68" stroke-width="1"/>
+                <text x="${padL + 39}" y="${padT + 35}" font-size="8.6" fill="#1f2937">Cumulative Frequency Histogram</text>
+            ` : '';
+
+            // Annotated median trace overlay (CF = 50 -> (60, 50) -> Score = 60)
+            let annotationSVG = '';
+            if (isAnnotated) {
+                const x60 = toX(60);
+                const y50 = toY(50);
+                const y0 = toY(0);
+
+                annotationSVG = `
+                    <defs>
+                        <marker id="med-arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 1 L 10 5 L 0 9 z" fill="#059669"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Horizontal dashed arrow from CF = 50 to (60, 50) -->
+                    <line x1="${padL}" y1="${y50.toFixed(1)}" x2="${(x60 - 6).toFixed(1)}" y2="${y50.toFixed(1)}" stroke="#059669" stroke-width="2.4" stroke-dasharray="6,3.5" marker-end="url(#med-arrow)"/>
+
+                    <!-- Vertical dashed arrow from (60, 50) down to Score = 60 -->
+                    <line x1="${x60.toFixed(1)}" y1="${(y50 + 5).toFixed(1)}" x2="${x60.toFixed(1)}" y2="${(y0 - 5).toFixed(1)}" stroke="#059669" stroke-width="2.4" stroke-dasharray="6,3.5" marker-end="url(#med-arrow)"/>
+
+                    <!-- Highlighted Intersection Dot at (60, 50) -->
+                    <circle cx="${x60.toFixed(1)}" cy="${y50.toFixed(1)}" r="5.5" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
+
+                    <!-- Badge: 50% of 100 = 50 -->
+                    <rect x="${padL + 10}" y="${(y50 - 25).toFixed(1)}" width="112" height="19" rx="9" fill="#ecfdf5" stroke="#10b981" stroke-width="1.1"/>
+                    <text x="${padL + 66}" y="${(y50 - 12.5).toFixed(1)}" font-size="9.5" font-weight="700" text-anchor="middle" fill="#065f46">50% of 100 = 50</text>
+
+                    <!-- Badge: Median = 60 -->
+                    <rect x="${(x60 + 8).toFixed(1)}" y="${(y0 - 30).toFixed(1)}" width="78" height="20" rx="10" fill="#059669"/>
+                    <text x="${(x60 + 47).toFixed(1)}" y="${(y0 - 16.5).toFixed(1)}" font-size="9.8" font-weight="700" text-anchor="middle" fill="#ffffff">Median = 60</text>
+                `;
+            }
+
+            return `
+                <svg viewBox="0 0 ${w} ${h}" class="graph-svg w-full h-auto block" role="img" aria-label="Cumulative frequency histogram and ogive of test scores">
+                    <rect x="0" y="0" width="${w}" height="${h}" fill="#ffffff" rx="8"/>
+
+                    <!-- Chart Title -->
+                    <text x="${(padL + (w - padR)) / 2}" y="20" font-size="11.5" font-weight="700" text-anchor="middle" fill="#111827">Cumulative Frequency Histogram and Ogive of Test Scores</text>
+
+                    <!-- Grid & Ticks -->
+                    ${gridSVG}
+
+                    <!-- Histogram Bars -->
+                    ${barsSVG}
+
+                    <!-- Axes -->
+                    <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${toY(0).toFixed(1)}" stroke="#1f2937" stroke-width="1.4"/>
+                    <line x1="${padL}" y1="${toY(0).toFixed(1)}" x2="${w - padR}" y2="${toY(0).toFixed(1)}" stroke="#1f2937" stroke-width="1.4"/>
+
+                    <!-- Axis Labels -->
+                    <text x="${(padL + (w - padR)) / 2}" y="${h - 10}" font-size="10.5" font-weight="600" text-anchor="middle" fill="#1f2937">Test Score</text>
+                    <text x="15" y="${padT + plotH / 2}" font-size="10.5" font-weight="600" text-anchor="middle" fill="#1f2937" transform="rotate(-90, 15, ${padT + plotH / 2})">Cumulative Frequency (Number of Students)</text>
+
+                    <!-- Ogive Curve & Points -->
+                    <path d="${ogivePath}" fill="none" stroke="#dc2626" stroke-width="2.4" stroke-linejoin="round"/>
+                    ${pointsSVG}
+
+                    <!-- Legend or Median Trace Overlay -->
+                    ${legendSVG}
+                    ${annotationSVG}
+                </svg>
+            `;
+        }
+
+        // Inject both inline SVGs
+        document.getElementById('graph-problem').innerHTML = createOgiveSVG('problem');
+        document.getElementById('graph-annotated').innerHTML = createOgiveSVG('annotated');
+
+        // Note: Backslashes are doubled inside JS template literals so MathJax receives valid LaTeX in the DOM.
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4 text-base">It looks like you found the halfway score between \\( 30 \\) and \\( 80 \\) (which is \\( 55 \\)), and then read <strong>up</strong> to the ogive to get a cumulative frequency of \\( 40 \\)!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Misconception: Reading the Ogive in the Wrong Direction</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Look at what happens when you start on the <strong>horizontal axis</strong> instead of the vertical axis:</p>
+                            <div class="text-center font-medium bg-red-50 py-2 px-3 rounded border border-red-100">
+                                \\[ \\text{Midpoint of } [30, 80] = \\frac{30 + 80}{2} = 55 \\]\\[\\longrightarrow\\; \\text{Ogive at } 55 \\text{ gives CF} = 40 \\]
+                            </div>
+                            <p>That tells you how many students scored \\( 55 \\) or less (\\( 40 \\) students), <em>not</em> the median test score! To find the median from an ogive, always start on the <strong>vertical (Cumulative Frequency) axis</strong> at \\( 50\\% \\) of the total students:</p>
+                            <div class="text-center font-bold text-red-800 bg-red-50 py-2 px-3 rounded border border-red-100">
+                                \\[ \\text{CF} = 50 \\;\\longrightarrow\\; (60, 50) \\;\\longrightarrow\\; \\text{Median Test Score} = 60 \\]
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Direction Check:</strong> Vertical axis (\\( 50\\% \\) of students) \\( \\to \\) Ogive \\( \\to \\) Horizontal axis (Median Score).
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4 text-base">You nailed the first step — finding the median position as \\( 50\\% \\) of \\( 100 \\) students \\( = 50 \\) — but you reported the <strong>vertical axis value</strong> instead of reading across to the Test Score!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Misconception: Reporting the Median Position Instead of the Median Score</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>The number \\( 50 \\) on the vertical axis represents the <strong>50th student</strong> (halfway through the \\( 100 \\) students), not their test score:</p>
+                            <div class="text-center font-medium bg-orange-50 py-2 px-3 rounded border border-orange-100">
+                                \\[ \\text{At Test Score} = 50, \\; \\text{only } 30 \\text{ students (30\%) scored } \\le 50 \\]
+                            </div>
+                            <p>To finish the process, trace horizontally from \\( \\text{CF} = 50 \\) across to the ogive point \\( (60, 50) \\) and read down to the horizontal axis:</p>
+                            <div class="text-center font-bold text-orange-800 bg-orange-50 py-2 px-3 rounded border border-orange-100">
+                                \\[ \\text{CF} = 50 \\implies \\text{Median Test Score} = 60 \\]
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Don't Stop Halfway:</strong> Finding \\( \\frac{N}{2} = 50 \\) tells you <em>where</em> to look on the \\( y \\)-axis; the final answer must always be read off the \\( x \\)-axis!
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4 text-base">It looks like you found the halfway value between the lowest and highest test scores on the horizontal axis: \\( \\frac{30 + 80}{2} = 55 \\).</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Misconception: Taking the Midpoint of the Score Range (\\( 30 \\) to \\( 80 \\))</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Finding \\( \\frac{30 + 80}{2} = 55 \\) only gives the <strong>midrange</strong> — it completely ignores how many students actually got each score!</p>
+                            <div class="text-center font-medium bg-purple-50 py-2 px-3 rounded border border-purple-100">
+                                \\[ \\text{At Score} = 55: \\; \\text{CF} = 40 \\text{ students (only } 40\\% \\text{, not } 50\\%\\text{!)} \\]
+                            </div>
+                            <p>Because more students scored in the higher brackets (especially \\( 60\\text{–}70 \\), which has \\( 35 \\) students), the middle student sits higher up at a score of \\( 60 \\).</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Remember:</strong> The median splits the <em>number of students</em> in half (\\( 50 \\) below, \\( 50 \\) above), not the scores from \\( 30 \\) to \\( 80 \\)!
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-4">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-check text-3xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-4 text-left text-base">You found the \\( 50\\% \\) mark on the Cumulative Frequency axis (\\( \\text{CF} = 50 \\)) and correctly traced across to the ogive point \\( (60, 50) \\) and down to the Test Score axis:</p>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-5 font-medium text-base space-y-1.5">
+                            <div>\\[ \\text{Median position} = \\frac{100}{2} = 50 \\text{ students} \\]</div>
+                            <div class="text-green-700 font-bold text-xl border-t pt-2">\\[ \\text{At } (60, 50) \\implies \\text{Median Test Score} = 60 \\]</div>
+                        </div>
+
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Explore Options A, B, and C on the left to see the most common ogive-reading traps, or click <strong>Walkthrough Solution Steps</strong> to view the annotated trace diagram.
+                        </p>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-green-300', 'ring-red-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback
+                emptyState.classList.add('hidden');
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Style feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step solution logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

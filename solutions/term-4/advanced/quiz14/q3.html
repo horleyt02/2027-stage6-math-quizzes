@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Trigonometric Equations (Degrees)</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .graph-svg text {
+            user-select: none;
+        }
+        .axis-label {
+            font-family: 'Times New Roman', Times, serif;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-drafting-compass text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-3 text-gray-800 font-medium">
+                    Consider the following equation for \( -180^\circ \le x \le 180^\circ \):
+                </p>
+                
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-5 text-center text-2xl">
+                    \[ 2\cos x + 1 = 0 \]
+                </div>
+
+                <p class="mb-5 text-gray-800 font-medium">What is the solution of the equation?</p>
+                
+                <div class="grid grid-cols-1 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( x = -120^\circ, \; 120^\circ \)</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( x = -60^\circ, \; 60^\circ \)</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( x = 120^\circ, \; 240^\circ \)</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow overflow-x-auto py-1 flex justify-center text-xl">\( x = 60^\circ, \; 300^\circ \)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Worked Solution Section -->
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1: Isolate cos(x) and Find Related Angle -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 1: Isolate \( \cos x \) and Find the Reference Angle</p>
+                        <p class="text-gray-700 text-sm">Rearrange \( 2\cos x + 1 = 0 \) to make \( \cos x \) the subject:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto space-y-2">
+                            <div>\[ 2\cos x = -1 \implies \cos x = -\frac{1}{2} \]</div>
+                            <div class="text-sm text-gray-600 border-t pt-2">Ignore the negative sign first to find the acute related angle:</div>
+                            <div class="text-blue-900 font-bold">\[ \cos\alpha = \frac{1}{2} \implies \alpha = 60^\circ \]</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: ASTC Unit Circle & Quadrants -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 2: Locate the Quadrants on the ASTC Unit Circle</p>
+                        <p class="text-gray-700 text-sm mb-3">Since \( \cos x = -\frac{1}{2} < 0 \), the solutions lie in <strong>Quadrant 2</strong> and <strong>Quadrant 3</strong>. Within the required domain \( -180^\circ \le x \le 180^\circ \):</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto text-sm space-y-1.5">
+                            <div><strong>Quadrant 2 (anticlockwise):</strong> \( x = 180^\circ - 60^\circ = +120^\circ \)</div>
+                            <div><strong>Quadrant 3 (clockwise):</strong> \( x = -(180^\circ - 60^\circ) = -120^\circ \) <span class="text-gray-500">(or \( 240^\circ - 360^\circ \))</span></div>
+                        </div>
+
+                        <!-- Inline SVG ASTC Unit Circle -->
+                        <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center mt-3">
+                            <div id="unit-circle-diagram" class="w-full max-w-[270px]"></div>
+                            <div class="flex flex-wrap justify-center gap-4 mt-2 text-xs text-gray-600">
+                                <span class="flex items-center">
+                                    <span class="w-3 h-0.5 bg-emerald-600 inline-block mr-1.5"></span>\( +120^\circ \) (Q2)
+                                </span>
+                                <span class="flex items-center">
+                                    <span class="w-3 h-0.5 bg-blue-600 inline-block mr-1.5"></span>\( -120^\circ \) (Q3)
+                                </span>
+                                <span class="flex items-center">
+                                    <span class="w-3 h-0.5 border-t-2 border-dashed border-orange-500 inline-block mr-1.5"></span>\( \cos x = -\frac{1}{2} \)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Verify with Cosine Graph on [-180°, 180°] -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 3: Verify Graphically on \( -180^\circ \le x \le 180^\circ \)</p>
+                        <p class="text-gray-700 text-sm mb-3">Plotting \( y = \cos x \) and the horizontal line \( y = -\frac{1}{2} \) across \( [-180^\circ, 180^\circ] \) confirms both symmetric intersections:</p>
+                        
+                        <!-- Inline SVG Cosine Graph -->
+                        <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center">
+                            <div id="cosine-graph-diagram" class="w-full max-w-[340px]"></div>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-3 shadow-sm overflow-x-auto text-center">
+                            <div class="text-green-700 font-bold text-xl">\[ x = -120^\circ, \; 120^\circ \]</div>
+                        </div>
+                        <p class="mt-2 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option A is the correct choice.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to uncover common sign and domain errors when solving trigonometric equations.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /**
+         * Builds a crisp inline SVG ASTC unit circle highlighting the vertical line
+         * x = -1/2 intersecting the unit circle at +120° (Q2) and -120° (Q3).
+         */
+        function createUnitCircleSVG() {
+            const w = 280;
+            const h = 248;
+            const cx = 140;
+            const cy = 128;
+            const R = 78;
+
+            // Convert standard math angle (degrees, 0 = right, CCW positive) to SVG coords
+            const pt = (r, deg) => {
+                const rad = (deg * Math.PI) / 180;
+                return {
+                    x: cx + r * Math.cos(rad),
+                    y: cy - r * Math.sin(rad)
+                };
+            };
+
+            const p120 = pt(R, 120);   // (-0.5, +sqrt(3)/2)
+            const pNeg120 = pt(R, -120); // (-0.5, -sqrt(3)/2)
+            const xLine = cx - R * 0.5;
+
+            // Angle arc for +120° (CCW from 0° to 120°)
+            const rPos = 26;
+            const aPosStart = pt(rPos, 0);
+            const aPosEnd = pt(rPos, 120);
+            const arcPos = `M ${aPosStart.x.toFixed(1)},${aPosStart.y.toFixed(1)} A ${rPos} ${rPos} 0 0 0 ${aPosEnd.x.toFixed(1)},${aPosEnd.y.toFixed(1)}`;
+
+            // Angle arc for -120° (CW from 0° to -120°)
+            const rNeg = 34;
+            const aNegStart = pt(rNeg, 0);
+            const aNegEnd = pt(rNeg, -120);
+            const arcNeg = `M ${aNegStart.x.toFixed(1)},${aNegStart.y.toFixed(1)} A ${rNeg} ${rNeg} 0 0 1 ${aNegEnd.x.toFixed(1)},${aNegEnd.y.toFixed(1)}`;
+
+            return `
+                <svg viewBox="0 0 ${w} ${h}" class="graph-svg w-full h-auto block" role="img" aria-label="ASTC unit circle showing solutions at +120 degrees and -120 degrees">
+                    <rect x="0" y="0" width="${w}" height="${h}" fill="#ffffff" rx="8"/>
+
+                    <!-- Soft highlight on left semicircle where cos(x) < 0 (Quadrants 2 & 3) -->
+                    <path d="M ${cx},${cy - R} A ${R} ${R} 0 0 0 ${cx},${cy + R} Z" fill="#fef3c7" fill-opacity="0.4"/>
+
+                    <!-- Axes -->
+                    <line x1="26" y1="${cy}" x2="${w - 26}" y2="${cy}" stroke="#64748b" stroke-width="1.2"/>
+                    <polygon points="${w - 20},${cy} ${w - 27},${cy - 3.2} ${w - 27},${cy + 3.2}" fill="#64748b"/>
+                    <line x1="${cx}" y1="${h - 20}" x2="${cx}" y2="24" stroke="#64748b" stroke-width="1.2"/>
+                    <polygon points="${cx},18 ${cx - 3.2},25 ${cx + 3.2},25" fill="#64748b"/>
+
+                    <!-- Unit Circle -->
+                    <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#94a3b8" stroke-width="1.8"/>
+
+                    <!-- ASTC Quadrant Letters -->
+                    <text x="${cx + 50}" y="${cy - 44}" font-size="14" font-weight="800" text-anchor="middle" fill="#cbd5e1">A</text>
+                    <text x="${cx - 56}" y="${cy - 44}" font-size="14" font-weight="800" text-anchor="middle" fill="#b45309" opacity="0.55">S</text>
+                    <text x="${cx - 56}" y="${cy + 56}" font-size="14" font-weight="800" text-anchor="middle" fill="#b45309" opacity="0.55">T</text>
+                    <text x="${cx + 50}" y="${cy + 56}" font-size="14" font-weight="800" text-anchor="middle" fill="#cbd5e1">C</text>
+
+                    <!-- Vertical dashed line x = -1/2 -->
+                    <line x1="${xLine.toFixed(1)}" y1="32" x2="${xLine.toFixed(1)}" y2="${h - 24}" stroke="#f97316" stroke-width="1.7" stroke-dasharray="4,3"/>
+                    <text x="${(xLine - 16).toFixed(1)}" y="${cy + 14}" font-size="9.5" font-weight="700" text-anchor="middle" fill="#c2410c">−½</text>
+
+                    <!-- Terminal Rays -->
+                    <line x1="${cx}" y1="${cy}" x2="${p120.x.toFixed(1)}" y2="${p120.y.toFixed(1)}" stroke="#059669" stroke-width="2.4" stroke-linecap="round"/>
+                    <line x1="${cx}" y1="${cy}" x2="${pNeg120.x.toFixed(1)}" y2="${pNeg120.y.toFixed(1)}" stroke="#2563eb" stroke-width="2.4" stroke-linecap="round"/>
+
+                    <!-- Angle Arcs -->
+                    <path d="${arcPos}" fill="none" stroke="#059669" stroke-width="1.8"/>
+                    <path d="${arcNeg}" fill="none" stroke="#2563eb" stroke-width="1.8"/>
+
+                    <!-- Reference Angle 60° cues -->
+                    <text x="${cx - 32}" y="${cy - 10}" font-size="8.8" font-weight="700" text-anchor="middle" fill="#065f46">60°</text>
+                    <text x="${cx - 32}" y="${cy + 18}" font-size="8.8" font-weight="700" text-anchor="middle" fill="#1d4ed8">60°</text>
+
+                    <!-- Angle Labels near arcs -->
+                    <text x="${cx + 15}" y="${cy - 30}" font-size="9.5" font-weight="700" fill="#059669">+120°</text>
+                    <text x="${cx + 16}" y="${cy + 39}" font-size="9.5" font-weight="700" fill="#2563eb">−120°</text>
+
+                    <!-- Solution Dots & Pill Badges -->
+                    <circle cx="${p120.x.toFixed(1)}" cy="${p120.y.toFixed(1)}" r="4.8" fill="#10b981" stroke="#ffffff" stroke-width="1.6"/>
+                    <rect x="${(p120.x - 42).toFixed(1)}" y="${(p120.y - 25).toFixed(1)}" width="48" height="17" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1"/>
+                    <text x="${(p120.x - 18).toFixed(1)}" y="${(p120.y - 13.5).toFixed(1)}" font-size="9.5" font-weight="700" text-anchor="middle" fill="#065f46">+120°</text>
+
+                    <circle cx="${pNeg120.x.toFixed(1)}" cy="${pNeg120.y.toFixed(1)}" r="4.8" fill="#2563eb" stroke="#ffffff" stroke-width="1.6"/>
+                    <rect x="${(pNeg120.x - 42).toFixed(1)}" y="${(pNeg120.y + 8).toFixed(1)}" width="48" height="17" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1"/>
+                    <text x="${(pNeg120.x - 18).toFixed(1)}" y="${(pNeg120.y + 19.5).toFixed(1)}" font-size="9.5" font-weight="700" text-anchor="middle" fill="#1d4ed8">−120°</text>
+
+                    <!-- Center dot -->
+                    <circle cx="${cx}" cy="${cy}" r="3" fill="#1e293b"/>
+                </svg>
+            `;
+        }
+
+        /**
+         * Builds a crisp inline SVG graph of y = cos(x) and y = -1/2 on [-180°, 180°],
+         * highlighting the two intersection points at x = -120° and x = 120°.
+         */
+        function createCosineGraphSVG() {
+            const w = 340;
+            const h = 195;
+            const xLeft = 34;
+            const xRight = 314;
+            const plotW = xRight - xLeft; // 280px for -180° to 180°
+            const cx = (xLeft + xRight) / 2; // 174 = 0°
+            const axisY = 96;
+            const scaleY = 58;
+
+            const toX = (deg) => cx + (deg / 180) * (plotW / 2);
+            const toY = (y) => axisY - y * scaleY;
+
+            // Sample y = cos(x) from -180° to 180°
+            const pts = [];
+            const steps = 120;
+            for (let i = 0; i <= steps; i++) {
+                const deg = -180 + 360 * (i / steps);
+                const rad = (deg * Math.PI) / 180;
+                pts.push(`${toX(deg).toFixed(2)},${toY(Math.cos(rad)).toFixed(2)}`);
+            }
+            const cosPath = `M ${pts.join(' L ')}`;
+
+            // X-axis tick marks
+            const ticks = [-180, -90, 90, 180];
+            let ticksSVG = '';
+            ticks.forEach(deg => {
+                const px = toX(deg).toFixed(1);
+                ticksSVG += `
+                    <line x1="${px}" y1="30" x2="${px}" y2="162" stroke="#f1f5f9" stroke-width="1"/>
+                    <line x1="${px}" y1="${axisY - 3}" x2="${px}" y2="${axisY + 3}" stroke="#475569" stroke-width="1.1"/>
+                    <text x="${px}" y="${axisY + 15}" font-size="9.2" font-weight="600" text-anchor="middle" fill="#64748b">${deg}°</text>
+                `;
+            });
+
+            const yNegHalf = toY(-0.5);
+            const xNeg120 = toX(-120);
+            const xPos120 = toX(120);
+
+            return `
+                <svg viewBox="0 0 ${w} ${h}" class="graph-svg w-full h-auto block" role="img" aria-label="Graph of y = cos(x) and y = -1/2 intersecting at -120 degrees and 120 degrees">
+                    <rect x="0" y="0" width="${w}" height="${h}" fill="#ffffff" rx="8"/>
+
+                    ${ticksSVG}
+
+                    <!-- Y-axis reference labels -->
+                    <text x="${cx - 7}" y="${(toY(1) + 3.5).toFixed(1)}" font-size="9.5" font-weight="600" text-anchor="end" fill="#64748b">1</text>
+                    <text x="${cx - 7}" y="${(toY(-1) + 3.5).toFixed(1)}" font-size="9.5" font-weight="600" text-anchor="end" fill="#64748b">−1</text>
+
+                    <!-- Axes -->
+                    <line x1="20" y1="${axisY}" x2="${w - 16}" y2="${axisY}" stroke="#334155" stroke-width="1.2"/>
+                    <polygon points="${w - 11},${axisY} ${w - 18},${axisY - 3.2} ${w - 18},${axisY + 3.2}" fill="#334155"/>
+                    <text x="${w - 8}" y="${axisY + 13}" font-size="11.5" class="axis-label" text-anchor="middle" fill="#334155">x</text>
+
+                    <line x1="${cx}" y1="22" x2="${cx}" y2="174" stroke="#334155" stroke-width="1.2"/>
+                    <polygon points="${cx},16 ${cx - 3.2},23 ${cx + 3.2},23" fill="#334155"/>
+                    <text x="${cx + 10}" y="22" font-size="11.5" class="axis-label" text-anchor="middle" fill="#334155">y</text>
+
+                    <!-- Horizontal line y = -1/2 -->
+                    <line x1="${xLeft}" y1="${yNegHalf.toFixed(1)}" x2="${xRight}" y2="${yNegHalf.toFixed(1)}" stroke="#f97316" stroke-width="1.8" stroke-dasharray="5,3.5"/>
+                    <text x="${cx + 22}" y="${(yNegHalf + 13).toFixed(1)}" font-size="9.5" font-weight="700" text-anchor="middle" fill="#ea580c">y = −½</text>
+
+                    <!-- Curve y = cos(x) -->
+                    <path d="${cosPath}" fill="none" stroke="#2563eb" stroke-width="2.3" stroke-linecap="round"/>
+                    <text x="${(toX(42)).toFixed(1)}" y="${(toY(0.95)).toFixed(1)}" font-size="9.8" font-weight="700" fill="#1d4ed8">y = cos x</text>
+
+                    <!-- Dashed vertical connectors to x-axis -->
+                    <line x1="${xNeg120.toFixed(1)}" y1="${yNegHalf.toFixed(1)}" x2="${xNeg120.toFixed(1)}" y2="${axisY}" stroke="#10b981" stroke-width="1.4" stroke-dasharray="3,2.5"/>
+                    <line x1="${xPos120.toFixed(1)}" y1="${yNegHalf.toFixed(1)}" x2="${xPos120.toFixed(1)}" y2="${axisY}" stroke="#10b981" stroke-width="1.4" stroke-dasharray="3,2.5"/>
+
+                    <!-- Intersection Points -->
+                    <circle cx="${xNeg120.toFixed(1)}" cy="${yNegHalf.toFixed(1)}" r="4.8" fill="#10b981" stroke="#ffffff" stroke-width="1.6"/>
+                    <circle cx="${xPos120.toFixed(1)}" cy="${yNegHalf.toFixed(1)}" r="4.8" fill="#10b981" stroke="#ffffff" stroke-width="1.6"/>
+
+                    <!-- Solution Badges -->
+                    <rect x="${(xNeg120 - 22).toFixed(1)}" y="${(axisY - 22).toFixed(1)}" width="44" height="16" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1"/>
+                    <text x="${xNeg120.toFixed(1)}" y="${(axisY - 11).toFixed(1)}" font-size="9.3" font-weight="700" text-anchor="middle" fill="#065f46">−120°</text>
+
+                    <rect x="${(xPos120 - 20).toFixed(1)}" y="${(axisY - 22).toFixed(1)}" width="40" height="16" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1"/>
+                    <text x="${xPos120.toFixed(1)}" y="${(axisY - 11).toFixed(1)}" font-size="9.3" font-weight="700" text-anchor="middle" fill="#065f46">120°</text>
+                </svg>
+            `;
+        }
+
+        // Inject both inline SVGs into the Worked Solution
+        document.getElementById('unit-circle-diagram').innerHTML = createUnitCircleSVG();
+        document.getElementById('cosine-graph-diagram').innerHTML = createCosineGraphSVG();
+
+        // Note: Backslashes are doubled inside JS template literals so MathJax receives valid LaTeX in the DOM.
+        const feedbackData = {
+            'A': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-4 text-left text-base">You rearranged accurately to \\( \\cos x = -\\frac{1}{2} \\), selected Quadrants 2 &amp; 3, and expressed both angles inside the required domain \\( -180^\\circ \\le x \\le 180^\\circ \\):</p>
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6 font-medium text-base space-y-2">
+                            <div>\\[ 2\\cos x + 1 = 0 \\implies \\cos x = -\\frac{1}{2} \\]</div>
+                            <div class="text-green-700 font-bold text-xl border-t pt-2">\\[ x = -120^\\circ, \\; 120^\\circ \\]</div>
+                        </div>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Explore Options B, C, and D on the left to review the classic sign and domain traps, or walk through the solution steps to see the ASTC unit circle and cosine graph.
+                        </p>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4 text-base">You respected the domain \\( -180^\\circ \\le x \\le 180^\\circ \\), but there was a <strong>sign error</strong> when rearranging \\( 2\\cos x + 1 = 0 \\)!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Misconception: Solving \\( \\cos x = +\\frac{1}{2} \\) Instead of \\( -\\frac{1}{2} \\)</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>The angles \\( -60^\\circ \\) and \\( 60^\\circ \\) lie in Quadrants 1 and 4 where cosine is <strong>positive</strong>:</p>
+                            <div class="text-center font-medium bg-red-50 py-2 px-3 rounded border border-red-100">
+                                \\[ 2\\cos(60^\\circ) + 1 = 2\\left(\\frac{1}{2}\\right) + 1 = 2 \\neq 0 \\]
+                            </div>
+                            <p>Subtracting \\( 1 \\) from both sides of \\( 2\\cos x + 1 = 0 \\) gives a <strong>negative</strong> cosine value, which moves the solutions to Quadrants 2 and 3:</p>
+                            <div class="text-center font-bold text-red-800 bg-red-50 py-2 px-3 rounded border border-red-100">
+                                \\[ \\cos x = -\\frac{1}{2} \\implies x = -120^\\circ, \\; 120^\\circ \\]
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Quick Check:</strong> Always substitute one of your answers back into \\( 2\\cos x + 1 \\) to verify it equals \\( 0 \\)!
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4 text-base">Your trigonometry is spot-on — \\( 120^\\circ \\) and \\( 240^\\circ \\) are indeed the solutions to \\( \\cos x = -\\frac{1}{2} \\) in Quadrants 2 &amp; 3 — but check the <strong>domain</strong> given in the question!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Misconception: Using \\( 0^\\circ \\le x \\le 360^\\circ \\) Instead of \\( -180^\\circ \\le x \\le 180^\\circ \\)</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>The question restricts \\( x \\) to <strong>\\( -180^\\circ \\le x \\le 180^\\circ \\)</strong>, so \\( 240^\\circ \\) is <em>outside</em> the allowed domain!</p>
+                            <p>To bring \\( 240^\\circ \\) into \\( [-180^\\circ, 180^\\circ] \\), subtract one full revolution (\\( 360^\\circ \\)):</p>
+                            <div class="text-center font-bold text-orange-800 bg-orange-50 py-2 px-3 rounded border border-orange-100">
+                                \\[ 240^\\circ - 360^\\circ = -120^\\circ \\implies x = -120^\\circ, \\; 120^\\circ \\]
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Domain Alert:</strong> Always underline the domain before writing your final answers — exam questions frequently switch between \\( [0^\\circ, 360^\\circ] \\) and \\( [-180^\\circ, 180^\\circ] \\)!
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: false,
+                title: 'If you chose D...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4 text-base">This option combines <strong>both</strong> classic misunderstandings: a sign error when rearranging the equation <em>and</em> using the wrong domain!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Misconception: Sign Error (\\( +\\frac{1}{2} \\)) &amp; Wrong Domain (\\( [0^\\circ, 360^\\circ] \\))</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <ul class="list-disc list-inside space-y-1.5">
+                                <li><strong>Sign error:</strong> \\( 60^\\circ \\) and \\( 300^\\circ \\) solve \\( \\cos x = +\\frac{1}{2} \\) (Quadrants 1 &amp; 4), whereas \\( 2\\cos x + 1 = 0 \\) gives \\( \\cos x = -\\frac{1}{2} \\) (Quadrants 2 &amp; 3).</li>
+                                <li><strong>Domain error:</strong> \\( 300^\\circ \\) lies outside the required domain \\( -180^\\circ \\le x \\le 180^\\circ \\).</li>
+                            </ul>
+                            <div class="text-center font-bold text-purple-800 bg-purple-50 py-2 px-3 rounded border border-purple-100">
+                                \\[ \\cos x = -\\frac{1}{2} \\text{ on } [-180^\\circ, 180^\\circ] \\implies x = -120^\\circ, \\; 120^\\circ \\]
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Two-Step Habit:</strong> (1) Check the sign of \\( \\cos x \\) carefully, and (2) verify every final angle fits inside the stated domain!
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-green-300', 'ring-red-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback
+                emptyState.classList.add('hidden');
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Style feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step solution logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
