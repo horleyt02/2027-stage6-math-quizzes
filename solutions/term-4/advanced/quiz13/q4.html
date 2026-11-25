@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solution Explorer - Probability Events</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax for rendering mathematical notation -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .step-container {
+            transition: all 0.4s ease;
+        }
+        .step-hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .step-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .correct-answer {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .incorrect-answer {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .diagram-svg text {
+            user-select: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- LEFT COLUMN: Problem, Options, and Worked Solution -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full border border-gray-200">
+            <div class="flex items-center mb-4 border-b pb-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                    <i class="fas fa-drafting-compass text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-800">Problem</h1>
+            </div>
+            
+            <div class="mb-8 text-lg">
+                <p class="mb-6 text-gray-800 font-medium">
+                    Given \( P(A) = 0.3 \), \( P(B) = 0.6 \), and \( P(A \cap B) = 0.2 \), which of the following correctly describes the events \( A \) and \( B \)?
+                </p>
+                
+                <div class="grid grid-cols-1 gap-4" id="multiple-choice">
+                    <!-- Option A -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-base sm:text-lg flex items-center" data-value="A">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">A</span>
+                        </div>
+                        <span class="flex-grow py-1">\( A \) and \( B \) are mutually exclusive and independent</span>
+                    </button>
+                    <!-- Option B -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-base sm:text-lg flex items-center" data-value="B">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">B</span>
+                        </div>
+                        <span class="flex-grow py-1">\( A \) and \( B \) are mutually exclusive and non-independent</span>
+                    </button>
+                    <!-- Option C -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-base sm:text-lg flex items-center" data-value="C">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">C</span>
+                        </div>
+                        <span class="flex-grow py-1">\( A \) and \( B \) are non-mutually exclusive and independent</span>
+                    </button>
+                    <!-- Option D -->
+                    <button class="choice-btn p-4 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-left font-medium text-base sm:text-lg flex items-center" data-value="D">
+                        <div class="relative w-8 h-8 flex-shrink-0 mr-4">
+                            <span class="absolute inset-0 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 transition-colors duration-200">D</span>
+                        </div>
+                        <span class="flex-grow py-1">\( A \) and \( B \) are non-mutually exclusive and non-independent</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Worked Solution Section -->
+            <div id="solution-section" class="mt-auto hidden flex-col">
+                <div class="flex items-center mb-4 border-b pb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3 text-green-600">
+                        <i class="fas fa-list-ol text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-green-800">Worked Solution</h2>
+                </div>
+                
+                <div id="solution-steps" class="space-y-4 mb-6">
+                    <!-- Step 1: Test for Mutual Exclusivity + Venn Diagram -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-1">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 1: Test for Mutual Exclusivity</p>
+                        <p class="text-gray-700 text-sm mb-2">Two events \( A \) and \( B \) are <strong>mutually exclusive</strong> if they cannot occur at the same time — meaning their intersection must be zero: \( P(A \cap B) = 0 \).</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-center font-medium overflow-x-auto space-y-1">
+                            <div>\[ P(A \cap B) = 0.2 \neq 0 \]</div>
+                            <div class="text-blue-900 text-sm font-semibold">Since the overlap is non-zero, \( A \) and \( B \) are <strong>non-mutually exclusive</strong>.</div>
+                        </div>
+
+                        <!-- Inline SVG Venn Diagram -->
+                        <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center mt-3">
+                            <div id="venn-diagram" class="w-full max-w-[310px]"></div>
+                            <div class="flex flex-wrap justify-center gap-3 mt-2 text-xs text-gray-600">
+                                <span class="flex items-center">
+                                    <span class="w-3 h-3 rounded-full bg-blue-200 border border-blue-500 inline-block mr-1.5"></span>\( P(A) = 0.1 + 0.2 = 0.3 \)
+                                </span>
+                                <span class="flex items-center">
+                                    <span class="w-3 h-3 rounded-full bg-emerald-200 border border-emerald-500 inline-block mr-1.5"></span>\( P(B) = 0.2 + 0.4 = 0.6 \)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Test for Independence -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-2">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 2: Test for Independence</p>
+                        <p class="text-gray-700 text-sm">Two events \( A \) and \( B \) are <strong>independent</strong> if and only if \( P(A \cap B) = P(A) \times P(B) \). Compare the product with the given intersection:</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm font-medium overflow-x-auto text-center space-y-2">
+                            <div>\[ P(A) \times P(B) = 0.3 \times 0.6 = 0.18 \]</div>
+                            <div class="border-t pt-2">\[ P(A \cap B) = 0.2 \]</div>
+                            <div class="text-blue-900 font-bold border-t pt-2">\[ 0.18 \neq 0.2 \implies P(A \cap B) \neq P(A) \times P(B) \]</div>
+                        </div>
+                        <p class="text-sm text-gray-700">Because the two values are not equal, \( A \) and \( B \) are <strong>non-independent</strong> (dependent).</p>
+                    </div>
+
+                    <!-- Step 3: Combine Both Conclusions -->
+                    <div class="step-container step-hidden bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm" id="step-3">
+                        <p class="font-bold text-gray-500 text-xs tracking-wider mb-2">Step 3: Combine Both Results</p>
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 my-2 shadow-sm text-sm text-gray-800 space-y-2">
+                            <div class="flex items-center">
+                                <i class="fas fa-times-circle text-red-500 mr-2"></i>
+                                <span><strong>Mutually Exclusive?</strong> No — \( P(A \cap B) = 0.2 \neq 0 \) (<strong>non-mutually exclusive</strong>).</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-times-circle text-red-500 mr-2"></i>
+                                <span><strong>Independent?</strong> No — \( 0.3 \times 0.6 = 0.18 \neq 0.2 \) (<strong>non-independent</strong>).</span>
+                            </div>
+                        </div>
+                        <p class="mt-3 text-sm font-semibold text-gray-600"><i class="fas fa-check text-green-600 mr-1"></i> Therefore, Option D is the correct choice.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <button id="next-step-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Walkthrough Solution Steps
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Error Analysis Feedback -->
+        <div class="bg-white rounded-2xl shadow-lg flex flex-col h-full border border-gray-200 overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-microscope text-xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl leading-tight">Error Analysis</h3>
+                        <p class="text-slate-300 text-sm mt-0.5">Misconception Feedback</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="flex-1 p-6 bg-slate-50 flex flex-col relative overflow-y-auto min-h-[400px]">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                    <i class="fas fa-hand-pointer text-4xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium text-gray-500">Select an answer on the left</p>
+                    <p class="text-sm mt-2">Explore the different options to uncover common misconceptions about mutually exclusive and independent events.</p>
+                </div>
+
+                <div id="feedback-content" class="hidden h-full flex flex-col fade-in">
+                    <div id="feedback-title" class="px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider"></div>
+                    <div id="feedback-body" class="text-gray-700 space-y-4 flex-grow text-lg"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /**
+         * Builds a crisp inline SVG Venn diagram for P(A) = 0.3, P(B) = 0.6,
+         * and P(A ∩ B) = 0.2, showing:
+         *  - A only = 0.1
+         *  - A ∩ B = 0.2 (highlighted overlap)
+         *  - B only = 0.4
+         *  - Outside (neither A nor B) = 0.3
+         */
+        function createVennSVG() {
+            const w = 310;
+            const h = 195;
+            const cy = 104;
+            const ax = 114;
+            const bx = 192;
+            const rA = 56;
+            const rB = 68;
+
+            return `
+                <svg viewBox="0 0 ${w} ${h}" class="diagram-svg w-full h-auto block" role="img" aria-label="Venn diagram showing A only 0.1, overlap 0.2, B only 0.4, and outside 0.3">
+                    <defs>
+                        <!-- Clip path to highlight the intersection A ∩ B -->
+                        <clipPath id="clip-circle-a">
+                            <circle cx="${ax}" cy="${cy}" r="${rA}"/>
+                        </clipPath>
+                    </defs>
+
+                    <!-- Sample Space Box S -->
+                    <rect x="8" y="8" width="${w - 16}" height="${h - 16}" rx="12" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.6"/>
+                    <text x="22" y="27" font-size="11" font-weight="700" fill="#64748b">S (Total = 1.0)</text>
+
+                    <!-- Circle A fill -->
+                    <circle cx="${ax}" cy="${cy}" r="${rA}" fill="#bfdbfe" fill-opacity="0.55" stroke="#2563eb" stroke-width="2"/>
+
+                    <!-- Circle B fill -->
+                    <circle cx="${bx}" cy="${cy}" r="${rB}" fill="#a7f3d0" fill-opacity="0.55" stroke="#059669" stroke-width="2"/>
+
+                    <!-- Highlighted Overlap Region A ∩ B -->
+                    <circle cx="${bx}" cy="${cy}" r="${rB}" fill="#818cf8" fill-opacity="0.32" clip-path="url(#clip-circle-a)"/>
+
+                    <!-- Re-draw circle outlines cleanly on top -->
+                    <circle cx="${ax}" cy="${cy}" r="${rA}" fill="none" stroke="#2563eb" stroke-width="2"/>
+                    <circle cx="${bx}" cy="${cy}" r="${rB}" fill="none" stroke="#059669" stroke-width="2"/>
+
+                    <!-- Circle Titles -->
+                    <text x="${ax - 24}" y="38" font-size="13" font-weight="800" text-anchor="middle" fill="#1d4ed8">A</text>
+                    <text x="${bx + 26}" y="32" font-size="13" font-weight="800" text-anchor="middle" fill="#047857">B</text>
+
+                    <!-- Region Values -->
+                    <!-- A only: 0.1 -->
+                    <text x="${ax - 24}" y="${cy + 5}" font-size="14" font-weight="700" text-anchor="middle" fill="#1e3a8a">0.1</text>
+
+                    <!-- Intersection A ∩ B: 0.2 -->
+                    <rect x="131" y="${cy - 13}" width="36" height="24" rx="6" fill="#ffffff" fill-opacity="0.92" stroke="#4f46e5" stroke-width="1.2"/>
+                    <text x="149" y="${cy + 4}" font-size="13.5" font-weight="800" text-anchor="middle" fill="#3730a3">0.2</text>
+
+                    <!-- B only: 0.4 -->
+                    <text x="${bx + 22}" y="${cy + 5}" font-size="14" font-weight="700" text-anchor="middle" fill="#065f46">0.4</text>
+
+                    <!-- Outside value: 0.3 -->
+                    <rect x="20" y="${h - 36}" width="52" height="20" rx="5" fill="#e2e8f0" stroke="#94a3b8" stroke-width="0.9"/>
+                    <text x="46" y="${h - 22.5}" font-size="10.5" font-weight="700" text-anchor="middle" fill="#334155">0.3</text>
+
+                    <!-- Overlap Callout Pill -->
+                    <text x="149" y="${h - 16}" font-size="9.5" font-weight="700" text-anchor="middle" fill="#4338ca">Overlap P(A ∩ B) = 0.2 ≠ 0</text>
+                </svg>
+            `;
+        }
+
+        // Inject the Venn diagram into Step 1
+        document.getElementById('venn-diagram').innerHTML = createVennSVG();
+
+        // Note: Backslashes are doubled inside JS template literals so MathJax receives valid LaTeX in the DOM.
+        const feedbackData = {
+            'A': {
+                isCorrect: false,
+                title: 'If you chose A...',
+                theme: 'red',
+                body: `
+                    <p class="mb-4 text-base">Both parts of this description fail their probability tests — and in fact, two events with non-zero probabilities can <strong>never</strong> be both mutually exclusive and independent!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
+                        <p class="font-bold text-red-800 mb-2">Key Rule: Mutually Exclusive vs. Independent</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Check both definitions against the given values:</p>
+                            <ul class="list-disc list-inside space-y-1.5">
+                                <li><strong>Mutually exclusive</strong> requires \\( P(A \\cap B) = 0 \\), but here \\( P(A \\cap B) = 0.2 \\neq 0 \\).</li>
+                                <li><strong>Independent</strong> requires \\( P(A \\cap B) = P(A) \\times P(B) \\), but \\( 0.3 \\times 0.6 = 0.18 \\neq 0.2 \\).</li>
+                            </ul>
+                            <div class="text-center font-medium bg-red-50 py-2 px-3 rounded border border-red-100">
+                                \\[ \\text{If } P(A) > 0 \\text{ and } P(B) > 0, \\text{ then } P(A)P(B) > 0 \\neq 0 \\]
+                            </div>
+                            <p>So whenever two events have positive probabilities, being mutually exclusive (\\( P(A \\cap B) = 0 \\)) makes independence (\\( P(A \\cap B) = P(A)P(B) > 0 \\)) mathematically impossible!</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Exam Shortcut:</strong> Whenever \\( P(A) > 0 \\) and \\( P(B) > 0 \\), you can immediately eliminate "mutually exclusive and independent"!
+                        </div>
+                    </div>
+                `
+            },
+            'B': {
+                isCorrect: false,
+                title: 'If you chose B...',
+                theme: 'orange',
+                body: `
+                    <p class="mb-4 text-base">You nailed the independence test (\\( 0.3 \\times 0.6 = 0.18 \\neq 0.2 \\), so they are <strong>non-independent</strong>), but double-check what <strong>mutually exclusive</strong> means!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-orange-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-400"></div>
+                        <p class="font-bold text-orange-800 mb-2">Misconception: Forgetting That Mutually Exclusive Means \\( P(A \\cap B) = 0 \\)</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>Mutually exclusive events have <strong>no overlap</strong> on a Venn diagram — they cannot happen together:</p>
+                            <div class="text-center font-medium bg-orange-50 py-2 px-3 rounded border border-orange-100">
+                                \\[ \\text{Mutually exclusive} \\iff P(A \\cap B) = 0 \\]
+                            </div>
+                            <p>Because we are given \\( P(A \\cap B) = 0.2 \\), there is a \\( 20\\% \\) chance both \\( A \\) and \\( B \\) happen together, which means they are <strong>non-mutually exclusive</strong>.</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Quick Check:</strong> Any non-zero value for \\( P(A \\cap B) \\) immediately proves the events are <em>non-mutually exclusive</em>.
+                        </div>
+                    </div>
+                `
+            },
+            'C': {
+                isCorrect: false,
+                title: 'If you chose C...',
+                theme: 'purple',
+                body: `
+                    <p class="mb-4 text-base">You correctly saw that \\( P(A \\cap B) = 0.2 \\neq 0 \\) means the events are <strong>non-mutually exclusive</strong>, but check the independence calculation closely!</p>
+                    
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-purple-400"></div>
+                        <p class="font-bold text-purple-800 mb-2">Misconception: Rounding \\( 0.18 \\) to \\( 0.2 \\) (or Assuming Overlap Means Independent)</p>
+                        <div class="overflow-x-auto space-y-3 text-sm text-gray-700">
+                            <p>To be independent, the intersection must match \\( P(A) \\times P(B) \\) <strong>exactly</strong>:</p>
+                            <div class="text-center font-medium bg-purple-50 py-2 px-3 rounded border border-purple-100">
+                                \\[ P(A) \\times P(B) = 0.3 \\times 0.6 = 0.18 \\]
+                            </div>
+                            <div class="text-center font-bold text-purple-800 bg-purple-50 py-2 px-3 rounded border border-purple-100">
+                                \\[ \\text{Given } P(A \\cap B) = 0.2 \\neq 0.18 \\implies \\text{Non-independent} \\]
+                            </div>
+                            <p>Even though \\( 0.18 \\) is close to \\( 0.2 \\), they are not equal — and simply having a non-zero overlap does not make two events independent.</p>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Precision Check:</strong> Independence is an exact equality test. Since \\( 0.18 \\neq 0.20 \\), knowing \\( B \\) occurred changes the probability of \\( A \\) (\\( P(A|B) = \\frac{0.2}{0.6} = \\frac{1}{3} \\neq 0.3 \\)).
+                        </div>
+                    </div>
+                `
+            },
+            'D': {
+                isCorrect: true,
+                title: 'Excellent Work!',
+                theme: 'green',
+                body: `
+                    <div class="text-center py-6">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-4xl text-green-500"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-green-700 mb-2">Correct!</h4>
+                        <p class="text-gray-600 mb-4 text-left text-base">You applied both probability tests accurately and kept the two concepts cleanly separated:</p>
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6 font-medium text-base text-left space-y-2">
+                            <div><strong>1. Mutual exclusivity test:</strong> \\( P(A \\cap B) = 0.2 \\neq 0 \\implies \\) <em>non-mutually exclusive</em>.</div>
+                            <div><strong>2. Independence test:</strong> \\( P(A) \\times P(B) = 0.3 \\times 0.6 = 0.18 \\neq 0.2 \\implies \\) <em>non-independent</em>.</div>
+                        </div>
+                        <p class="text-sm bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-200 text-left">
+                            <i class="fas fa-info-circle mr-1"></i> Explore Options A, B, and C on the left to review the classic misconceptions between mutually exclusive and independent events, or walk through the solution steps to view the Venn diagram.
+                        </p>
+                    </div>
+                `
+            }
+        };
+
+        let currentStep = 0;
+        const totalSteps = 3;
+        let hasStartedSolution = false;
+
+        const choiceBtns = document.querySelectorAll('.choice-btn');
+        const emptyState = document.getElementById('empty-state');
+        const feedbackContent = document.getElementById('feedback-content');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackBody = document.getElementById('feedback-body');
+        
+        const solutionSection = document.getElementById('solution-section');
+        const nextStepBtn = document.getElementById('next-step-btn');
+
+        choiceBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedValue = this.getAttribute('data-value');
+                const data = feedbackData[selectedValue];
+
+                // Reset all buttons
+                choiceBtns.forEach(b => {
+                    b.classList.remove('correct-answer', 'incorrect-answer', 'border-blue-500', 'ring-2', 'ring-offset-2', 'ring-green-300', 'ring-red-300');
+                    b.classList.add('border-gray-200');
+                    b.querySelector('span.absolute').classList.remove('bg-green-500', 'text-white', 'bg-red-500');
+                    b.querySelector('span.absolute').classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                // Highlight selected button
+                this.classList.remove('border-gray-200');
+                const badge = this.querySelector('span.absolute');
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                
+                if (data.isCorrect) {
+                    this.classList.add('correct-answer', 'ring-2', 'ring-offset-2', 'ring-green-300');
+                    badge.classList.add('bg-green-500', 'text-white');
+                } else {
+                    this.classList.add('incorrect-answer', 'ring-2', 'ring-offset-2', 'ring-red-300');
+                    badge.classList.add('bg-red-500', 'text-white');
+                }
+
+                // Show solution section
+                if (!hasStartedSolution) {
+                    solutionSection.classList.remove('hidden');
+                    solutionSection.classList.add('flex', 'fade-in');
+                    hasStartedSolution = true;
+                }
+
+                // Show feedback
+                emptyState.classList.add('hidden');
+                feedbackContent.classList.remove('fade-in');
+                void feedbackContent.offsetWidth; // Trigger reflow
+                feedbackContent.classList.add('fade-in');
+                feedbackContent.classList.remove('hidden');
+
+                feedbackTitle.textContent = data.title;
+                feedbackBody.innerHTML = data.body;
+
+                // Style feedback title based on theme
+                feedbackTitle.className = 'px-4 py-2 rounded-lg font-bold mb-5 w-max text-sm uppercase tracking-wider';
+                if (data.theme === 'red') feedbackTitle.classList.add('bg-red-100', 'text-red-800');
+                if (data.theme === 'orange') feedbackTitle.classList.add('bg-orange-100', 'text-orange-800');
+                if (data.theme === 'purple') feedbackTitle.classList.add('bg-purple-100', 'text-purple-800');
+                if (data.theme === 'green') feedbackTitle.classList.add('bg-green-100', 'text-green-800');
+
+                // Re-trigger MathJax to process the newly injected HTML content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([feedbackBody]).catch((err) => console.log('MathJax error: ', err));
+                }
+            });
+        });
+
+        // Step-by-step solution logic
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                const stepEl = document.getElementById(`step-${currentStep}`);
+                stepEl.classList.remove('step-hidden');
+                stepEl.classList.add('step-visible');
+                
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Re-trigger MathJax just in case
+                if (window.MathJax) {
+                    MathJax.typesetPromise([stepEl]);
+                }
+                
+                if (currentStep === totalSteps) {
+                    nextStepBtn.classList.add('hidden');
+                } else {
+                    nextStepBtn.innerText = `Show Step ${currentStep + 1}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
